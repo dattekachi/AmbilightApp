@@ -252,4 +252,3 @@ BlackBorder BlackBorderDetector::process_letterbox(const Image<ColorRgb>& image)
 
 	return detectedBorder;
 }
-

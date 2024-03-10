@@ -88,4 +88,3 @@ void SuspendHandler::sleeping(bool sleep)
 		emit SignalHibernate(true, hyperhdr::SystemComponent::SUSPEND);
 	}
 }
-

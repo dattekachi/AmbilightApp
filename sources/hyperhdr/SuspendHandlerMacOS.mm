@@ -100,4 +100,3 @@ SuspendHandler::~SuspendHandler()
 	_macSuspendHandlerInstance = nil;
 	_suspendHandler = nullptr;
 }
-

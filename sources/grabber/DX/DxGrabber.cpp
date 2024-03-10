@@ -2,7 +2,7 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
 *  Project homesite: https://github.com/awawa-dev/HyperHDR
 *
@@ -313,8 +313,6 @@ void DxGrabber::stop()
 		_timer->stop();
 		Info(_log, "Stopped");
 	}
-
-	_retryTimer->stop();
 }
 
 bool DxGrabber::initDirectX(QString selectedDeviceName)

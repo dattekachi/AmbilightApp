@@ -369,19 +369,19 @@ $(document).ready(function ()
 	$('#dash_currv').html(window.currentVersion);
 	$('#dash_instance').html(window.currentHyperHdrInstanceName);
 
-	getReleases(function (callback)
-	{
-		if (callback)
-		{
-			$('#dash_latev').html(window.latestVersion.tag_name);
+	// getReleases(function (callback)
+	// {
+	// 	if (callback)
+	// 	{
+	// 		$('#dash_latev').html(window.latestVersion.tag_name);
 
-			if (compareHyperHdrVersion(window.latestVersion.tag_name, window.currentVersion))
-				$('#versioninforesult').html('<div class="callout callout-warning" style="margin:0px"><a target="_blank" href="' + window.latestVersion.html_url + '">' + $.i18n('dashboard_infobox_message_updatewarning', window.latestVersion.tag_name) + '</a></div>');
-			else
-				$('#versioninforesult').html('<div class="callout callout-success" style="margin:0px">' + $.i18n('dashboard_infobox_message_updatesuccess') + '</div>');
+	// 		if (compareHyperHdrVersion(window.latestVersion.tag_name, window.currentVersion))
+	// 			$('#versioninforesult').html('<div class="callout callout-warning" style="margin:0px"><a target="_blank" href="' + window.latestVersion.html_url + '">' + $.i18n('dashboard_infobox_message_updatewarning', window.latestVersion.tag_name) + '</a></div>');
+	// 		else
+	// 			$('#versioninforesult').html('<div class="callout callout-success" style="margin:0px">' + $.i18n('dashboard_infobox_message_updatesuccess') + '</div>');
 
-		}
-	});
+	// 	}
+	// });
 
 
 	//determine platform

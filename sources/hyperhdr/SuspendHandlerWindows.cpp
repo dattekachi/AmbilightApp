@@ -158,4 +158,3 @@ bool SuspendHandler::nativeEventFilter(const QByteArray& eventType, void* messag
 
 	return false;
 }
-

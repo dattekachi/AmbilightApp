@@ -2,7 +2,7 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
 *  Project homesite: https://github.com/awawa-dev/HyperHDR
 *
@@ -68,7 +68,7 @@ VideoControl::~VideoControl()
 	emit GlobalSignals::getInstance()->SignalRequestComponent(hyperhdr::COMP_VIDEOGRABBER, int(_hyperhdr->getInstanceIndex()), false);
 	emit GlobalSignals::getInstance()->SignalRequestComponent(hyperhdr::COMP_CEC, int(_hyperhdr->getInstanceIndex()), false);
 
-	std::cout << "VideoControl exits now" << std::endl;
+	std::cout << "VideoControl exists now" << std::endl;
 }
 
 bool VideoControl::isCEC()
@@ -93,9 +93,6 @@ void VideoControl::handleUsbImage()
 {
 	Image<ColorRgb> image;
 	QString name;
-
-	if (!_usbCaptEnabled)
-		return;
 	
 	incoming.mutex.lock();
 	{
@@ -112,8 +109,8 @@ void VideoControl::handleUsbImage()
 
 	if (_usbCaptName != name)
 	{
+		_hyperhdr->registerInput(_usbCaptPrio, hyperhdr::COMP_VIDEOGRABBER, "System", name);
 		_usbCaptName = name;
-		_hyperhdr->registerInput(_usbCaptPrio, hyperhdr::COMP_VIDEOGRABBER, "System", _usbCaptName);
 	}
 
 	_alive = true;
@@ -130,7 +127,7 @@ void VideoControl::setUsbCaptureEnable(bool enable)
 	{
 		if (enable)
 		{
-			_hyperhdr->registerInput(_usbCaptPrio, hyperhdr::COMP_VIDEOGRABBER, "System", _usbCaptName);
+			_hyperhdr->registerInput(_usbCaptPrio, hyperhdr::COMP_VIDEOGRABBER);
 			connect(GlobalSignals::getInstance(), &GlobalSignals::SignalNewVideoImage, this, &VideoControl::handleIncomingUsbImage, static_cast<Qt::ConnectionType>(Qt::DirectConnection | Qt::UniqueConnection));
 		}
 		else
@@ -138,6 +135,7 @@ void VideoControl::setUsbCaptureEnable(bool enable)
 			disconnect(GlobalSignals::getInstance(), &GlobalSignals::SignalNewVideoImage, this, &VideoControl::handleIncomingUsbImage);
 			_hyperhdr->clear(_usbCaptPrio);
 			_usbInactiveTimer->stop();
+			_usbCaptName = "";
 		}
 
 		_usbCaptEnabled = enable;

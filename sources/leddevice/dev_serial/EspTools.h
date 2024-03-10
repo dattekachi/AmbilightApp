@@ -4,7 +4,7 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
 *  Project homesite: https://github.com/awawa-dev/HyperHDR
 *
@@ -119,7 +119,7 @@ public:
 						incoming.replace(incoming[i], '*');
 					}
 				QString result = QString(incoming).remove('*').replace('\n', ' ').trimmed();
-				if (result.indexOf("Awa driver", Qt::CaseInsensitive) >= 0)
+				if (result.indexOf("ESP driver", Qt::CaseInsensitive) >= 0)
 				{
 					Info(_log, "DETECTED DEVICE USING HyperSerialEsp8266/HyperSerialESP32/HyperSerialPico FIRMWARE (%s) at %i msec", QSTRING_CSTR(result), int(InternalClock::now() - start));
 					start = 0;

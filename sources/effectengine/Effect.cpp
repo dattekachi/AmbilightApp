@@ -2,7 +2,7 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
 *  Project homesite: https://github.com/awawa-dev/HyperHDR
 *
@@ -283,7 +283,7 @@ std::list<EffectDefinition> Effect::getAvailableEffects()
 {
 	std::list<EffectDefinition> _availableEffects;
 
-	_availableEffects.push_back(Animation4Music_WavesPulse::getDefinition());
+	/*_availableEffects.push_back(Animation4Music_WavesPulse::getDefinition());
 
 	_availableEffects.push_back(Animation4Music_WavesPulseFast::getDefinition());
 
@@ -337,12 +337,12 @@ std::list<EffectDefinition> Effect::getAvailableEffects()
 
 	_availableEffects.push_back(Animation4Music_QuatroGreen::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_QuatroBlue::getDefinition());
+	_availableEffects.push_back(Animation4Music_QuatroBlue::getDefinition());*/
 
 
 
 
-	_availableEffects.push_back(Animation4Music_TestEq::getDefinition());
+	//_availableEffects.push_back(Animation4Music_TestEq::getDefinition());
 
 	_availableEffects.push_back(Animation_AtomicSwirl::getDefinition());
 

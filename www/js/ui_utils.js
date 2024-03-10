@@ -141,49 +141,49 @@ function updateHyperhdrInstanceListing()
 		}
 	}
 
-	let hyperHDRs = window.serverInfo.sessions;
-	if (hyperHDRs != null && hyperHDRs.length > 0)
-	{
-		for(var i = 0; i< hyperHDRs.length; i++)
-			if(hyperHDRs[i].name == "HyperHDR")
-			{				
-				if (i == 0)
-				{
-					if (hasItems)
-						$('#hyperhdr_instances_list').append('<li class="dropdown-divider bg-info" style="border-top-width:2px;"></li>');
-				}
-				else if (hasItems)
-					$('#hyperhdr_instances_list').append('<li class="dropdown-divider bg-info"></li>');
+	// let hyperHDRs = window.serverInfo.sessions;
+	// if (hyperHDRs != null && hyperHDRs.length > 0)
+	// {
+	// 	for(var i = 0; i< hyperHDRs.length; i++)
+	// 		if(hyperHDRs[i].name == "HyperHDR")
+	// 		{				
+	// 			if (i == 0)
+	// 			{
+	// 				if (hasItems)
+	// 					$('#hyperhdr_instances_list').append('<li class="dropdown-divider bg-info" style="border-top-width:2px;"></li>');
+	// 			}
+	// 			else if (hasItems)
+	// 				$('#hyperhdr_instances_list').append('<li class="dropdown-divider bg-info"></li>');
 				
 
-				var hostName = hyperHDRs[i].host;
+	// 			var hostName = hyperHDRs[i].host;
 
-				if (hostName.length > 0)
-				{
-					hostName = hostName.replace(/"/g, "'");
-				}
+	// 			if (hostName.length > 0)
+	// 			{
+	// 				hostName = hostName.replace(/"/g, "'");
+	// 			}
 
-				var html = `<li id="remote_hyperhdrinstance_${i}" class="text-info" data-toggle="tooltip" data-placement="right" title="${hostName}"><a>`+
-						'<div class="d-flex" style="cursor: pointer;">'+							
-							`<div class="flex ps-2 pe-1">`+
-								`<svg xmlns="http://www.w3.org/2000/svg" data-src="svg/button_link.svg" width="16" height="16" fill="currentColor" style="position: relative;top: -2px;"></svg>`+
-							'</div>'+
-							`<div class="flex pe-2">`+
-								`<span class="h-100" style="display: inline-flex; align-items: center;">${hyperHDRs[i].address}:${hyperHDRs[i].port}</span>`+
-							'</div>'+
-						'</div>'+
-					'</a></li>';
-				$('#hyperhdr_instances_list').append(html);
+	// 			var html = `<li id="remote_hyperhdrinstance_${i}" class="text-info" data-toggle="tooltip" data-placement="right" title="${hostName}"><a>`+
+	// 					'<div class="d-flex" style="cursor: pointer;">'+							
+	// 						`<div class="flex ps-2 pe-1">`+
+	// 							`<svg xmlns="http://www.w3.org/2000/svg" data-src="svg/button_link.svg" width="16" height="16" fill="currentColor" style="position: relative;top: -2px;"></svg>`+
+	// 						'</div>'+
+	// 						`<div class="flex pe-2">`+
+	// 							`<span class="h-100" style="display: inline-flex; align-items: center;">${hyperHDRs[i].address}:${hyperHDRs[i].port}</span>`+
+	// 						'</div>'+
+	// 					'</div>'+
+	// 				'</a></li>';
+	// 			$('#hyperhdr_instances_list').append(html);
 
-				const destAddress = `http://${hyperHDRs[i].address}:${hyperHDRs[i].port}`;
-				$(`#remote_hyperhdrinstance_${i}`).off().on("click",function(e){
-					$("#loading_overlay").addClass("overlay");
-					window.location.href = destAddress;
-				});
+	// 			const destAddress = `http://${hyperHDRs[i].address}:${hyperHDRs[i].port}`;
+	// 			$(`#remote_hyperhdrinstance_${i}`).off().on("click",function(e){
+	// 				$("#loading_overlay").addClass("overlay");
+	// 				window.location.href = destAddress;
+	// 			});
 
-				hasItems = true;
-			}		
-	}
+	// 			hasItems = true;
+	// 		}		
+	// }
 
 	
 	if (hasItems)

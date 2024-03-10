@@ -1,6 +1,10 @@
 var storedLang;
-var availLang = ['cs','de','en','es','fr','it','nl','pl','ro','sv','vi','ru','tr','zh-CN'];
-var availLangText = ['Čeština', 'Deutsch', 'English', 'Español', 'Français', 'Italiano', 'Nederlands', 'Polski', 'Română', 'Svenska', 'Tiếng Việt', 'Русский', 'Türkçe', '汉语'];
+// var availLang = ['cs','de','en','es','fr','it','nl','pl','ro','sv','vi','ru','tr','zh-CN'];
+// var availLangText = ['Čeština', 'Deutsch', 'English', 'Español', 'Français', 'Italiano', 'Nederlands', 'Polski', 'Română', 'Svenska', 'Tiếng Việt', 'Русский', 'Türkçe', '汉语'];
+
+var availLang = ['vi', 'en'];
+var availLangText = ['Tiếng Việt', 'English'];
+
 //$.i18n.debug = true;
 
 //Change Password
@@ -53,8 +57,8 @@ $(document).ready( function() {
 		storedLang = getStorage("langcode");
 		if (storedLang == null)
 		{
-			setStorage("langcode", 'auto');
-			storedLang = 'auto';
+			setStorage("langcode", 'vi');
+			storedLang = 'vi';
 			initTrans(storedLang);
 		}
 		else
@@ -65,8 +69,8 @@ $(document).ready( function() {
 	else
 	{
 		showInfoDialog('warning', "Can't store settings", "Your browser doesn't support localStorage. You can't save a specific language setting (fallback to 'auto detection') and access level (fallback to 'default'). Some wizards may be hidden. You could still use the webinterface without further issues");
-		initTrans('auto');
-		storedLang = 'auto';		
+		initTrans('vi');
+		storedLang = 'vi';		
 		$('#btn_setlang').attr("disabled", true);
 	}
 

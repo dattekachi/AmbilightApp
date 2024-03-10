@@ -16,7 +16,7 @@
         <link rel="apple-touch-icon-precomposed" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
 
-        <title data-i18n="general_webui_title">HyperHDR - Web Configuration</title>
+        <title data-i18n="general_webui_title">Ambilight App - Cài Đặt App</title>
 
         <!-- jQuery -->
         <script src="js/lib/jquery.min.js"></script>
@@ -113,7 +113,7 @@
 				<nav class="mt-2">
 				  <ul class="nav nav-pills nav-sidebar nav-child-indent flex-column" data-widget="treeview" role="menu">
 					<li class="nav-item">
-						<p><a href="http://www.hyperhdr.eu/" class="nav-link brand-link logo-switch rounded-0">
+						<p><a href="http://localhost:8090" class="nav-link brand-link logo-switch rounded-0">
 						<img id="left_top_hyperhdr_logo" src="/img/hyperhdr/hyperhdrwhitelogo.png" alt="HyperHDR" class="brand-image-xs logo-xl" style="margin-left:-10px;width: 100%; float: none; max-height: none; height: auto; position: static;">
 						<img src="/img/hyperhdr/small_menu.png" alt="HyperHDR" class="brand-image-xl logo-xs" style="left:8px;">
 						</a></p>
@@ -149,43 +149,45 @@
 						</div>
 					</li>
 					<li><hr class="dropdown-divider mt-2 mb-3"></li>
-					<li class="nav-item">
-						<a href="#overview" class="nav-link system-link"><svg data-src="svg/overview_heartbeat.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_dashboard_token">Overview</p></a>
-					</li>
-					<li class="nav-item">
-						<a href="#general" class="nav-link system-link"><svg data-src="svg/general.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_general_conf_token">General</p></a>
-					</li>
-					<li class="nav-item">					
-						<a href="#light_source" class="nav-link system-link"><svg data-src="svg/light_source.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_leds_conf_token">LED Hardware</p></a>
-					</li>
-					<li class="nav-item">
-						<a href="#grabber" class="nav-link system-link" id="grabber_capturing_menu_item"><svg data-src="svg/capturing.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_grabber_conf_token">Capturing Hardware</p></a>
-					</li>
-					<li class="nav-item">											
-						<a href="#effects" class="nav-link system-link"><svg data-src="svg/effects.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_effect_conf_token">Effects</p></a>
-					</li>
-					<li class="nav-item">																	
-						<a href="#processing" class="nav-link system-link"><svg data-src="svg/image_processing.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_colors_conf_token">Image Processing</p></a>
-					</li>					
-					<li class="nav-item">																	
-						<a href="#remote" class="nav-link system-link"><svg data-src="svg/remote_control.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_remotecontrol_token">Remote Control</p></a>
-					</li>
-					<li class="nav-item">																	
-						<a href="#logs" class="nav-link system-link"><svg data-src="svg/logs.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_logging_token">Log</p></a>
-					</li>					
 					
 					<li class="nav-item">
+						<a href="#overview" class="nav-link system-link"><svg data-src="svg/overview_heartbeat.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_dashboard_token">Tổng quan</p></a>
+					</li>
+					<li class="nav-item">
+						<a href="#general" class="nav-link system-link"><svg data-src="svg/light_source.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_general_conf_token">Quản lí LED</p></a>
+					</li>
+					<li class="nav-item">					
+						<a href="#light_source" class="nav-link system-link"><svg data-src="svg/general.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_leds_conf_token">Cấu hình LED</p></a>
+					</li>
+					
+					<hr>
+
+					<li class="nav-item">											
+						<a href="#effects" class="nav-link system-link"><svg data-src="svg/effects.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_effect_conf_token">Cài đặt hiệu ứng</p></a>
+					</li>
+					<li class="nav-item">																	
+						<a href="#processing" class="nav-link system-link"><svg data-src="svg/image_processing.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_colors_conf_token">Xử lý hình ảnh, màu sắc</p></a>
+					</li>
+
+					<hr>
+
+					<li class="nav-item">
 						<a href="#" class="nav-link">
-							<svg data-src="svg/advanced.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_advanced_token">Advanced</p><svg data-src="svg/main_menu_expander.svg" fill="currentColor" class="svg4hyperhdr leftmenu right"></svg>
+							<svg data-src="svg/advanced.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_advanced_token">Cài đặt nâng cao</p><svg data-src="svg/main_menu_expander.svg" fill="currentColor" class="svg4hyperhdr leftmenu right"></svg>
 						</a>
 						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="#grabber" class="nav-link system-link"><svg data-src="svg/capturing.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_grabber_conf_token">Capturing Hardware</p></a>
+							</li>					
 							<li class="nav-item">																	
-								<a href="#" class="nav-link">
-									<svg data-src="svg/translate.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="language_selector">Language</p><svg data-src="svg/main_menu_expander.svg" fill="currentColor" class="svg4hyperhdr leftmenu right"></svg>
-								</a>
-								<ul id="language_container_menu" class="nav nav-treeview"></ul>
-							</li>
-							
+								<a href="#remote" class="nav-link system-link"><svg data-src="svg/remote_control.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_remotecontrol_token">Bảng điều khiển nhanh</p></a>
+							</li>	
+							<li class="nav-item">																	
+								<a href="#network" class="nav-link system-link"><svg data-src="svg/network_services.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_network_conf_token">Cài đặt mạng</p></a>
+							</li>		
+							<li class="nav-item">																	
+								<a href="#logs" class="nav-link system-link"><svg data-src="svg/logs.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_logging_token">Gỡ Lỗi</p></a>
+							</li>	
 							<li class="nav-item">																	
 								<a href="#" class="nav-link">
 									<svg data-src="svg/misc.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="misc_selector">Misc</p><svg data-src="svg/main_menu_expander.svg" fill="currentColor" class="svg4hyperhdr leftmenu right"></svg>
@@ -206,36 +208,15 @@
 										<a class="nav-link"><svg data-src="svg/change_password.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><span data-i18n="InfoDialog_changePassword_title"></span></a>
 									</li>
 								</ul>
-							</li>
-							<li class="nav-item">																	
-								<a href="#" class="nav-link">
-									<svg data-src="svg/lut.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="LUT_selector">LUT</p><svg data-src="svg/main_menu_expander.svg" fill="currentColor" class="svg4hyperhdr leftmenu right"></svg>
-								</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item">																	
-										<a href="#lut_downloader" class="nav-link system-link"><svg data-src="svg/lut_download.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_grabber_lut">Download LUT</p></a>
-									</li>
-									<li class="nav-item">																	
-										<a href="#grabber_calibration" class="nav-link system-link"><svg data-src="svg/lut_calibration.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_grabber_calibration_token">LUT calibration</p></a>
-									</li>
-									<li class="nav-item">																	
-										<a href="#lut_generator" class="nav-link system-link"><svg data-src="svg/lut_table.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_LUT_generator_token">LUT table</p></a>
-									</li>
-								</ul>
-							</li>
-							<li class="nav-item">																	
-								<a href="#network" class="nav-link system-link"><svg data-src="svg/network_services.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_network_conf_token">Network</p></a>
-							</li>
-							<li class="nav-item">																	
-								<a href="#json_api" class="nav-link system-link"><svg data-src="svg/json_api.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_json_api_token">JSON API</p></a>
-							</li>							
-							<li class="nav-item">																	
-								<a href="#update" class="nav-link system-link"><svg data-src="svg/update.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_update_token">Update</p></a>
-							</li>							
-							<li class="nav-item">																	
-								<a href="#about" class="nav-link system-link"><svg data-src="svg/about.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="main_menu_about_token">About</p></a>
-							</li>												
+							</li>								
 						</ul>
+					</li>
+
+					<li class="nav-item">																	
+						<a href="#" class="nav-link">
+							<svg data-src="svg/translate.svg" fill="currentColor" class="svg4hyperhdr leftmenu"></svg><p data-i18n="language_selector">Ngôn ngữ</p><svg data-src="svg/main_menu_expander.svg" fill="currentColor" class="svg4hyperhdr leftmenu right"></svg>
+						</a>
+						<ul id="language_container_menu" class="nav nav-treeview"></ul>
 					</li>
 				  </ul>
 				</nav>

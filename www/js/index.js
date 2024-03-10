@@ -1,4 +1,7 @@
 var instNameInit = false
+setStorage("suppressMissingLutWarning", "true");
+setStorage("suppressErrorDetectedWarning", "true");
+setStorage("suppressDefaultPwWarning", "true");
 
 function systemLink(e)
 {

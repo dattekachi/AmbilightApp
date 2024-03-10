@@ -30,6 +30,8 @@ public slots:
 	void settings();
 	void setEffect();
 	void clearEfxColor();
+	void runMusicLed();
+	//void restartApp();
 	void setAutorunState();
 
 private slots:
@@ -58,6 +60,8 @@ private:
 	QAction* _colorAction;
 	QAction* _settingsAction;
 	QAction* _clearAction;
+	QAction* _runmusicledAction;
+	//QAction* _restartappAction;
 	QAction* _autorunAction;
 
 	QSystemTrayIcon* _trayIcon;

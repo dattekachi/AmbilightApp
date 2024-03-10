@@ -54,7 +54,7 @@ public slots:
 
 	QVector<QVariantMap> getInstanceData() const;
 
-	bool startInstance(quint8 inst, QObject* caller = nullptr, int tan = 0, bool disableOnStartup = false);
+	bool startInstance(quint8 inst, QObject* caller = nullptr, int tan = 0);
 
 	bool stopInstance(quint8 inst);
 
@@ -99,7 +99,7 @@ private:
 
 	HyperHdrManager(const QString& rootPath, bool readonlyMode);
 
-	void startAll(bool disableOnStartup);
+	void startAll();
 
 	void stopAllonExit();
 

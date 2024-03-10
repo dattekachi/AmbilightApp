@@ -60,7 +60,7 @@ bool ProviderSerial::init(const QJsonObject& deviceConfig)
 		_isAutoDeviceName = _deviceName.toLower() == "auto";
 		_baudRate_Hz = deviceConfig["rate"].toInt();
 		_delayAfterConnect_ms = deviceConfig["delayAfterConnect"].toInt(0);
-		_espHandshake = deviceConfig["espHandshake"].toBool(false);
+		_espHandshake = deviceConfig["espHandshake"].toBool(true);
 		_maxRetry = _devConfig["maxRetry"].toInt(60);
 		_forceSerialDetection = deviceConfig["forceSerialDetection"].toBool(false);
 

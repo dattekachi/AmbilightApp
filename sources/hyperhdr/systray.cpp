@@ -28,6 +28,7 @@
 
 #include "HyperHdrDaemon.h"
 #include "systray.h"
+#include <qprocess.h>
 
 SysTray::SysTray(HyperHdrDaemon* hyperhdrDaemon, quint16 webPort)
 	: QObject(),
@@ -37,6 +38,8 @@ SysTray::SysTray(HyperHdrDaemon* hyperhdrDaemon, quint16 webPort)
 	_colorAction(nullptr),
 	_settingsAction(nullptr),
 	_clearAction(nullptr),
+	_runmusicledAction(nullptr),
+	//_restartappAction(nullptr),
 	_autorunAction(nullptr),
 	_trayIcon(nullptr),
 	_trayIconMenu(nullptr),
@@ -74,6 +77,8 @@ SysTray::~SysTray()
 	delete _colorAction;
 	delete _settingsAction;
 	delete _clearAction;
+	delete _runmusicledAction;
+	//delete _restartappAction;
 	delete _autorunAction;
 
 	delete _trayIcon;
@@ -115,21 +120,29 @@ void SysTray::createTrayIcon()
 	_trayIcon = new QSystemTrayIcon();
 	_trayIcon->setContextMenu(_trayIconMenu);
 
-	_quitAction = new QAction(tr("&Quit"));
+	_quitAction = new QAction(tr("&Thoát"));
 	_quitAction->setIcon(QPixmap(":/quit.svg"));
 	connect(_quitAction, &QAction::triggered, QApplication::instance(), &QApplication::quit);
 
-	_colorAction = new QAction(tr("&Color"));
+	_colorAction = new QAction(tr("&Chọn màu"));
 	_colorAction->setIcon(QPixmap(":/color.svg"));
 	connect(_colorAction, &QAction::triggered, this, &SysTray::showColorDialog);
 
-	_settingsAction = new QAction(tr("&Settings"));
+	_settingsAction = new QAction(tr("&Cài đặt"));
 	_settingsAction->setIcon(QPixmap(":/settings.svg"));
 	connect(_settingsAction, &QAction::triggered, this, &SysTray::settings);
 
-	_clearAction = new QAction(tr("&Clear"));
+	_clearAction = new QAction(tr("&Theo màu màn hình"));
 	_clearAction->setIcon(QPixmap(":/clear.svg"));
 	connect(_clearAction, &QAction::triggered, this, &SysTray::clearEfxColor);
+
+	_runmusicledAction = new QAction(tr("&Mở nháy theo nhạc"));
+	_runmusicledAction->setIcon(QPixmap(":/music.svg"));
+	connect(_runmusicledAction, &QAction::triggered, this, &SysTray::runMusicLed);
+
+	//_restartappAction = new QAction(tr("&Khởi động lại"));
+	//_restartappAction->setIcon(QPixmap(":/quit.svg"));
+	//connect(_restartappAction, &QAction::triggered, this, &SysTray::restartApp);
 
 	std::list<EffectDefinition> efxs;
 
@@ -139,7 +152,7 @@ void SysTray::createTrayIcon()
 
 	_trayIconEfxMenu = new QMenu();
 	_trayIconEfxMenu->setIcon(QPixmap(":/effects.svg"));
-	_trayIconEfxMenu->setTitle(tr("Effects"));
+	_trayIconEfxMenu->setTitle(tr("Chọn hiệu ứng"));
 
 	for (const EffectDefinition& efx : efxs)
 	{
@@ -150,7 +163,7 @@ void SysTray::createTrayIcon()
 	}
 
 #ifdef _WIN32
-	_autorunAction = new QAction(tr("&Disable autostart"));
+	_autorunAction = new QAction(tr("&Tắt tự khởi động"));
 	_autorunAction->setIcon(QPixmap(":/autorun.svg"));
 	connect(_autorunAction, &QAction::triggered, this, &SysTray::setAutorunState);
 
@@ -163,6 +176,8 @@ void SysTray::createTrayIcon()
 	_trayIconMenu->addAction(_colorAction);
 	_trayIconMenu->addMenu(_trayIconEfxMenu);
 	_trayIconMenu->addAction(_clearAction);
+	_trayIconMenu->addAction(_runmusicledAction);
+	//_trayIconMenu->addAction(_restartappAction);
 	_trayIconMenu->addSeparator();
 	_trayIconMenu->addAction(_quitAction);
 }
@@ -173,11 +188,11 @@ bool SysTray::getCurrentAutorunState()
 	QSettings reg("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
 	if (reg.value("Hyperhdr", 0).toString() == qApp->applicationFilePath().replace('/', '\\'))
 	{
-		_autorunAction->setText(tr("&Disable autostart"));
+		_autorunAction->setText(tr("&Tắt tự khởi động"));
 		return true;
 	}
 
-	_autorunAction->setText(tr("&Enable autostart"));
+	_autorunAction->setText(tr("&Bật tự khởi động"));
 	return false;
 }
 #endif
@@ -268,6 +283,26 @@ void SysTray::clearEfxColor()
 	if (_hyperhdr)
 		QUEUE_CALL_1(_hyperhdr.get(), clear, int, 1);
 }
+
+void SysTray::runMusicLed()
+{
+	QString szLedFxPath = "C:\\Program Files\\Ambilight App\\LedFx\\LedFx.exe";
+	QDesktopServices::openUrl(QUrl::fromLocalFile(szLedFxPath));
+}
+
+//void SysTray::restartApp()
+//{
+//	// Khởi động lại ứng dụng hiện tại sau 1 giây
+//	QTimer::singleShot(1000, []() {
+//		QCoreApplication::quit();
+//
+//		// Lấy đường dẫn đến tệp thực thi của ứng dụng hiện tại
+//		QString appPath = QCoreApplication::applicationFilePath();
+//
+//		// Khởi động lại ứng dụng hiện tại
+//		QDesktopServices::openUrl(QUrl::fromLocalFile(appPath));
+//	});
+//}
 
 void SysTray::signalInstanceStateChangedHandler(InstanceState state, quint8 instance, const QString& name)
 {

@@ -308,4 +308,3 @@ void FlatBufferServer::handlerImageReceived(int priority, const Image<ColorRgb>&
 	
 	emit GlobalSignals::getInstance()->SignalSetGlobalImage(priority, image, timeout_ms, origin, clientDescription);
 }
-

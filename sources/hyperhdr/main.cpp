@@ -46,6 +46,8 @@
 #include "detectProcess.h"
 #include "HyperHdrDaemon.h"
 #include "systray.h"
+#include <qprocess.h>
+#include <QDesktopServices>
 
 using namespace commandline;
 
@@ -74,6 +76,7 @@ QCoreApplication* createApplication(int& argc, char* argv[])
 {
 	bool isGuiApp = false;
 	bool forceNoGui = false;
+
 	// command line
 	for (int i = 1; i < argc; ++i)
 	{
@@ -123,8 +126,32 @@ QCoreApplication* createApplication(int& argc, char* argv[])
 	return app;
 }
 
+bool isRunning(const QString& process) {
+	QProcess tasklist;
+	tasklist.start(
+		"tasklist",
+		QStringList() << "/NH"
+		<< "/FO" << "CSV"
+		<< "/FI" << QString("IMAGENAME eq %1").arg(process));
+	tasklist.waitForFinished();
+	QString output = tasklist.readAllStandardOutput();
+	return output.startsWith(QString("\"%1").arg(process));
+}
+
 int main(int argc, char** argv)
 {
+
+	if (isRunning("LedFx.exe")) {
+		QString szAppName = "LedFx.exe";
+		QProcess process;
+		process.setProgram("taskkill");
+		QStringList arguments;
+		arguments << "/F" << "/IM" << szAppName;
+		process.setArguments(arguments);
+		process.start();
+		process.waitForFinished();
+	}
+
 	QStringList params;
 
 	// check if we are running already an instance
@@ -141,6 +168,11 @@ int main(int argc, char** argv)
 	bool isGuiApp = (qobject_cast<QApplication*>(app.data()) != 0 && QSystemTrayIcon::isSystemTrayAvailable());
 
 	DefaultSignalHandler::install();
+
+	if (!isRunning("HyperionScreenCap.exe")) {
+		QString szHyperionScreenCapPath = "C:\\Program Files\\Hyperion Screen Capture\\HyperionScreenCap.exe";
+		QDesktopServices::openUrl(QUrl::fromLocalFile(szHyperionScreenCapPath));
+	}
 
 	// force the locale
 	setlocale(LC_ALL, "C");

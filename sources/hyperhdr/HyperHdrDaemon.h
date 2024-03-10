@@ -172,4 +172,3 @@ private:
 	bool				_isGuiApp;
 	bool				_disableOnStart;
 };
-
