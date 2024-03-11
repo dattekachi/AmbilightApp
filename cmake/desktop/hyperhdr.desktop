@@ -1,11 +1,11 @@
 [Desktop Entry]
 Name=HyperHDR
-GenericName=HyperHDR Ambient Lighting
+GenericName=Ambilight App Lighting
 Comment=HyperHDR mimics the well known Ambilight from Philips
 Icon=/usr/share/pixmaps/hyperhdr/hyperhdr_128.png
 Terminal=false
-TryExec=hyperhdr
-Exec=hyperhdr
+TryExec=ambilightapp
+Exec=ambilightapp
 Type=Application
 StartupNotify=false
 Categories=Application;
