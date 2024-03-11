@@ -46,9 +46,9 @@ if(ENABLE_MQTT)
 endif()
 
 # Executables
-add_subdirectory(ambilightapp)
+add_subdirectory(hyperhdr)
 if (NOT APPLE)
-	add_subdirectory(ambilightapp-remote)
+	add_subdirectory(hyperhdr-remote)
 endif()
 
 
