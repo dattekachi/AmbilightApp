@@ -286,8 +286,14 @@ void SysTray::clearEfxColor()
 
 void SysTray::runMusicLed()
 {
+#ifdef _WIN32
 	QString szLedFxPath = "C:\\Program Files\\Ambilight App\\LedFx\\LedFx.exe";
 	QDesktopServices::openUrl(QUrl::fromLocalFile(szLedFxPath));
+#else
+	QProcess process;
+	process.start("open", QStringList() << "/Applications/Music Led Studio.app");
+	process.waitForFinished();
+#endif
 }
 
 //void SysTray::restartApp()

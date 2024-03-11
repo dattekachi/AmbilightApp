@@ -126,31 +126,38 @@ QCoreApplication* createApplication(int& argc, char* argv[])
 	return app;
 }
 
-bool isRunning(const QString& process) {
-	QProcess tasklist;
-	tasklist.start(
-		"tasklist",
-		QStringList() << "/NH"
-		<< "/FO" << "CSV"
-		<< "/FI" << QString("IMAGENAME eq %1").arg(process));
-	tasklist.waitForFinished();
-	QString output = tasklist.readAllStandardOutput();
-	return output.startsWith(QString("\"%1").arg(process));
-}
+#ifdef _WIN32
+	bool isRunning(const QString& process) {
+		QProcess tasklist;
+		tasklist.start(
+			"tasklist",
+			QStringList() << "/NH"
+			<< "/FO" << "CSV"
+			<< "/FI" << QString("IMAGENAME eq %1").arg(process));
+		tasklist.waitForFinished();
+		QString output = tasklist.readAllStandardOutput();
+		return output.startsWith(QString("\"%1").arg(process));
+	}
+#endif
 
 int main(int argc, char** argv)
 {
 
-	if (isRunning("LedFx.exe")) {
-		QString szAppName = "LedFx.exe";
-		QProcess process;
-		process.setProgram("taskkill");
-		QStringList arguments;
-		arguments << "/F" << "/IM" << szAppName;
-		process.setArguments(arguments);
-		process.start();
-		process.waitForFinished();
-	}
+	#ifdef _WIN32
+		if (isRunning("LedFx.exe")) {
+			QString szAppName = "LedFx.exe";
+			QProcess process;
+			process.setProgram("taskkill");
+			QStringList arguments;
+			arguments << "/F" << "/IM" << szAppName;
+			process.setArguments(arguments);
+			process.start();
+			process.waitForFinished();
+		}
+	#else
+		const char* command = "killall MusicLedStudio_v2";
+		system(command);
+	#endif
 
 	QStringList params;
 
@@ -169,10 +176,12 @@ int main(int argc, char** argv)
 
 	DefaultSignalHandler::install();
 
+#ifdef _WIN32
 	if (!isRunning("HyperionScreenCap.exe")) {
 		QString szHyperionScreenCapPath = "C:\\Program Files\\Hyperion Screen Capture\\HyperionScreenCap.exe";
 		QDesktopServices::openUrl(QUrl::fromLocalFile(szHyperionScreenCapPath));
 	}
+#endif
 
 	// force the locale
 	setlocale(LC_ALL, "C");
