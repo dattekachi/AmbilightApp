@@ -303,7 +303,7 @@ jobs:
 
   publish:
     name: Publish Releases
-    if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
+    # if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
     needs: [windows, macOS]
     runs-on: ubuntu-22.04
     permissions:
