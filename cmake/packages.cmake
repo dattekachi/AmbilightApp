@@ -180,7 +180,7 @@ SET ( CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\hyperhdr.exe")
 SET ( CPACK_NSIS_HELP_LINK "http://www.hyperhdr.eu/")
 SET ( CPACK_NSIS_URL_INFO_ABOUT "https://github.com/awawa-dev/HyperHDR")
 SET ( CPACK_NSIS_MUI_FINISHPAGE_RUN "hyperhdr.exe")
-SET ( CPACK_NSIS_BRANDING_TEXT "AmbilightApp-${HYPERHDR_VERSION}")
+SET ( CPACK_NSIS_BRANDING_TEXT "HyperHDR-${HYPERHDR_VERSION}")
 # custom nsis plugin directory
 SET ( CPACK_NSIS_EXTRA_DEFS "!addplugindir ${CMAKE_SOURCE_DIR}/cmake/nsis/plugins")
 # additional hyperhdr startmenu link, won't be created if the user disables startmenu links
