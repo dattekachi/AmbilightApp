@@ -195,7 +195,7 @@ jobs:
 
       # Upload artifacts (only on tagged commit)
       - name: Upload artifacts
-        # if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
+        if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
             name: release-artifact-${{ matrix.JOB_RUNNER }}      
@@ -203,7 +203,7 @@ jobs:
 
       # Upload artifacts from commit
       - name: Upload artifacts from commit
-        # if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
+        if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
             name: Apple_macOS_${{ matrix.NICE_NAME }}_DMG_installer
@@ -254,7 +254,7 @@ jobs:
 
       # Upload artifacts (only on tagged commit)
       - name: Upload artifacts
-        # if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
+        if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: release-artifact-windows
@@ -262,7 +262,7 @@ jobs:
           
       # Upload artifacts from commit
       - name: Upload artifacts from commit
-        # if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
+        if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: Windows_x64_setup
@@ -303,7 +303,7 @@ jobs:
 
   publish:
     name: Publish Releases
-    # if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
+    if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
     needs: [windows, macOS]
     runs-on: ubuntu-22.04
     permissions:
