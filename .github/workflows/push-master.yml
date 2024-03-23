@@ -187,7 +187,7 @@ jobs:
   publish:
     name: Publish Releases
     if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
-    needs: [Linux, windows, macOS]
+    needs: [windows, macOS]
     runs-on: ubuntu-22.04
     permissions:
       contents: write
