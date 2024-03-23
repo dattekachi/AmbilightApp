@@ -14,13 +14,14 @@ elif [ "$HOME" != "" ]; then
 else
 	# for executing in non ci environment
 	CI_NAME="$(uname -s | tr '[:upper:]' '[:lower:]')"
-fi
+# fi
 
-if [[ "$BUILD_ARCHIVES" == '0' ]]; then
-	IS_ARCHIVE_SKIPPED=" -DDO_NOT_BUILD_ARCHIVES=ON"
-else
-	IS_ARCHIVE_SKIPPED=" -DDO_NOT_BUILD_ARCHIVES=OFF"
-fi
+# if [[ "$BUILD_ARCHIVES" == '0' ]]; then
+# 	IS_ARCHIVE_SKIPPED=" -DDO_NOT_BUILD_ARCHIVES=ON"
+# else
+# 	IS_ARCHIVE_SKIPPED=" -DDO_NOT_BUILD_ARCHIVES=OFF"
+# fi
+IS_ARCHIVE_SKIPPED=" -DDO_NOT_BUILD_ARCHIVES=OFF"
 
 # set environment variables if not exists (debug)
 [ -z "${BUILD_TYPE}" ] && BUILD_TYPE="Release"

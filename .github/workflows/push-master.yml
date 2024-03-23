@@ -137,8 +137,7 @@ jobs:
 
       # Upload artifacts (only on tagged commit)
       - name: Upload artifacts
-        # if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
-        if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
+        if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: release-artifact-windows
