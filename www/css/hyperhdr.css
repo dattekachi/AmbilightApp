@@ -531,8 +531,8 @@ body:not(.dark-mode) .modal-hyperhdr-header {
 }
 
 body:not(.dark-mode) .card-default>.card-header{
-	background-color:#1d9ef0 !important;
-	border-color:#199AEA !important;
+	background-color:#327faf !important;
+	border-color:#307baa !important;
 	color:#FFFFFF !important;
 }
 
