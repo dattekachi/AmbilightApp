@@ -46,7 +46,7 @@
 #include <base/GrabberWrapper.h>
 #include <api/HyperAPI.h>
 #include <utils/ColorSys.h>
-#include <base/HyperHdrManager.h>
+#include <base/AmbilightAppManager.h>
 #include <utils/ColorSpaceCalibration.h>
 
 ColorRgb LutCalibrator::primeColors[] = {
@@ -94,7 +94,7 @@ LutCalibrator::~LutCalibrator()
 {	
 }
 
-void LutCalibrator::incomingCommand(QString rootpath, GrabberWrapper* grabberWrapper, hyperhdr::Components defaultComp, int checksum, ColorRgb startColor, ColorRgb endColor, bool limitedRange, double saturation, double luminance, double gammaR, double gammaG, double gammaB, int coef)
+void LutCalibrator::incomingCommand(QString rootpath, GrabberWrapper* grabberWrapper, ambilightapp::Components defaultComp, int checksum, ColorRgb startColor, ColorRgb endColor, bool limitedRange, double saturation, double luminance, double gammaR, double gammaG, double gammaB, int coef)
 {
 	_rootPath = rootpath;
 
@@ -123,7 +123,7 @@ void LutCalibrator::incomingCommand(QString rootpath, GrabberWrapper* grabberWra
 			{
 				Debug(_log, "Enabling pseudo-HDR mode for calibration to bypass TurboJPEG MJPEG to RGB processing");
 
-				emit GlobalSignals::getInstance()->SignalRequestComponent(hyperhdr::Components::COMP_HDR, -1, true);
+				emit GlobalSignals::getInstance()->SignalRequestComponent(ambilightapp::Components::COMP_HDR, -1, true);
 
 				int hdrEnabled = 0;
 				SAFE_CALL_0_RET(grabberWrapper, getHdrToneMappingEnabled, int, hdrEnabled);
@@ -179,12 +179,12 @@ void LutCalibrator::incomingCommand(QString rootpath, GrabberWrapper* grabberWra
 				_log->enable();
 			}
 
-			if (defaultComp == hyperhdr::COMP_VIDEOGRABBER)
+			if (defaultComp == ambilightapp::COMP_VIDEOGRABBER)
 			{
 				Debug(_log, "Using video grabber as a source");
 				connect(GlobalSignals::getInstance(), &GlobalSignals::SignalNewVideoImage, this, &LutCalibrator::setVideoImage, Qt::ConnectionType::UniqueConnection);
 			}
-			else if (defaultComp == hyperhdr::COMP_SYSTEMGRABBER)
+			else if (defaultComp == ambilightapp::COMP_SYSTEMGRABBER)
 			{
 				Debug(_log, "Using system grabber as a source");
 				connect(GlobalSignals::getInstance(), &GlobalSignals::SignalNewSystemImage, this, &LutCalibrator::setSystemImage, Qt::ConnectionType::UniqueConnection);
@@ -240,7 +240,7 @@ void LutCalibrator::setSystemImage(const QString& name, const Image<ColorRgb>& i
 	handleImage(image);
 }
 
-void LutCalibrator::signalSetGlobalImageHandler(int priority, const Image<ColorRgb>& image, int timeout_ms, hyperhdr::Components origin)
+void LutCalibrator::signalSetGlobalImageHandler(int priority, const Image<ColorRgb>& image, int timeout_ms, ambilightapp::Components origin)
 {
 	handleImage(image);
 }

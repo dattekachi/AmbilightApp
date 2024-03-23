@@ -1,7 +1,7 @@
 // project includes
 #include <mqtt/mqtt.h>
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -10,9 +10,9 @@
 
 #include <api/HyperAPI.h>
 
-// default param %1 is 'HyperHDR', do not edit templates here
-const static QString TEMPLATE_HYPERHDRAPI = QStringLiteral("%1/JsonAPI");
-const static QString TEMPLATE_HYPERHDRAPI_RESPONSE = QStringLiteral("%1/JsonAPI/response");
+// default param %1 is 'Ambilight App', do not edit templates here
+const static QString TEMPLATE_AMBILIGHTAPPAPI = QStringLiteral("%1/JsonAPI");
+const static QString TEMPLATE_AMBILIGHTAPPAPI_RESPONSE = QStringLiteral("%1/JsonAPI/response");
 
 mqtt::mqtt(const QJsonDocument& mqttConfig)
 	: QObject()
@@ -43,12 +43,12 @@ void mqtt::start(QString host, int port, QString username, QString password, boo
 	if (_clientInstance != nullptr)
 		return;
 
-	HYPERHDRAPI = QString(TEMPLATE_HYPERHDRAPI).arg(customTopic);
-	HYPERHDRAPI_RESPONSE = QString(TEMPLATE_HYPERHDRAPI_RESPONSE).arg(customTopic);
+	AMBILIGHTAPPAPI = QString(TEMPLATE_AMBILIGHTAPPAPI).arg(customTopic);
+	AMBILIGHTAPPAPI_RESPONSE = QString(TEMPLATE_AMBILIGHTAPPAPI_RESPONSE).arg(customTopic);
 
 	Debug(_log, "Starting the MQTT connection. Address: %s:%i. Protocol: %s. Authentication: %s, Ignore errors: %s",
 		QSTRING_CSTR(host), port, (is_ssl) ? "SSL" : "NO SSL", (!username.isEmpty() || !password.isEmpty()) ? "YES" : "NO", (ignore_ssl_errors) ? "YES" : "NO");
-	Debug(_log, "MQTT topic: %s, MQTT response: %s", QSTRING_CSTR(HYPERHDRAPI), QSTRING_CSTR(HYPERHDRAPI_RESPONSE));
+	Debug(_log, "MQTT topic: %s, MQTT response: %s", QSTRING_CSTR(AMBILIGHTAPPAPI), QSTRING_CSTR(AMBILIGHTAPPAPI_RESPONSE));
 
 	QHostAddress address(host);
 
@@ -69,7 +69,7 @@ void mqtt::start(QString host, int port, QString username, QString password, boo
 	else
 		_clientInstance = new QMQTT::Client(address, port, this);
 
-	QString clientId = QString("HyperHDR:%1").arg(QHostInfo::localHostName());
+	QString clientId = QString("Ambilight App:%1").arg(QHostInfo::localHostName());
 	_clientInstance->setClientId(clientId);
 
 	if (!username.isEmpty())
@@ -123,7 +123,7 @@ void mqtt::connected()
 
 	if (_clientInstance != nullptr)
 	{
-		_clientInstance->subscribe(HYPERHDRAPI, 2);
+		_clientInstance->subscribe(AMBILIGHTAPPAPI, 2);
 	}
 }
 
@@ -213,7 +213,7 @@ void mqtt::handleSettingsUpdate(settings::type type, const QJsonDocument& config
 
 		_customTopic = obj["custom_topic"].toString().trimmed();
 		if (_customTopic.isEmpty())
-			_customTopic = "HyperHDR";
+			_customTopic = "AmbilightAPP";
 
 		if (_initialized)
 		{
@@ -266,11 +266,11 @@ void mqtt::executeJson(QString origin, const QJsonDocument& input, QJsonDocument
 /////////////////////// Testing ///////////////////////////
 ///////////////////////////////////////////////////////////
 // listener:
-// mosquitto_sub -h localhost -t HyperHDR/JsonAPI/response
+// mosquitto_sub -h localhost -t AmbilightAPP/JsonAPI/response
 // commands:
-// mosquitto_pub -h localhost -t HyperHDR/JsonAPI -m "[{\"command\" : \"clear\", \"priority\" :1}, {\"command\" : \"clear\", \"priority\" :2}]"
-// mosquitto_pub -h localhost -t HyperHDR/JsonAPI -m "[{\"command\":\"componentstate\",\"componentstate\": {\"component\":\"HDR\",\"state\": true } }, {\"command\":\"componentstate\",\"componentstate\": {\"component\":\"HDR\",\"state\": false } }]"
-// mosquitto_pub -h localhost -t HyperHDR/JsonAPI -m "[{\"command\" : \"instance\",\"subcommand\":\"switchTo\",\"instance\":1},{\"command\":\"componentstate\",\"componentstate\":{\"component\":\"LEDDEVICE\",\"state\": false}}]"
+// mosquitto_pub -h localhost -t AmbilightAPP/JsonAPI -m "[{\"command\" : \"clear\", \"priority\" :1}, {\"command\" : \"clear\", \"priority\" :2}]"
+// mosquitto_pub -h localhost -t AmbilightAPP/JsonAPI -m "[{\"command\":\"componentstate\",\"componentstate\": {\"component\":\"HDR\",\"state\": true } }, {\"command\":\"componentstate\",\"componentstate\": {\"component\":\"HDR\",\"state\": false } }]"
+// mosquitto_pub -h localhost -t AmbilightAPP/JsonAPI -m "[{\"command\" : \"instance\",\"subcommand\":\"switchTo\",\"instance\":1},{\"command\":\"componentstate\",\"componentstate\":{\"component\":\"LEDDEVICE\",\"state\": false}}]"
 ///////////////////////////////////////////////////////////
 
 void mqtt::received(const QMQTT::Message& message)
@@ -278,12 +278,12 @@ void mqtt::received(const QMQTT::Message& message)
 	QString topic = message.topic();
 	QString payload = QString().fromUtf8(message.payload());
 
-	if (QString::compare(HYPERHDRAPI, topic) == 0 && payload.length() > 0)
+	if (QString::compare(AMBILIGHTAPPAPI, topic) == 0 && payload.length() > 0)
 	{
 		QJsonParseError error;
 		QJsonDocument doc = QJsonDocument::fromJson(payload.toUtf8(), &error);
 		QMQTT::Message result;
-		result.setTopic(HYPERHDRAPI_RESPONSE);
+		result.setTopic(AMBILIGHTAPPAPI_RESPONSE);
 		result.setQos(2);
 		if (doc.isEmpty())
 			result.setPayload(QString("{\"success\" : false, \"error\" : \"%1 at offset: %2\"}").arg(error.errorString()).arg(error.offset).toUtf8());

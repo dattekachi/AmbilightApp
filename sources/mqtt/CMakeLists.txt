@@ -7,12 +7,12 @@ FILE ( GLOB mqtt_SOURCES "${CURRENT_HEADER_DIR}/*.h"  "${CURRENT_SOURCE_DIR}/*.h
 add_library(mqtt ${mqtt_SOURCES} )
 
 target_link_libraries(mqtt
-	hyperhdr-base
-	hyperhdr-utils
+	ambilightapp-base
+	ambilightapp-utils
 	${QT_LIBRARIES}
 	qmqtt
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers( mqtt REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers( mqtt REUSE_FROM precompiled_ambilightapp_headers)
 endif()

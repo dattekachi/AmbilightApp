@@ -42,7 +42,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 
 #include <QDirIterator>
 #include <QFileInfo>

@@ -7,10 +7,10 @@ FILE ( GLOB SOUNDCAPWINDOWS_SOURCES "${CURRENT_HEADER_DIR}/*.h"  "${CURRENT_SOUR
 add_library(sound-capture-windows ${SOUNDCAPWINDOWS_SOURCES} )
 
 target_link_libraries(sound-capture-windows
-	hyperhdr-base
+	ambilightapp-base
 	${QT_LIBRARIES}
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-	target_precompile_headers(sound-capture-windows REUSE_FROM precompiled_hyperhdr_headers)
+	target_precompile_headers(sound-capture-windows REUSE_FROM precompiled_ambilightapp_headers)
 endif()

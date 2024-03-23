@@ -7,10 +7,10 @@ FILE ( GLOB AVF_SOURCES "${CURRENT_HEADER_DIR}/*.h" "${CURRENT_SOURCE_DIR}/*.cpp
 add_library(AVF-grabber ${AVF_SOURCES} )
 
 target_link_libraries(AVF-grabber
-	hyperhdr-base
+	ambilightapp-base
 	${QT_LIBRARIES}
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(AVF-grabber REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(AVF-grabber REUSE_FROM precompiled_ambilightapp_headers)
 endif()

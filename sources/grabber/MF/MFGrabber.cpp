@@ -50,7 +50,7 @@
 #include <sys/types.h>
 #include <limits.h>
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 
 #include <QDirIterator>
 #include <QFileInfo>
@@ -196,7 +196,7 @@ void MFGrabber::setHdrToneMappingEnabled(int mode)
 				loadLutFile(PixelFormat::RGB24);
 			_MFWorkerManager.Start();
 		}
-		emit SignalSetNewComponentStateToAllInstances(hyperhdr::Components::COMP_HDR, (mode != 0));
+		emit SignalSetNewComponentStateToAllInstances(ambilightapp::Components::COMP_HDR, (mode != 0));
 	}
 	else
 		Debug(_log, "setHdrToneMappingMode nothing changed: %s", (mode == 0) ? "Disabled" : ((mode == 1) ? "Fullscreen" : "Border mode"));
@@ -969,7 +969,7 @@ bool MFGrabber::process_image(const void* frameImageBuffer, int size)
 				QString access = (frameStat.directAccess) ? " (direct)" : "";
 				if (diff >= 59000 && diff <= 65000)
 					emit GlobalSignals::getInstance()->SignalPerformanceNewReport(
-						PerformanceReport(hyperhdr::PerformanceReportType::VIDEO_GRABBER, frameStat.token, this->_actualDeviceName + access, total / qMax(diff / 1000.0, 1.0), av, frameStat.goodFrame, frameStat.badFrame));
+						PerformanceReport(ambilightapp::PerformanceReportType::VIDEO_GRABBER, frameStat.token, this->_actualDeviceName + access, total / qMax(diff / 1000.0, 1.0), av, frameStat.goodFrame, frameStat.badFrame));
 				
 				resetCounter(now);
 
@@ -1037,7 +1037,7 @@ void MFGrabber::newWorkerFrameErrorHandler(unsigned int workerIndex, QString err
 	frameStat.badFrame++;
 	if (error.indexOf(QString(UNSUPPORTED_DECODER)) == 0)
 	{
-		Error(_log, "Unsupported MJPEG/YUV format. Please contact HyperHDR developers! (info: %s)", QSTRING_CSTR(error));
+		Error(_log, "Unsupported MJPEG/YUV format. Please contact Ambilight App developers! (info: %s)", QSTRING_CSTR(error));
 	}
 	//Debug(_log, "Error occured while decoding mjpeg frame %d = %s", sourceCount, QSTRING_CSTR(error));	
 

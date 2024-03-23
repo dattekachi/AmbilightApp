@@ -7,7 +7,7 @@
 #include <db/AuthTable.h>
 #include <db/MetaTable.h>
 
-using namespace hyperhdr;
+using namespace ambilightapp;
 
 AccessManager::AccessManager(QObject* parent, bool readonlyMode)
 	: QObject(parent)
@@ -38,7 +38,7 @@ AccessManager::AccessManager(QObject* parent, bool readonlyMode)
 		_authTable->createUser(DEFAULT_CONFIG_USER, DEFAULT_CONFIG_PASSWORD);
 	}
 
-	// update HyperHDR user token on startup
+	// update Ambilight App user token on startup
 	_authTable->setUserToken(DEFAULT_CONFIG_USER);
 }
 
@@ -156,9 +156,9 @@ bool AccessManager::updateUserPassword(const QString& user, const QString& pw, c
 	return false;
 }
 
-bool AccessManager::resetHyperhdrUser()
+bool AccessManager::resetAmbilightappUser()
 {
-	return _authTable->resetHyperhdrUser();
+	return _authTable->resetAmbilightappUser();
 }
 
 void AccessManager::setNewTokenRequest(QObject* caller, const QString& comment, const QString& id, const int& tan)

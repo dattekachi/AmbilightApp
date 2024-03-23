@@ -27,7 +27,7 @@
 
 #include <utils/Macros.h>
 
-void hyperhdr::THREAD_REMOVER(QString message, QThread* parentThread, QObject* client)
+void ambilightapp::THREAD_REMOVER(QString message, QThread* parentThread, QObject* client)
 {
 	SMARTPOINTER_MESSAGE(message);
 	if (parentThread->isRunning())
@@ -42,7 +42,7 @@ void hyperhdr::THREAD_REMOVER(QString message, QThread* parentThread, QObject* c
 	delete parentThread;
 }
 
-void hyperhdr::THREAD_MULTI_REMOVER(QString message, QThread* parentThread, std::vector<QObject*> clients)
+void ambilightapp::THREAD_MULTI_REMOVER(QString message, QThread* parentThread, std::vector<QObject*> clients)
 {	
 	SMARTPOINTER_MESSAGE(message);
 	if (parentThread->isRunning())
@@ -57,7 +57,7 @@ void hyperhdr::THREAD_MULTI_REMOVER(QString message, QThread* parentThread, std:
 	delete parentThread;
 }
 
-void hyperhdr::SMARTPOINTER_MESSAGE(QString message)
+void ambilightapp::SMARTPOINTER_MESSAGE(QString message)
 {
 	printf("SmartPointer is removing: %s\n", QSTRING_CSTR(message));
 }

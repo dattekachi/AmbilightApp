@@ -25,12 +25,12 @@
 *  SOFTWARE.
 */
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <base/ImageToLedManager.h>
 #include <base/ImageColorAveraging.h>
 #include <blackborder/BlackBorderProcessor.h>
 
-using namespace hyperhdr;
+using namespace ambilightapp;
 
 void ImageToLedManager::registerProcessingUnit(
 	const unsigned width,
@@ -83,20 +83,20 @@ QString ImageToLedManager::mappingTypeToStr(int mappingType)
 	return "multicolor_mean";
 }
 
-ImageToLedManager::ImageToLedManager(const LedString& ledString, HyperHdrInstance* hyperhdr)
-	: QObject(hyperhdr)
-	, _instanceIndex(hyperhdr->getInstanceIndex())
+ImageToLedManager::ImageToLedManager(const LedString& ledString, AmbilightAppInstance* ambilightapp)
+	: QObject(ambilightapp)
+	, _instanceIndex(ambilightapp->getInstanceIndex())
 	, _log(Logger::getInstance(QString("IMAGETOLED_MNG%1").arg(_instanceIndex)))
 	, _ledString(ledString)
-	, _borderProcessor(new BlackBorderProcessor(hyperhdr, this))
+	, _borderProcessor(new BlackBorderProcessor(ambilightapp, this))
 	, _colorAveraging(nullptr)
 	, _mappingType(0)
 	, _sparseProcessing(false)	
 {
 	// init
-	handleSettingsUpdate(settings::type::COLOR, hyperhdr->getSetting(settings::type::COLOR));
+	handleSettingsUpdate(settings::type::COLOR, ambilightapp->getSetting(settings::type::COLOR));
 	// listen for changes in color - ledmapping
-	connect(hyperhdr, &HyperHdrInstance::SignalInstanceSettingsChanged, this, &ImageToLedManager::handleSettingsUpdate);
+	connect(ambilightapp, &AmbilightAppInstance::SignalInstanceSettingsChanged, this, &ImageToLedManager::handleSettingsUpdate);
 
 	for (int i = 0; i < 256; i++)
 		_advanced[i] = i * i;
@@ -226,7 +226,7 @@ void ImageToLedManager::verifyBorder(const Image<ColorRgb>& image)
 
 	if (_borderProcessor->enabled() && _borderProcessor->process(image))
 	{
-		const hyperhdr::BlackBorder border = _borderProcessor->getCurrentBorder();
+		const ambilightapp::BlackBorder border = _borderProcessor->getCurrentBorder();
 
 		if (border.unknown)
 		{

@@ -9,8 +9,8 @@ add_library(database
 )
 
 target_link_libraries(database
-	hyperhdr-base
-	hyperhdr-utils
+	ambilightapp-base
+	ambilightapp-utils
 	Qt${Qt_VERSION}::Core
 	Qt${Qt_VERSION}::Sql
 )
@@ -20,5 +20,5 @@ if (USE_STATIC_QT_PLUGINS)
 endif()
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(database REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(database REUSE_FROM precompiled_ambilightapp_headers)
 endif()

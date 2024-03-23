@@ -7,7 +7,7 @@ FILE ( GLOB V4L2_SOURCES "${CURRENT_HEADER_DIR}/*.h"  "${CURRENT_SOURCE_DIR}/*.c
 add_library(v4l2-grabber ${V4L2_SOURCES} )
 
 target_link_libraries(v4l2-grabber
-	hyperhdr-base
+	ambilightapp-base
 	${QT_LIBRARIES}
 )
 
@@ -15,5 +15,5 @@ target_include_directories(v4l2-grabber PUBLIC ${TURBOJPEG_INCLUDE_DIRS})
 target_link_libraries(v4l2-grabber ${TURBOJPEG_LINK_LIBRARIES})
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(v4l2-grabber REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(v4l2-grabber REUSE_FROM precompiled_ambilightapp_headers)
 endif()

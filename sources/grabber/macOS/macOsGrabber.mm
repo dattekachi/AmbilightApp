@@ -38,7 +38,7 @@
 #include <sys/types.h>
 #include <limits.h>
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 
 #include <QDirIterator>
 #include <QFileInfo>
@@ -65,7 +65,7 @@ macOsGrabber::macOsGrabber(const QString& device, const QString& configurationPa
 	getDevices();
 
 	//
-	activity = [[NSProcessInfo processInfo]beginActivityWithOptions:NSActivityBackground reason : @"HyperHDR background activity"];
+	activity = [[NSProcessInfo processInfo]beginActivityWithOptions:NSActivityBackground reason : @"Ambilight App background activity"];
 	[activity retain] ;
 }
 

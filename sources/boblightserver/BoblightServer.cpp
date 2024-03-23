@@ -5,7 +5,7 @@
 #include <boblightserver/BoblightServer.h>
 #include "BoblightClientConnection.h"
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 
 // qt incl
 #include <QTcpServer>
@@ -13,11 +13,11 @@
 // netUtil
 #include <webserver/WebServer.h>
 
-using namespace hyperhdr;
+using namespace ambilightapp;
 
-BoblightServer::BoblightServer(HyperHdrInstance* hyperhdr, const QJsonDocument& config)
+BoblightServer::BoblightServer(AmbilightAppInstance* ambilightapp, const QJsonDocument& config)
 	: QObject()
-	, _hyperhdr(hyperhdr)
+	, _ambilightapp(ambilightapp)
 	, _server(new QTcpServer(this))
 	, _openConnections()
 	, _priority(0)
@@ -27,7 +27,7 @@ BoblightServer::BoblightServer(HyperHdrInstance* hyperhdr, const QJsonDocument& 
 	Info(_log, "Instance created");
 
 	// listen for component change
-	connect(_hyperhdr, &HyperHdrInstance::SignalRequestComponent, this, &BoblightServer::compStateChangeRequest);
+	connect(_ambilightapp, &AmbilightAppInstance::SignalRequestComponent, this, &BoblightServer::compStateChangeRequest);
 	// listen new connection signal from server
 	connect(_server, &QTcpServer::newConnection, this, &BoblightServer::newConnection);
 
@@ -50,7 +50,7 @@ void BoblightServer::start()
 
 	Info(_log, "Started on port %d", _port);
 
-	_hyperhdr->setNewComponentState(COMP_BOBLIGHTSERVER, _server->isListening());
+	_ambilightapp->setNewComponentState(COMP_BOBLIGHTSERVER, _server->isListening());
 }
 
 void BoblightServer::stop()
@@ -63,7 +63,7 @@ void BoblightServer::stop()
 	_server->close();
 
 	Info(_log, "Stopped");
-	_hyperhdr->setNewComponentState(COMP_BOBLIGHTSERVER, _server->isListening());
+	_ambilightapp->setNewComponentState(COMP_BOBLIGHTSERVER, _server->isListening());
 }
 
 bool BoblightServer::active() const
@@ -71,7 +71,7 @@ bool BoblightServer::active() const
 	return _server->isListening();
 }
 
-void BoblightServer::compStateChangeRequest(hyperhdr::Components component, bool enable)
+void BoblightServer::compStateChangeRequest(ambilightapp::Components component, bool enable)
 {
 	if (component == COMP_BOBLIGHTSERVER)
 	{
@@ -95,8 +95,8 @@ void BoblightServer::newConnection()
 	if (socket != nullptr)
 	{
 		Info(_log, "new connection");
-		_hyperhdr->registerInput(_priority, hyperhdr::COMP_BOBLIGHTSERVER, QString("Boblight@%1").arg(socket->peerAddress().toString()));
-		BoblightClientConnection* connection = new BoblightClientConnection(_hyperhdr, socket, _priority);
+		_ambilightapp->registerInput(_priority, ambilightapp::COMP_BOBLIGHTSERVER, QString("Boblight@%1").arg(socket->peerAddress().toString()));
+		BoblightClientConnection* connection = new BoblightClientConnection(_ambilightapp, socket, _priority);
 		_openConnections.insert(connection);
 
 		// register slot for cleaning up after the connection closed

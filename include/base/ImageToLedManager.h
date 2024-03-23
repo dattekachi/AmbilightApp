@@ -14,14 +14,14 @@
 #include <base/ImageColorAveraging.h>
 #include <blackborder/BlackBorderProcessor.h>
 
-class HyperHdrInstance;
+class AmbilightAppInstance;
 
 class ImageToLedManager : public QObject
 {
 	Q_OBJECT
 
 public:
-	ImageToLedManager(const LedString& ledString, HyperHdrInstance* hyperhdr);
+	ImageToLedManager(const LedString& ledString, AmbilightAppInstance* ambilightapp);
 
 	void setSize(unsigned width, unsigned height);
 	void setLedString(const LedString& ledString);
@@ -58,8 +58,8 @@ private:
 	quint8		_instanceIndex;
 	Logger*		_log;	
 	LedString	_ledString;
-	hyperhdr::BlackBorderProcessor* _borderProcessor;
-	std::unique_ptr<hyperhdr::ImageColorAveraging> _colorAveraging;
+	ambilightapp::BlackBorderProcessor* _borderProcessor;
+	std::unique_ptr<ambilightapp::ImageColorAveraging> _colorAveraging;
 	int		_mappingType;
 	bool	_sparseProcessing;
 	uint16_t _advanced[256];	

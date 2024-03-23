@@ -2,7 +2,7 @@
 
 #include <utils/Image.h>
 
-namespace hyperhdr
+namespace ambilightapp
 {
 	struct BlackBorder
 	{

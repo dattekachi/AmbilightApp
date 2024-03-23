@@ -8,34 +8,34 @@
 	#include <utils/Components.h>
 #endif
 
-class HyperHdrInstance;
+class AmbilightAppInstance;
 
 class ComponentController : public QObject
 {
 	Q_OBJECT
 
 public:
-    ComponentController(HyperHdrInstance* hyperhdr, bool disableOnStartup);
+    ComponentController(AmbilightAppInstance* ambilightapp, bool disableOnStartup);
     virtual ~ComponentController();
 
-	int isComponentEnabled(hyperhdr::Components comp) const;
-	const std::map<hyperhdr::Components, bool>& getComponentsState() const;
+	int isComponentEnabled(ambilightapp::Components comp) const;
+	const std::map<ambilightapp::Components, bool>& getComponentsState() const;
 
 signals:
-	void SignalComponentStateChanged(hyperhdr::Components comp, bool state);
-	void SignalRequestComponent(hyperhdr::Components component, bool enabled);
+	void SignalComponentStateChanged(ambilightapp::Components comp, bool state);
+	void SignalRequestComponent(ambilightapp::Components component, bool enabled);
 
 public slots:
-	void setNewComponentState(hyperhdr::Components comp, bool activated);
+	void setNewComponentState(ambilightapp::Components comp, bool activated);
 	void turnGrabbers(bool activated);
 
 private slots:
-	void handleCompStateChangeRequest(hyperhdr::Components comps, bool activated);
+	void handleCompStateChangeRequest(ambilightapp::Components comps, bool activated);
 
 private:
 	Logger* _log;
-	std::map<hyperhdr::Components, bool> _componentStates;
-	std::map<hyperhdr::Components, bool> _prevComponentStates;
-	std::map<hyperhdr::Components, bool> _prevGrabbers;
+	std::map<ambilightapp::Components, bool> _componentStates;
+	std::map<ambilightapp::Components, bool> _prevComponentStates;
+	std::map<ambilightapp::Components, bool> _prevGrabbers;
 	bool _disableOnStartup;
 };

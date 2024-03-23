@@ -8,13 +8,13 @@
 #include <flatbufserver/FlatBufferConnection.h>
 
 // flatbuffer FBS
-#include "hyperhdr_reply_generated.h"
-#include "hyperhdr_request_generated.h"
+#include "ambilightapp_reply_generated.h"
+#include "ambilightapp_request_generated.h"
 
 FlatBufferConnection::FlatBufferConnection(QObject* parent, const QString& origin, const QString& address, int priority, bool skipReply)
 	: QObject(parent)
-	, _socket((address == HYPERHDR_DOMAIN_SERVER) ? nullptr : new QTcpSocket(this))
-	, _domain((address == HYPERHDR_DOMAIN_SERVER) ? new QLocalSocket(this) : nullptr)
+	, _socket((address == AMBILIGHTAPP_DOMAIN_SERVER) ? nullptr : new QTcpSocket(this))
+	, _domain((address == AMBILIGHTAPP_DOMAIN_SERVER) ? new QLocalSocket(this) : nullptr)
 	, _origin(origin)
 	, _priority(priority)
 	, _prevSocketState(QAbstractSocket::UnconnectedState)
@@ -27,7 +27,7 @@ FlatBufferConnection::FlatBufferConnection(QObject* parent, const QString& origi
 	if (_socket == nullptr)
 		Info(_log, "Connection using local domain socket. Ignoring port.");
 	else
-		Info(_log, "Connection using TCP socket (address != %s)", QSTRING_CSTR(HYPERHDR_DOMAIN_SERVER));
+		Info(_log, "Connection using TCP socket (address != %s)", QSTRING_CSTR(AMBILIGHTAPP_DOMAIN_SERVER));
 
 	if (_socket != nullptr)
 	{
@@ -61,9 +61,9 @@ FlatBufferConnection::FlatBufferConnection(QObject* parent, const QString& origi
 
 	// init connect
 	if (_socket == nullptr)
-		Info(_log, "Connecting to HyperHDR local domain: %s", _host.toStdString().c_str());
+		Info(_log, "Connecting to Ambilight App local domain: %s", _host.toStdString().c_str());
 	else
-		Info(_log, "Connecting to HyperHDR: %s:%d", _host.toStdString().c_str(), _port);
+		Info(_log, "Connecting to Ambilight App: %s:%d", _host.toStdString().c_str(), _port);
 
 	connectToHost();
 
@@ -112,9 +112,9 @@ void FlatBufferConnection::readData()
 		const uint8_t* msgData = reinterpret_cast<const uint8_t*>(msg.constData());
 		flatbuffers::Verifier verifier(msgData, messageSize);
 
-		if (hyperhdrnet::VerifyReplyBuffer(verifier))
+		if (ambilightappnet::VerifyReplyBuffer(verifier))
 		{
-			parseReply(hyperhdrnet::GetReply(msgData));
+			parseReply(ambilightappnet::GetReply(msgData));
 			continue;
 		}
 		Error(_log, "Unable to parse reply");
@@ -141,8 +141,8 @@ void FlatBufferConnection::setSkipReply(bool skip)
 
 void FlatBufferConnection::setRegister(const QString& origin, int priority)
 {
-	auto registerReq = hyperhdrnet::CreateRegister(_builder, _builder.CreateString(QSTRING_CSTR(origin)), priority);
-	auto req = hyperhdrnet::CreateRequest(_builder, hyperhdrnet::Command_Register, registerReq.Union());
+	auto registerReq = ambilightappnet::CreateRegister(_builder, _builder.CreateString(QSTRING_CSTR(origin)), priority);
+	auto req = ambilightappnet::CreateRequest(_builder, ambilightappnet::Command_Register, registerReq.Union());
 
 	_builder.Finish(req);
 	uint32_t size = _builder.GetSize();
@@ -170,8 +170,8 @@ void FlatBufferConnection::setRegister(const QString& origin, int priority)
 
 void FlatBufferConnection::setColor(const ColorRgb& color, int priority, int duration)
 {
-	auto colorReq = hyperhdrnet::CreateColor(_builder, (color.red << 16) | (color.green << 8) | color.blue, duration);
-	auto req = hyperhdrnet::CreateRequest(_builder, hyperhdrnet::Command_Color, colorReq.Union());
+	auto colorReq = ambilightappnet::CreateColor(_builder, (color.red << 16) | (color.green << 8) | color.blue, duration);
+	auto req = ambilightappnet::CreateRequest(_builder, ambilightappnet::Command_Color, colorReq.Union());
 
 	_builder.Finish(req);
 	sendMessage(_builder.GetBufferPointer(), _builder.GetSize());
@@ -204,9 +204,9 @@ void FlatBufferConnection::sendImage(const Image<ColorRgb>& image)
 	_lastSendImage = current;
 
 	auto imgData = _builder.CreateVector(image.rawMem(), image.size());
-	auto rawImg = hyperhdrnet::CreateRawImage(_builder, imgData, image.width(), image.height());
-	auto imageReq = hyperhdrnet::CreateImage(_builder, hyperhdrnet::ImageType_RawImage, rawImg.Union(), -1);
-	auto req = hyperhdrnet::CreateRequest(_builder, hyperhdrnet::Command_Image, imageReq.Union());
+	auto rawImg = ambilightappnet::CreateRawImage(_builder, imgData, image.width(), image.height());
+	auto imageReq = ambilightappnet::CreateImage(_builder, ambilightappnet::ImageType_RawImage, rawImg.Union(), -1);
+	auto req = ambilightappnet::CreateRequest(_builder, ambilightappnet::Command_Image, imageReq.Union());
 
 	_builder.Finish(req);
 	sendMessage(_builder.GetBufferPointer(), _builder.GetSize());
@@ -215,8 +215,8 @@ void FlatBufferConnection::sendImage(const Image<ColorRgb>& image)
 
 void FlatBufferConnection::clear(int priority)
 {
-	auto clearReq = hyperhdrnet::CreateClear(_builder, priority);
-	auto req = hyperhdrnet::CreateRequest(_builder, hyperhdrnet::Command_Clear, clearReq.Union());
+	auto clearReq = ambilightappnet::CreateClear(_builder, priority);
+	auto req = ambilightappnet::CreateRequest(_builder, ambilightappnet::Command_Clear, clearReq.Union());
 
 	_builder.Finish(req);
 	sendMessage(_builder.GetBufferPointer(), _builder.GetSize());
@@ -246,13 +246,13 @@ void FlatBufferConnection::sendMessage(const uint8_t* buffer, uint32_t size)
 		switch (_socket->state())
 		{
 			case QAbstractSocket::UnconnectedState:
-				Info(_log, "No connection to HyperHDR: %s:%d", _host.toStdString().c_str(), _port);
+				Info(_log, "No connection to Ambilight App: %s:%d", _host.toStdString().c_str(), _port);
 				break;
 			case QAbstractSocket::ConnectedState:
-				Info(_log, "Connected to HyperHDR: %s:%d", _host.toStdString().c_str(), _port);
+				Info(_log, "Connected to Ambilight App: %s:%d", _host.toStdString().c_str(), _port);
 				break;
 			default:
-				Debug(_log, "Connecting to HyperHDR: %s:%d", _host.toStdString().c_str(), _port);
+				Debug(_log, "Connecting to Ambilight App: %s:%d", _host.toStdString().c_str(), _port);
 				break;
 		}
 		_prevSocketState = _socket->state();
@@ -266,13 +266,13 @@ void FlatBufferConnection::sendMessage(const uint8_t* buffer, uint32_t size)
 		switch (_domain->state())
 		{
 			case QLocalSocket::UnconnectedState:
-				Info(_log, "No connection to HyperHDR domain: %s", _host.toStdString().c_str());
+				Info(_log, "No connection to Ambilight App domain: %s", _host.toStdString().c_str());
 				break;
 			case QLocalSocket::ConnectedState:
-				Info(_log, "Connected to HyperHDR domain: %s", _host.toStdString().c_str());
+				Info(_log, "Connected to Ambilight App domain: %s", _host.toStdString().c_str());
 				break;
 			default:
-				Debug(_log, "Connecting to HyperHDR domain: %s", _host.toStdString().c_str());
+				Debug(_log, "Connecting to Ambilight App domain: %s", _host.toStdString().c_str());
 				break;
 		}
 		_prevLocalState = _domain->state();
@@ -307,7 +307,7 @@ void FlatBufferConnection::sendMessage(const uint8_t* buffer, uint32_t size)
 	}
 }
 
-bool FlatBufferConnection::parseReply(const hyperhdrnet::Reply* reply)
+bool FlatBufferConnection::parseReply(const ambilightappnet::Reply* reply)
 {
 	_sent = false;
 

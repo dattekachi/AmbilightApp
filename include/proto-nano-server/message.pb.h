@@ -10,17 +10,17 @@
 #endif
 
 /* Enum definitions */
-typedef enum _proto_HyperhdrRequest_Command { 
-    proto_HyperhdrRequest_Command_COLOR = 1, 
-    proto_HyperhdrRequest_Command_IMAGE = 2, 
-    proto_HyperhdrRequest_Command_CLEAR = 3, 
-    proto_HyperhdrRequest_Command_CLEARALL = 4 
-} proto_HyperhdrRequest_Command;
+typedef enum _proto_AmbilightappRequest_Command { 
+    proto_AmbilightappRequest_Command_COLOR = 1, 
+    proto_AmbilightappRequest_Command_IMAGE = 2, 
+    proto_AmbilightappRequest_Command_CLEAR = 3, 
+    proto_AmbilightappRequest_Command_CLEARALL = 4 
+} proto_AmbilightappRequest_Command;
 
-typedef enum _proto_HyperhdrReply_Type { 
-    proto_HyperhdrReply_Type_REPLY = 1, 
-    proto_HyperhdrReply_Type_VIDEO = 2 
-} proto_HyperhdrReply_Type;
+typedef enum _proto_AmbilightappReply_Type { 
+    proto_AmbilightappReply_Type_REPLY = 1, 
+    proto_AmbilightappReply_Type_VIDEO = 2 
+} proto_AmbilightappReply_Type;
 
 /* Struct definitions */
 typedef struct _proto_ClearRequest { 
@@ -38,9 +38,9 @@ typedef struct _proto_ColorRequest {
     int32_t duration; 
 } proto_ColorRequest;
 
-typedef struct _proto_HyperhdrReply { 
+typedef struct _proto_AmbilightappReply { 
     /* Identifies which field is filled in. */
-    proto_HyperhdrReply_Type type; 
+    proto_AmbilightappReply_Type type; 
     /* flag indication success or failure */
     bool has_success;
     bool success; 
@@ -49,13 +49,13 @@ typedef struct _proto_HyperhdrReply {
     /* Proto Messages for video mode */
     bool has_video;
     int32_t video; 
-} proto_HyperhdrReply;
+} proto_AmbilightappReply;
 
-typedef struct _proto_HyperhdrRequest { 
+typedef struct _proto_AmbilightappRequest { 
     /* command specification */
-    proto_HyperhdrRequest_Command command; 
+    proto_AmbilightappRequest_Command command; 
     pb_extension_t *extensions; 
-} proto_HyperhdrRequest;
+} proto_AmbilightappRequest;
 
 typedef struct _proto_ImageRequest { 
     /* priority to use when setting the image */
@@ -86,13 +86,13 @@ extern const pb_extension_type_t proto_ClearRequest_clearRequest; /* field type:
 #endif
 
 /* Helper constants for enums */
-#define _proto_HyperhdrRequest_Command_MIN proto_HyperhdrRequest_Command_COLOR
-#define _proto_HyperhdrRequest_Command_MAX proto_HyperhdrRequest_Command_CLEARALL
-#define _proto_HyperhdrRequest_Command_ARRAYSIZE ((proto_HyperhdrRequest_Command)(proto_HyperhdrRequest_Command_CLEARALL+1))
+#define _proto_AmbilightappRequest_Command_MIN proto_AmbilightappRequest_Command_COLOR
+#define _proto_AmbilightappRequest_Command_MAX proto_AmbilightappRequest_Command_CLEARALL
+#define _proto_AmbilightappRequest_Command_ARRAYSIZE ((proto_AmbilightappRequest_Command)(proto_AmbilightappRequest_Command_CLEARALL+1))
 
-#define _proto_HyperhdrReply_Type_MIN proto_HyperhdrReply_Type_REPLY
-#define _proto_HyperhdrReply_Type_MAX proto_HyperhdrReply_Type_VIDEO
-#define _proto_HyperhdrReply_Type_ARRAYSIZE ((proto_HyperhdrReply_Type)(proto_HyperhdrReply_Type_VIDEO+1))
+#define _proto_AmbilightappReply_Type_MIN proto_AmbilightappReply_Type_REPLY
+#define _proto_AmbilightappReply_Type_MAX proto_AmbilightappReply_Type_VIDEO
+#define _proto_AmbilightappReply_Type_ARRAYSIZE ((proto_AmbilightappReply_Type)(proto_AmbilightappReply_Type_VIDEO+1))
 
 
 #ifdef __cplusplus
@@ -100,27 +100,27 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define proto_HyperhdrRequest_init_default       {_proto_HyperhdrRequest_Command_MIN, NULL}
+#define proto_AmbilightappRequest_init_default       {_proto_AmbilightappRequest_Command_MIN, NULL}
 #define proto_ColorRequest_init_default          {0, 0, false, 0}
 #define proto_ImageRequest_init_default          {0, 0, 0, {{NULL}, NULL}, false, 0}
 #define proto_ClearRequest_init_default          {0}
-#define proto_HyperhdrReply_init_default         {_proto_HyperhdrReply_Type_MIN, false, 0, {{NULL}, NULL}, false, 0}
-#define proto_HyperhdrRequest_init_zero          {_proto_HyperhdrRequest_Command_MIN, NULL}
+#define proto_AmbilightappReply_init_default         {_proto_AmbilightappReply_Type_MIN, false, 0, {{NULL}, NULL}, false, 0}
+#define proto_AmbilightappRequest_init_zero          {_proto_AmbilightappRequest_Command_MIN, NULL}
 #define proto_ColorRequest_init_zero             {0, 0, false, 0}
 #define proto_ImageRequest_init_zero             {0, 0, 0, {{NULL}, NULL}, false, 0}
 #define proto_ClearRequest_init_zero             {0}
-#define proto_HyperhdrReply_init_zero            {_proto_HyperhdrReply_Type_MIN, false, 0, {{NULL}, NULL}, false, 0}
+#define proto_AmbilightappReply_init_zero            {_proto_AmbilightappReply_Type_MIN, false, 0, {{NULL}, NULL}, false, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define proto_ClearRequest_priority_tag          1
 #define proto_ColorRequest_priority_tag          1
 #define proto_ColorRequest_RgbColor_tag          2
 #define proto_ColorRequest_duration_tag          3
-#define proto_HyperhdrReply_type_tag             1
-#define proto_HyperhdrReply_success_tag          2
-#define proto_HyperhdrReply_error_tag            3
-#define proto_HyperhdrReply_video_tag            4
-#define proto_HyperhdrRequest_command_tag        1
+#define proto_AmbilightappReply_type_tag             1
+#define proto_AmbilightappReply_success_tag          2
+#define proto_AmbilightappReply_error_tag            3
+#define proto_AmbilightappReply_video_tag            4
+#define proto_AmbilightappRequest_command_tag        1
 #define proto_ImageRequest_priority_tag          1
 #define proto_ImageRequest_imagewidth_tag        2
 #define proto_ImageRequest_imageheight_tag       3
@@ -131,11 +131,11 @@ extern "C" {
 #define proto_ClearRequest_clearRequest_tag      12
 
 /* Struct field encoding specification for nanopb */
-#define proto_HyperhdrRequest_FIELDLIST(X, a) \
+#define proto_AmbilightappRequest_FIELDLIST(X, a) \
 X(a, STATIC,   REQUIRED, UENUM,    command,           1) \
 X(a, CALLBACK, OPTIONAL, EXTENSION, extensions,       10)
-#define proto_HyperhdrRequest_CALLBACK pb_default_field_callback
-#define proto_HyperhdrRequest_DEFAULT (const pb_byte_t*)"\x08\x01\x00"
+#define proto_AmbilightappRequest_CALLBACK pb_default_field_callback
+#define proto_AmbilightappRequest_DEFAULT (const pb_byte_t*)"\x08\x01\x00"
 
 #define proto_ColorRequest_FIELDLIST(X, a) \
 X(a, STATIC,   REQUIRED, INT32,    priority,          1) \
@@ -158,33 +158,33 @@ X(a, STATIC,   REQUIRED, INT32,    priority,          1)
 #define proto_ClearRequest_CALLBACK NULL
 #define proto_ClearRequest_DEFAULT NULL
 
-#define proto_HyperhdrReply_FIELDLIST(X, a) \
+#define proto_AmbilightappReply_FIELDLIST(X, a) \
 X(a, STATIC,   REQUIRED, UENUM,    type,              1) \
 X(a, STATIC,   OPTIONAL, BOOL,     success,           2) \
 X(a, CALLBACK, OPTIONAL, STRING,   error,             3) \
 X(a, STATIC,   OPTIONAL, INT32,    video,             4)
-#define proto_HyperhdrReply_CALLBACK pb_default_field_callback
-#define proto_HyperhdrReply_DEFAULT (const pb_byte_t*)"\x08\x01\x00"
+#define proto_AmbilightappReply_CALLBACK pb_default_field_callback
+#define proto_AmbilightappReply_DEFAULT (const pb_byte_t*)"\x08\x01\x00"
 
-extern const pb_msgdesc_t proto_HyperhdrRequest_msg;
+extern const pb_msgdesc_t proto_AmbilightappRequest_msg;
 extern const pb_msgdesc_t proto_ColorRequest_msg;
 extern const pb_msgdesc_t proto_ImageRequest_msg;
 extern const pb_msgdesc_t proto_ClearRequest_msg;
-extern const pb_msgdesc_t proto_HyperhdrReply_msg;
+extern const pb_msgdesc_t proto_AmbilightappReply_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
-#define proto_HyperhdrRequest_fields &proto_HyperhdrRequest_msg
+#define proto_AmbilightappRequest_fields &proto_AmbilightappRequest_msg
 #define proto_ColorRequest_fields &proto_ColorRequest_msg
 #define proto_ImageRequest_fields &proto_ImageRequest_msg
 #define proto_ClearRequest_fields &proto_ClearRequest_msg
-#define proto_HyperhdrReply_fields &proto_HyperhdrReply_msg
+#define proto_AmbilightappReply_fields &proto_AmbilightappReply_msg
 
 /* Maximum encoded size of messages (where known) */
 /* proto_ImageRequest_size depends on runtime parameters */
-/* proto_HyperhdrReply_size depends on runtime parameters */
+/* proto_AmbilightappReply_size depends on runtime parameters */
 #define proto_ClearRequest_size                  11
 #define proto_ColorRequest_size                  33
-#define proto_HyperhdrRequest_size               2
+#define proto_AmbilightappRequest_size               2
 
 #ifdef __cplusplus
 } /* extern "C" */

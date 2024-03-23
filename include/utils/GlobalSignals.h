@@ -38,7 +38,7 @@
 #include <utils/PerformanceCounters.h>
 #include <bonjour/DiscoveryRecord.h>
 
-class HyperHdrManager;
+class AmbilightAppManager;
 class AccessManager;
 class SoundCapture;
 class GrabberHelper;
@@ -62,7 +62,7 @@ public:
 	void operator=(GlobalSignals const&) = delete;
 
 signals:
-	void SignalGetInstanceManager(std::shared_ptr<HyperHdrManager>& instanceManager);
+	void SignalGetInstanceManager(std::shared_ptr<AmbilightAppManager>& instanceManager);
 
 	void SignalGetAccessManager(std::shared_ptr<AccessManager>& accessManager);
 
@@ -82,15 +82,15 @@ signals:
 
 	void SignalClearGlobalInput(int priority, bool forceClearAll);
 
-	void SignalSetGlobalImage(int priority, const Image<ColorRgb>& image, int timeout_ms, hyperhdr::Components origin, QString clientDescription);
+	void SignalSetGlobalImage(int priority, const Image<ColorRgb>& image, int timeout_ms, ambilightapp::Components origin, QString clientDescription);
 
-	void SignalSetGlobalColor(int priority, const std::vector<ColorRgb>& ledColor, int timeout_ms, hyperhdr::Components origin, QString clientDescription);
+	void SignalSetGlobalColor(int priority, const std::vector<ColorRgb>& ledColor, int timeout_ms, ambilightapp::Components origin, QString clientDescription);
 
-	void SignalRequestComponent(hyperhdr::Components component, int hyperHdrInd, bool listen);
+	void SignalRequestComponent(ambilightapp::Components component, int hyperHdrInd, bool listen);
 
 	void SignalPerformanceNewReport(PerformanceReport pr);
 
-	void SignalPerformanceStateChanged(bool enabled, hyperhdr::PerformanceReportType type, int id, QString name = "");
+	void SignalPerformanceStateChanged(bool enabled, ambilightapp::PerformanceReportType type, int id, QString name = "");
 
 	void SignalDiscoveryRequestToScan(DiscoveryRecord::Service type);
 

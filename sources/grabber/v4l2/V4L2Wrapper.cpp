@@ -27,7 +27,7 @@
 
 #include <QMetaType>
 #include <grabber/v4l2/V4L2Wrapper.h>
-#include <base/HyperHdrManager.h>
+#include <base/AmbilightAppManager.h>
 
 V4L2Wrapper::V4L2Wrapper(const QString& device,
 	const QString& configurationPath)

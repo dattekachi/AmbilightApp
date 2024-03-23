@@ -32,7 +32,7 @@ InstanceConfig::InstanceConfig(bool master, quint8 instanceIndex, QObject* paren
 		Q_INIT_RESOURCE(resource);
 		try
 		{
-			_schemaJson = QJsonUtils::readSchema(":/hyperhdr-schema");
+			_schemaJson = QJsonUtils::readSchema(":/ambilightapp-schema");
 		}
 		catch (const std::runtime_error& error)
 		{
@@ -158,7 +158,7 @@ bool InstanceConfig::upgradeDB(QJsonObject& dbConfig)
 		return false;
 	}
 
-	// HyperHDR v20 update
+	// Ambilight App v1 update
 	if (version < 2)
 	{
 		auto colorObject = dbConfig["color"].toObject();

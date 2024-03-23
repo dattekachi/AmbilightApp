@@ -14,7 +14,7 @@
 #include <utils/settings.h>
 
 class BoblightClientConnection;
-class HyperHdrInstance;
+class AmbilightAppInstance;
 class QTcpServer;
 
 ///
@@ -27,10 +27,10 @@ class BoblightServer : public QObject
 public:
 	///
 	/// BoblightServer constructor
-	/// @param hyperhdr HyperHDR instance
+	/// @param ambilightapp Ambilight App instance
 	/// @param port port number on which to start listening for connections
 	///
-	BoblightServer(HyperHdrInstance* hyperhdr, const QJsonDocument& config);
+	BoblightServer(AmbilightAppInstance* ambilightapp, const QJsonDocument& config);
 	~BoblightServer() override;
 
 	///
@@ -53,10 +53,10 @@ public slots:
 	///
 	void stop();
 
-	void compStateChangeRequest(hyperhdr::Components component, bool enable);
+	void compStateChangeRequest(ambilightapp::Components component, bool enable);
 
 	///
-	/// @brief Handle settings update from HyperHDR Settingsmanager emit or this constructor
+	/// @brief Handle settings update from Ambilight App Settingsmanager emit or this constructor
 	/// @param type   settingyType from enum
 	/// @param config configuration object
 	///
@@ -75,8 +75,8 @@ private slots:
 	void closedConnection(BoblightClientConnection* connection);
 
 private:
-	/// HyperHdr instance
-	HyperHdrInstance* _hyperhdr;
+	/// AmbilightApp instance
+	AmbilightAppInstance* _ambilightapp;
 
 	/// The TCP server object
 	QTcpServer* _server;
@@ -84,7 +84,7 @@ private:
 	/// List with open connections
 	QSet<BoblightClientConnection*> _openConnections;
 
-	/// hyperhdr priority
+	/// ambilightapp priority
 	int _priority;
 
 	/// Logger instance

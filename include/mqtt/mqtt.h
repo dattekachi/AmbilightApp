@@ -38,9 +38,9 @@ private:
 	void executeJson(QString origin, const QJsonDocument& input, QJsonDocument& result);
 	void initRetry();
 
-	// HyperHDR MQTT topic & reponse path
-	QString			HYPERHDRAPI;
-	QString			HYPERHDRAPI_RESPONSE;
+	// Ambilight App MQTT topic & reponse path
+	QString			AMBILIGHTAPPAPI;
+	QString			AMBILIGHTAPPAPI_RESPONSE;
 
 	QString		_customTopic;
 

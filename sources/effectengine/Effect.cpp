@@ -33,7 +33,7 @@
 // effect engin eincludes
 #include <effectengine/Effect.h>
 #include <utils/Logger.h>
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <effectengine/Animation_RainbowSwirl.h>
 #include <effectengine/Animation_RainbowWaves.h>
 #include <effectengine/Animation_SwirlFast.h>
@@ -94,19 +94,19 @@
 
 #include <utils/GlobalSignals.h>
 
-Effect::Effect(HyperHdrInstance* hyperhdr, int visiblePriority, int priority, int timeout, const EffectDefinition& effect)
+Effect::Effect(AmbilightAppInstance* ambilightapp, int visiblePriority, int priority, int timeout, const EffectDefinition& effect)
 	: QObject()
 	, _visiblePriority(visiblePriority)
 	, _priority(priority)
 	, _timeout(timeout)
-	, _instanceIndex(hyperhdr->getInstanceIndex())
+	, _instanceIndex(ambilightapp->getInstanceIndex())
 	, _name(effect.name)
 	, _effect(effect.factory())
 	, _endTime(-1)
 	, _interrupt(false)
-	, _image(hyperhdr->getLedGridSize(), QImage::Format_ARGB32_Premultiplied)	
+	, _image(ambilightapp->getLedGridSize(), QImage::Format_ARGB32_Premultiplied)	
 	, _timer(this)
-	, _ledCount(hyperhdr->getLedCount())
+	, _ledCount(ambilightapp->getLedCount())
 {
 	_log = Logger::getInstance(QString("EFFECT%1(%2)").arg(_instanceIndex).arg((_name.length() > 9) ? _name.left(6) + "..." : _name));
 

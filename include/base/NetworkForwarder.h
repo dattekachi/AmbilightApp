@@ -21,7 +21,7 @@
 #endif
 
 // Forward declaration
-class HyperHdrInstance;
+class AmbilightAppInstance;
 class QTcpSocket;
 class FlatBufferConnection;
 
@@ -46,12 +46,12 @@ public slots:
 
 private slots:
 	void handleSettingsUpdate(settings::type type, const QJsonDocument& config);
-	void handleCompStateChangeRequest(hyperhdr::Components component, bool enable);
+	void handleCompStateChangeRequest(ambilightapp::Components component, bool enable);
 	void forwardJsonMessage(const QJsonObject& message);
 	void sendJsonMessage(const QJsonObject& message, QTcpSocket* socket);
 
 private:
-	std::weak_ptr<HyperHdrInstance> _instanceZero;
+	std::weak_ptr<AmbilightAppInstance> _instanceZero;
 
 	Logger* _log;
 	QStringList   _jsonSlaves;

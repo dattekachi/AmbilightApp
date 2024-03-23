@@ -11,13 +11,13 @@ include_directories(
 FILE ( GLOB FLATBUFSERVER_SOURCES "${CURRENT_HEADER_DIR}/*.h"  "${CURRENT_SOURCE_DIR}/*.h"  "${CURRENT_SOURCE_DIR}/*.cpp" )
 
 set(Flatbuffer_GENERATED_FBS
-	hyperhdr_reply_generated.h
-	hyperhdr_request_generated.h
+	ambilightapp_reply_generated.h
+	ambilightapp_request_generated.h
 )
 
 set(Flatbuffer_FBS
-	${CURRENT_SOURCE_DIR}/hyperhdr_reply.fbs
-	${CURRENT_SOURCE_DIR}/hyperhdr_request.fbs
+	${CURRENT_SOURCE_DIR}/ambilightapp_reply.fbs
+	${CURRENT_SOURCE_DIR}/ambilightapp_request.fbs
 )
 FOREACH(FBS_FILE ${Flatbuffer_FBS})
 	compile_flattbuffer_schema(${FBS_FILE} ${CMAKE_CURRENT_SOURCE_DIR})
@@ -34,12 +34,12 @@ add_library(flatbufserver
 )
 
 target_link_libraries(flatbufserver
-	hyperhdr-utils
+	ambilightapp-utils
 	flatbuffers
 	Qt${Qt_VERSION}::Network
 	Qt${Qt_VERSION}::Core
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(flatbufserver REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(flatbufserver REUSE_FROM precompiled_ambilightapp_headers)
 endif()

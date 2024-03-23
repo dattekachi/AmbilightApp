@@ -1,6 +1,6 @@
 #pragma once
 
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 
 #ifndef PCH_ENABLED
 	#include <QObject>
@@ -32,7 +32,7 @@ public:
 	~WrapperCEC() override;
 
 public slots:
-	void sourceRequestHandler(hyperhdr::Components component, int hyperHdrInd, bool listen);	
+	void sourceRequestHandler(ambilightapp::Components component, int hyperHdrInd, bool listen);	
 
 signals:
 	void SignalStateChange(bool enabled, QString info);

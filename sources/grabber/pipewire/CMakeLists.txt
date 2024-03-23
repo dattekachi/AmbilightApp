@@ -17,8 +17,8 @@ FILE ( GLOB PIPEWIRE_SOURCES "${CURRENT_HEADER_DIR}/smartPipewire.h" "${CURRENT_
 
 add_library(Pipewire-grabber ${PIPEWIRE_SOURCES} )
 
-target_link_libraries(Pipewire-grabber hyperhdr-base ${QT_LIBRARIES} )
+target_link_libraries(Pipewire-grabber ambilightapp-base ${QT_LIBRARIES} )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(Pipewire-grabber REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(Pipewire-grabber REUSE_FROM precompiled_ambilightapp_headers)
 endif()

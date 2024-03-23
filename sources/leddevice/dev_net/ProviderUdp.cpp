@@ -37,7 +37,7 @@
 #include <QUdpSocket>
 #include <QHostInfo>
 
-// Local HyperHDR includes
+// Local Ambilight App includes
 #include "ProviderUdp.h"
 
 ProviderUdp::ProviderUdp(const QJsonObject& deviceConfig)

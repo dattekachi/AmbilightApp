@@ -170,7 +170,7 @@ signals:
 
 	void SignalCapturingException(const char* err);
 
-	void SignalSetNewComponentStateToAllInstances(hyperhdr::Components component, bool enable);
+	void SignalSetNewComponentStateToAllInstances(ambilightapp::Components component, bool enable);
 
 	void SignalBenchmarkUpdate(int status, QString message);
 

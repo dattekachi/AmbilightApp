@@ -69,9 +69,9 @@ void FlatBufferClient::readyRead()
 		const auto* msgData = reinterpret_cast<const uint8_t*>(msg.constData());
 		flatbuffers::Verifier verifier(msgData, messageSize);
 
-		if (hyperhdrnet::VerifyRequestBuffer(verifier))
+		if (ambilightappnet::VerifyRequestBuffer(verifier))
 		{
-			auto message = hyperhdrnet::GetRequest(msgData);
+			auto message = ambilightappnet::GetRequest(msgData);
 			handleMessage(message);
 			continue;
 		}
@@ -102,40 +102,40 @@ void FlatBufferClient::disconnected()
 	emit SignalClientDisconnected(this);
 }
 
-void FlatBufferClient::handleMessage(const hyperhdrnet::Request* req)
+void FlatBufferClient::handleMessage(const ambilightappnet::Request* req)
 {
 	const void* reqPtr;
 	if ((reqPtr = req->command_as_Color()) != nullptr) {
-		handleColorCommand(static_cast<const hyperhdrnet::Color*>(reqPtr));
+		handleColorCommand(static_cast<const ambilightappnet::Color*>(reqPtr));
 	}
 	else if ((reqPtr = req->command_as_Image()) != nullptr) {
-		handleImageCommand(static_cast<const hyperhdrnet::Image*>(reqPtr));
+		handleImageCommand(static_cast<const ambilightappnet::Image*>(reqPtr));
 	}
 	else if ((reqPtr = req->command_as_Clear()) != nullptr) {
-		handleClearCommand(static_cast<const hyperhdrnet::Clear*>(reqPtr));
+		handleClearCommand(static_cast<const ambilightappnet::Clear*>(reqPtr));
 	}
 	else if ((reqPtr = req->command_as_Register()) != nullptr) {
-		handleRegisterCommand(static_cast<const hyperhdrnet::Register*>(reqPtr));
+		handleRegisterCommand(static_cast<const ambilightappnet::Register*>(reqPtr));
 	}
 	else {
 		sendErrorReply("Received invalid packet.");
 	}
 }
 
-void FlatBufferClient::handleColorCommand(const hyperhdrnet::Color* colorReq)
+void FlatBufferClient::handleColorCommand(const ambilightappnet::Color* colorReq)
 {
 	// extract parameters
 	const int32_t rgbData = colorReq->data();
 	std::vector<ColorRgb> color{ ColorRgb{ uint8_t(qRed(rgbData)), uint8_t(qGreen(rgbData)), uint8_t(qBlue(rgbData)) } };
 
 	// set output
-	emit SignalSetGlobalColor(_priority, color, colorReq->duration(), hyperhdr::Components::COMP_FLATBUFSERVER, _clientDescription);
+	emit SignalSetGlobalColor(_priority, color, colorReq->duration(), ambilightapp::Components::COMP_FLATBUFSERVER, _clientDescription);
 
 	// send reply
 	sendSuccessReply();
 }
 
-void FlatBufferClient::handleRegisterCommand(const hyperhdrnet::Register* regReq)
+void FlatBufferClient::handleRegisterCommand(const ambilightappnet::Register* regReq)
 {
 	if (regReq->priority() < 50 || regReq->priority() > 250)
 	{
@@ -147,7 +147,7 @@ void FlatBufferClient::handleRegisterCommand(const hyperhdrnet::Register* regReq
 	_priority = regReq->priority();
 	_clientDescription = regReq->origin()->c_str() + _clientAddress;
 
-	auto reply = hyperhdrnet::CreateReplyDirect(_builder, nullptr, -1, _priority);
+	auto reply = ambilightappnet::CreateReplyDirect(_builder, nullptr, -1, _priority);
 	_builder.Finish(reply);
 
 	// send reply
@@ -156,7 +156,7 @@ void FlatBufferClient::handleRegisterCommand(const hyperhdrnet::Register* regReq
 	_builder.Clear();
 }
 
-void FlatBufferClient::handleImageCommand(const hyperhdrnet::Image* image)
+void FlatBufferClient::handleImageCommand(const ambilightappnet::Image* image)
 {
 	// extract parameters
 	int duration = image->duration();
@@ -164,7 +164,7 @@ void FlatBufferClient::handleImageCommand(const hyperhdrnet::Image* image)
 	const void* reqPtr;
 	if ((reqPtr = image->data_as_RawImage()) != nullptr)
 	{
-		const auto* img = static_cast<const hyperhdrnet::RawImage*>(reqPtr);
+		const auto* img = static_cast<const ambilightappnet::RawImage*>(reqPtr);
 		const auto& imageData = img->data();
 		const int width = img->width();
 		const int height = img->height();
@@ -178,7 +178,7 @@ void FlatBufferClient::handleImageCommand(const hyperhdrnet::Image* image)
 		Image<ColorRgb> imageDest(width, height);
 		memmove(imageDest.rawMem(), imageData->data(), imageData->size());
 
-		emit SignalImageReceived(_priority, imageDest, duration, hyperhdr::Components::COMP_FLATBUFSERVER, _clientDescription);
+		emit SignalImageReceived(_priority, imageDest, duration, ambilightapp::Components::COMP_FLATBUFSERVER, _clientDescription);
 	}
 
 	// send reply
@@ -186,7 +186,7 @@ void FlatBufferClient::handleImageCommand(const hyperhdrnet::Image* image)
 }
 
 
-void FlatBufferClient::handleClearCommand(const hyperhdrnet::Clear* clear)
+void FlatBufferClient::handleClearCommand(const ambilightappnet::Clear* clear)
 {
 	// extract parameters
 	const int priority = clear->priority();	
@@ -223,7 +223,7 @@ void FlatBufferClient::sendMessage()
 
 void FlatBufferClient::sendSuccessReply()
 {
-	auto reply = hyperhdrnet::CreateReplyDirect(_builder);
+	auto reply = ambilightappnet::CreateReplyDirect(_builder);
 	_builder.Finish(reply);
 
 	// send reply
@@ -235,7 +235,7 @@ void FlatBufferClient::sendSuccessReply()
 void FlatBufferClient::sendErrorReply(const std::string& error)
 {
 	// create reply
-	auto reply = hyperhdrnet::CreateReplyDirect(_builder, error.c_str());
+	auto reply = ambilightappnet::CreateReplyDirect(_builder, error.c_str());
 	_builder.Finish(reply);
 
 	// send reply

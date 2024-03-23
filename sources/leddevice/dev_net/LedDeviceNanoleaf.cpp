@@ -1,4 +1,4 @@
-// Local-HyperHDR includes
+// Local-Ambilight App includes
 #include "LedDeviceNanoleaf.h"
 #include <utils/QStringUtils.h>
 #include <ssdp/SSDPDiscover.h>

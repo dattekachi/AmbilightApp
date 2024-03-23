@@ -34,7 +34,7 @@
 	#include <utils/Logger.h>
 #endif
 
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 #include <utils/PerformanceCounters.h>
 #include <utils/GlobalSignals.h>
 #include <utils/SystemPerformanceCounters.h>
@@ -43,10 +43,10 @@
 	#include <bonjour/DiscoveryWrapper.h>
 #endif
 
-using namespace hyperhdr;
+using namespace ambilightapp;
 
 PerformanceReport::PerformanceReport():
-	type((int)hyperhdr::PerformanceReportType::UNKNOWN),
+	type((int)ambilightapp::PerformanceReportType::UNKNOWN),
 	id(-1),
 	param1(0),
 	param2(0),
@@ -88,7 +88,7 @@ PerformanceReport::PerformanceReport(int _type, qint64 _token, QString _name, do
 PerformanceCounters::PerformanceCounters()
 {
 	qRegisterMetaType<PerformanceReport>();
-	qRegisterMetaType<hyperhdr::PerformanceReportType>("hyperhdr::PerformanceReportType");
+	qRegisterMetaType<ambilightapp::PerformanceReportType>("ambilightapp::PerformanceReportType");
 
 	_system = std::unique_ptr<SystemPerformanceCounters>(new SystemPerformanceCounters());
 

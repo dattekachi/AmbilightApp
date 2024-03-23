@@ -16,7 +16,7 @@ class QLocalServer;
 class FlatBufferClient;
 class NetOrigin;
 
-#define HYPERHDR_DOMAIN_SERVER QStringLiteral("hyperhdr-domain")
+#define AMBILIGHTAPP_DOMAIN_SERVER QStringLiteral("ambilightapp-domain")
 #define BASEAPI_FLATBUFFER_USER_LUT_FILE QStringLiteral("BASEAPI_user_lut_file")
 
 class FlatBufferServer : public QObject
@@ -27,7 +27,7 @@ public:
 	~FlatBufferServer() override;
 
 signals:
-	void SignalSetNewComponentStateToAllInstances(hyperhdr::Components component, bool enable);
+	void SignalSetNewComponentStateToAllInstances(ambilightapp::Components component, bool enable);
 	void SignalImportFromProto(int priority, int duration, const Image<ColorRgb>& image, QString clientDescription);
 
 public slots:
@@ -35,8 +35,8 @@ public slots:
 	void initServer();
 	int getHdrToneMappingEnabled();
 	void handlerImportFromProto(int priority, int duration, const Image<ColorRgb>& image, QString clientDescription);
-	void handlerImageReceived(int priority, const Image<ColorRgb>& image, int timeout_ms, hyperhdr::Components origin, QString clientDescription);
-	void signalRequestSourceHandler(hyperhdr::Components component, int instanceIndex, bool listen);
+	void handlerImageReceived(int priority, const Image<ColorRgb>& image, int timeout_ms, ambilightapp::Components origin, QString clientDescription);
+	void signalRequestSourceHandler(ambilightapp::Components component, int instanceIndex, bool listen);
 
 private slots:
 	void handlerNewConnection();

@@ -16,7 +16,7 @@ install_file()
 }
 
 
-echo "Finalizing HyperHDR setup"
+echo "Finalizing Ambilight App setup"
 
 #check system
 CPU_RPI=`grep -m1 -c 'BCM2708\|BCM2709\|BCM2710\|BCM2835\|BCM2836\|BCM2837\|BCM2711' /proc/cpuinfo`
@@ -38,35 +38,35 @@ STARTUP_MSG="Service is NOT enabled by default for GUI or non-systemd OS"
 
 if [ $CPU_RPI -eq 1 ]; then
 	ENABLE_SERVICE=1
-	STARTUP_MSG="HyperHDR is installed as a service and starts automatically"
+	STARTUP_MSG="Ambilight App is installed as a service and starts automatically"
 fi
 
 start_msg=""
 restart_msg=""
 
 echo "Extracting LUT table..."
-tar -xf /usr/share/hyperhdr/lut/lut_lin_tables.tar.xz -C /usr/share/hyperhdr/lut/
-rm -f -v /usr/share/hyperhdr/lut/lut_lin_tables.tar.xz
+tar -xf /usr/share/ambilightapp/lut/lut_lin_tables.tar.xz -C /usr/share/ambilightapp/lut/
+rm -f -v /usr/share/ambilightapp/lut/lut_lin_tables.tar.xz
 
 if grep -m1 systemd /proc/1/comm > /dev/null
 then	
 	# systemd
 	if [ -z "${DISPLAY}" ]; then
-		STARTUP_MSG="HyperHDR is installed as a service and starts automatically"
+		STARTUP_MSG="Ambilight App is installed as a service and starts automatically"
 		echo "Init daemon: systemd (service is enabled by default for console systems)"
 		ENABLE_SERVICE=1
 	else
-		echo "Init daemon: GUI detected (service is NOT enabled by default, you can run HyperHDR as an application or service with 'systemctl enable (and next: start) hyperhdr@${FOUND_USR}.service')"
+		echo "Init daemon: GUI detected (service is NOT enabled by default, you can run Ambilight App as an application or service with 'systemctl enable (and next: start) ambilightapp@${FOUND_USR}.service')"
 		ENABLE_SERVICE=0
 		ENABLE_XSYS=1
 	fi
 	
-	install_file /usr/share/hyperhdr/service/hyperhdr.systemd /etc/systemd/system/hyperhdr@.service	
+	install_file /usr/share/ambilightapp/service/ambilightapp.systemd /etc/systemd/system/ambilightapp@.service	
 
 	if [ $ENABLE_SERVICE -eq 1 ]; then
-		systemctl enable hyperhdr"@${FOUND_USR}".service
-		start_msg="systemctl start hyperhdr for user ${FOUND_USR}"
-		systemctl start hyperhdr"@${FOUND_USR}"
+		systemctl enable ambilightapp"@${FOUND_USR}".service
+		start_msg="systemctl start ambilightapp for user ${FOUND_USR}"
+		systemctl start ambilightapp"@${FOUND_USR}"
 	fi
 
 elif [ -e /sbin/initctl ]
@@ -74,9 +74,9 @@ then
 	# upstart
 	if [ $ENABLE_SERVICE -eq 1 ]; then
 		echo "Init daemon: upstart (service is enabled by default)"
-		install_file /usr/share/hyperhdr/service/hyperhdr.initctl /etc/init/hyperhdr.conf && initctl reload-configuration
-		start_msg="initctl start hyperhdr"
-		initctl start hyperhdr
+		install_file /usr/share/ambilightapp/service/ambilightapp.initctl /etc/init/ambilightapp.conf && initctl reload-configuration
+		start_msg="initctl start ambilightapp"
+		initctl start ambilightapp
 	else
 		echo "Init daemon: upstart (service is NOT enabled by default)"
 	fi
@@ -85,32 +85,32 @@ else
 	# sysV
 	if [ $ENABLE_SERVICE -eq 1 ]; then
 		echo "Init daemon: sysV (enabled by default)"
-		install_file /usr/share/hyperhdr/service/hyperhdr.init /etc/init.d/hyperhdr && chmod +x /etc/init.d/hyperhdr && update-rc.d hyperhdr defaults 98 02
-		start_msg="service hyperhdr start"
-		service hyperhdr start
+		install_file /usr/share/ambilightapp/service/ambilightapp.init /etc/init.d/ambilightapp && chmod +x /etc/init.d/ambilightapp && update-rc.d ambilightapp defaults 98 02
+		start_msg="service ambilightapp start"
+		service ambilightapp start
 	else
 		echo "Init daemon: sysV (service is NOT enabled by default)"
 	fi
 fi
 
 #cleanup
-rm -r /usr/share/hyperhdr/service
+rm -r /usr/share/ambilightapp/service
 
 #link binarys and set exec bit
-BINSP=/usr/share/hyperhdr/bin
+BINSP=/usr/share/ambilightapp/bin
 BINTP=/usr/bin
 chmod +x -R $BINSP
-ln -fs $BINSP/hyperhdr $BINTP/hyperhdr
-ln -fs $BINSP/hyperhdr-remote $BINTP/hyperhdr-remote
+ln -fs $BINSP/ambilightapp $BINTP/ambilightapp
+ln -fs $BINSP/ambilightapp-remote $BINTP/ambilightapp-remote
 
 # install desktop icons
-echo "Install HyperHDR desktop icons"
-mkdir /usr/share/pixmaps/hyperhdr 2>/dev/null
-cp /usr/share/hyperhdr/desktop/*.png /usr/share/pixmaps/hyperhdr 2>/dev/null
-desktop-file-install /usr/share/hyperhdr/desktop/hyperhdr.desktop 2>/dev/null
+echo "Install Ambilight App desktop icons"
+mkdir /usr/share/pixmaps/ambilightapp 2>/dev/null
+cp /usr/share/ambilightapp/desktop/*.png /usr/share/pixmaps/ambilightapp 2>/dev/null
+desktop-file-install /usr/share/ambilightapp/desktop/ambilightapp.desktop 2>/dev/null
 
 # cleanup desktop icons
-rm -r /usr/share/hyperhdr/desktop 2>/dev/null
+rm -r /usr/share/ambilightapp/desktop 2>/dev/null
 
 #Check, if dtparam=spi=on is in place
 if [ $CPU_RPI -eq 1 ]; then
@@ -134,16 +134,16 @@ fi
 echo ${start_msg}
 
 echo "\n +-----------------------------------------------------------------------+"
-echo " |                 \033[32;1mHyperHDR has been installed/updated!\033[0m                  |"
+echo " |                 \033[32;1mAmbilight App has been installed/updated!\033[0m                  |"
 echo " +-----------------------------------------------------------------------+"
 printf " |  For configuration, visit with your browser: \033[37;1m%13s:%s\033[0m       |\n" "$NET_IP" "8090"
 printf " |  If already used by another service try: \033[37;1m%13s:%s\033[0m           |\n" "$NET_IP" "8091"
-printf " |  Start the service: \033[37;1msudo systemctl start hyperhdr@%-12s\033[0m        |\n" "$FOUND_USR"
-printf " |  Stop the service: \033[37;1msudo systemctl stop hyperhdr@%-12s\033[0m          |\n" "$FOUND_USR"
-echo   " |  Troubleshooting? Run HyperHDR manually: \033[37;1m/usr/bin/hyperhdr\033[0m            |"
+printf " |  Start the service: \033[37;1msudo systemctl start ambilightapp@%-12s\033[0m        |\n" "$FOUND_USR"
+printf " |  Stop the service: \033[37;1msudo systemctl stop ambilightapp@%-12s\033[0m          |\n" "$FOUND_USR"
+echo   " |  Troubleshooting? Run Ambilight App manually: \033[37;1m/usr/bin/ambilightapp\033[0m            |"
 echo   " +-----------------------------------------------------------------------+"
 case "$STARTUP_MSG" in 
-  *"HyperHDR is installed as a service"*)
+  *"Ambilight App is installed as a service"*)
 	printf " |  \033[32;1m%-67s\033[0m  |\n" "$STARTUP_MSG";;
   *) printf " |  \033[31;1m%-67s\033[0m  |\n" "$STARTUP_MSG"
 esac

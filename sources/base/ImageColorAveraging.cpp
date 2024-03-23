@@ -30,7 +30,7 @@
 
 #define push_back_index(list, index) list.push_back((index) * 3)
 
-using namespace hyperhdr;
+using namespace ambilightapp;
 
 ImageColorAveraging::ImageColorAveraging(
 				Logger* _log,

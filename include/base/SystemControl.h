@@ -9,14 +9,14 @@
 	#include <utils/Components.h>
 #endif
 
-class HyperHdrInstance;
+class AmbilightAppInstance;
 
 class SystemControl : public QObject
 {
 	Q_OBJECT
 
 public:
-	SystemControl(HyperHdrInstance* hyperhdr);
+	SystemControl(AmbilightAppInstance* ambilightapp);
 	~SystemControl();
 
 	quint8 getCapturePriority();
@@ -26,13 +26,13 @@ public:
 	void setSysCaptureEnable(bool enable);
 
 private slots:
-	void handleCompStateChangeRequest(hyperhdr::Components component, bool enable);
+	void handleCompStateChangeRequest(ambilightapp::Components component, bool enable);
 	void handleSettingsUpdate(settings::type type, const QJsonDocument& config);
 	void handleSysImage(const QString& name, const Image<ColorRgb>& image);
 	void setSysInactive();
 
 private:
-	HyperHdrInstance* _hyperhdr;
+	AmbilightAppInstance* _ambilightapp;
 
 	bool	_sysCaptEnabled;
 	bool	_alive;

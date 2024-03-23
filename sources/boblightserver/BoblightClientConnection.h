@@ -16,7 +16,7 @@
 #define FAST_FLOAT_PARSE
 
 class ImageProcessor;
-class HyperHdrInstance;
+class AmbilightAppInstance;
 
 ///
 /// The Connection object created by \a BoblightServer when a new connection is established
@@ -29,9 +29,9 @@ public:
 	///
 	/// Constructor
 	/// @param socket The Socket object for this connection
-	/// @param hyperhdr The HyperHDR server
+	/// @param ambilightapp The Ambilight App server
 	///
-	BoblightClientConnection(HyperHdrInstance* hyperhdr, QTcpSocket* socket, int priority);
+	BoblightClientConnection(AmbilightAppInstance* ambilightapp, QTcpSocket* socket, int priority);
 
 	///
 	/// Destructor
@@ -119,8 +119,8 @@ private:
 	/// The TCP-Socket that is connected tot the boblight-client
 	QTcpSocket* _socket;
 
-	/// Link to HyperHDR for writing led-values to a priority channel
-	HyperHdrInstance* _hyperhdr;
+	/// Link to Ambilight App for writing led-values to a priority channel
+	AmbilightAppInstance* _ambilightapp;
 
 	/// The buffer used for reading data from the socket
 	QByteArray _receiveBuffer;

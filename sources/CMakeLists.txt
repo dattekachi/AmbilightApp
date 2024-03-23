@@ -1,9 +1,9 @@
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/precompiled_hyperhdr_headers.cpp "void precompiledHeadersHyperHDR(){};")
-	add_library(precompiled_hyperhdr_headers ${CMAKE_CURRENT_BINARY_DIR}/precompiled_hyperhdr_headers.cpp)
-	target_link_libraries(precompiled_hyperhdr_headers Qt${Qt_VERSION}::Gui Qt${Qt_VERSION}::Network)
+	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/precompiled_ambilightapp_headers.cpp "void precompiledHeadersAmbilightAPP(){};")
+	add_library(precompiled_ambilightapp_headers ${CMAKE_CURRENT_BINARY_DIR}/precompiled_ambilightapp_headers.cpp)
+	target_link_libraries(precompiled_ambilightapp_headers Qt${Qt_VERSION}::Gui Qt${Qt_VERSION}::Network)
 
-    target_precompile_headers(precompiled_hyperhdr_headers PRIVATE ${CMAKE_SOURCE_DIR}/include/base/AllHeaders_pch.h ${CMAKE_SOURCE_DIR}/include/base/AllHdrHeaders_pch.h )
+    target_precompile_headers(precompiled_ambilightapp_headers PRIVATE ${CMAKE_SOURCE_DIR}/include/base/AllHeaders_pch.h ${CMAKE_SOURCE_DIR}/include/base/AllHdrHeaders_pch.h )
 endif()
 
 # Define the current source locations
@@ -46,9 +46,9 @@ if(ENABLE_MQTT)
 endif()
 
 # Executables
-add_subdirectory(hyperhdr)
+add_subdirectory(ambilightapp)
 if (NOT APPLE)
-	add_subdirectory(hyperhdr-remote)
+	add_subdirectory(ambilightapp-remote)
 endif()
 
 

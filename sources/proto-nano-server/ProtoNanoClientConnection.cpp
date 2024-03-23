@@ -100,7 +100,7 @@ void ProtoNanoClientConnection::processData(const uint8_t* buffer, uint32_t mess
 {
 	pb_istream_t stream = pb_istream_from_buffer(buffer, messageSize);
 
-	proto_HyperhdrRequest mainMessage = proto_HyperhdrRequest_init_zero;
+	proto_AmbilightappRequest mainMessage = proto_AmbilightappRequest_init_zero;
 	pb_extension_t imageExt = pb_extension_init_zero;
 	pb_extension_t clearExt = pb_extension_init_zero;
 	proto_ImageRequest imageReq = proto_ImageRequest_init_zero;
@@ -119,7 +119,7 @@ void ProtoNanoClientConnection::processData(const uint8_t* buffer, uint32_t mess
 	clearExt.dest = &clearReq;
 	clearExt.next = nullptr;
 
-	bool status = pb_decode(&stream, proto_HyperhdrRequest_fields, &mainMessage);
+	bool status = pb_decode(&stream, proto_AmbilightappRequest_fields, &mainMessage);
 
 	if (status)
 	{
@@ -211,14 +211,14 @@ void ProtoNanoClientConnection::handleClearCommand(const proto_ClearRequest& mes
 }
 
 
-void ProtoNanoClientConnection::sendMessage(const proto_HyperhdrReply& message)
+void ProtoNanoClientConnection::sendMessage(const proto_AmbilightappReply& message)
 {
 	uint8_t buffer[256];
 	uint32_t size;
 	bool status;
 
 	pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-	status = pb_encode(&stream, proto_HyperhdrReply_fields, &message);
+	status = pb_encode(&stream, proto_AmbilightappReply_fields, &message);
 	size = (uint32_t)(stream.bytes_written);
 
 	if (status)
@@ -235,8 +235,8 @@ void ProtoNanoClientConnection::sendMessage(const proto_HyperhdrReply& message)
 void ProtoNanoClientConnection::sendSuccessReply()
 {
 	// create reply
-	proto_HyperhdrReply reply = proto_HyperhdrReply_init_zero;
-	reply.type = _proto_HyperhdrReply_Type::proto_HyperhdrReply_Type_REPLY;
+	proto_AmbilightappReply reply = proto_AmbilightappReply_init_zero;
+	reply.type = _proto_AmbilightappReply_Type::proto_AmbilightappReply_Type_REPLY;
 	reply.success = true;
 	reply.has_success = true;
 
@@ -257,8 +257,8 @@ bool ProtoNanoClientConnection::writeError(pb_ostream_t* stream, const pb_field_
 void ProtoNanoClientConnection::sendErrorReply(const std::string& error)
 {
 	// create reply
-	proto_HyperhdrReply reply = proto_HyperhdrReply_init_zero;
-	reply.type = _proto_HyperhdrReply_Type::proto_HyperhdrReply_Type_REPLY;
+	proto_AmbilightappReply reply = proto_AmbilightappReply_init_zero;
+	reply.type = _proto_AmbilightappReply_Type::proto_AmbilightappReply_Type_REPLY;
 	reply.success = false;
 	reply.has_success = true;
 	reply.error.arg = (char*) error.c_str();

@@ -31,12 +31,12 @@
 
 #include <base/SystemControl.h>
 #include <base/SystemWrapper.h>
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <utils/GlobalSignals.h>
 
-SystemControl::SystemControl(HyperHdrInstance* hyperhdr)
-	: QObject(hyperhdr)
-	, _hyperhdr(hyperhdr)
+SystemControl::SystemControl(AmbilightAppInstance* ambilightapp)
+	: QObject(ambilightapp)
+	, _ambilightapp(ambilightapp)
 	, _sysCaptEnabled(false)
 	, _alive(false)
 	, _sysCaptPrio(0)
@@ -45,23 +45,23 @@ SystemControl::SystemControl(HyperHdrInstance* hyperhdr)
 	, _isCEC(false)
 {
 	// settings changes
-	connect(_hyperhdr, &HyperHdrInstance::SignalInstanceSettingsChanged, this, &SystemControl::handleSettingsUpdate);
+	connect(_ambilightapp, &AmbilightAppInstance::SignalInstanceSettingsChanged, this, &SystemControl::handleSettingsUpdate);
 
 	// comp changes
-	connect(_hyperhdr, &HyperHdrInstance::SignalRequestComponent, this, &SystemControl::handleCompStateChangeRequest);
+	connect(_ambilightapp, &AmbilightAppInstance::SignalRequestComponent, this, &SystemControl::handleCompStateChangeRequest);
 
 	// inactive timer system grabber
 	connect(_sysInactiveTimer, &QTimer::timeout, this, &SystemControl::setSysInactive);
 	_sysInactiveTimer->setInterval(800);
 
 	// init
-	QJsonDocument settings = _hyperhdr->getSetting(settings::type::SYSTEMCONTROL);
+	QJsonDocument settings = _ambilightapp->getSetting(settings::type::SYSTEMCONTROL);
 	QUEUE_CALL_2(this, handleSettingsUpdate, settings::type, settings::type::SYSTEMCONTROL, QJsonDocument, settings);
 }
 
 SystemControl::~SystemControl()
 {
-	emit GlobalSignals::getInstance()->SignalRequestComponent(hyperhdr::COMP_SYSTEMGRABBER, int(_hyperhdr->getInstanceIndex()), false);
+	emit GlobalSignals::getInstance()->SignalRequestComponent(ambilightapp::COMP_SYSTEMGRABBER, int(_ambilightapp->getInstanceIndex()), false);
 
 	std::cout << "SystemControl exits now" << std::endl;
 }
@@ -84,7 +84,7 @@ void SystemControl::handleSysImage(const QString& name, const Image<ColorRgb>& i
 	if (_sysCaptName != name)
 	{
 		_sysCaptName = name;
-		_hyperhdr->registerInput(_sysCaptPrio, hyperhdr::COMP_SYSTEMGRABBER, "System", _sysCaptName);
+		_ambilightapp->registerInput(_sysCaptPrio, ambilightapp::COMP_SYSTEMGRABBER, "System", _sysCaptName);
 	}
 
 	_alive = true;
@@ -92,7 +92,7 @@ void SystemControl::handleSysImage(const QString& name, const Image<ColorRgb>& i
 	if (!_sysInactiveTimer->isActive() && _sysInactiveTimer->remainingTime() < 0)
 		_sysInactiveTimer->start();
 
-	_hyperhdr->setInputImage(_sysCaptPrio, image);
+	_ambilightapp->setInputImage(_sysCaptPrio, image);
 }
 
 void SystemControl::setSysCaptureEnable(bool enable)
@@ -101,19 +101,19 @@ void SystemControl::setSysCaptureEnable(bool enable)
 	{
 		if (enable)
 		{
-			_hyperhdr->registerInput(_sysCaptPrio, hyperhdr::COMP_SYSTEMGRABBER, "System", _sysCaptName);
+			_ambilightapp->registerInput(_sysCaptPrio, ambilightapp::COMP_SYSTEMGRABBER, "System", _sysCaptName);
 			connect(GlobalSignals::getInstance(), &GlobalSignals::SignalNewSystemImage, this, &SystemControl::handleSysImage, Qt::UniqueConnection);
 		}
 		else
 		{
 			disconnect(GlobalSignals::getInstance(), &GlobalSignals::SignalNewSystemImage, this, &SystemControl::handleSysImage);
-			_hyperhdr->clear(_sysCaptPrio);
+			_ambilightapp->clear(_sysCaptPrio);
 			_sysInactiveTimer->stop();
 		}
 
 		_sysCaptEnabled = enable;
-		_hyperhdr->setNewComponentState(hyperhdr::COMP_SYSTEMGRABBER, enable);
-		emit GlobalSignals::getInstance()->SignalRequestComponent(hyperhdr::COMP_SYSTEMGRABBER, int(_hyperhdr->getInstanceIndex()), enable);
+		_ambilightapp->setNewComponentState(ambilightapp::COMP_SYSTEMGRABBER, enable);
+		emit GlobalSignals::getInstance()->SignalRequestComponent(ambilightapp::COMP_SYSTEMGRABBER, int(_ambilightapp->getInstanceIndex()), enable);
 	}
 }
 
@@ -130,13 +130,13 @@ void SystemControl::handleSettingsUpdate(settings::type type, const QJsonDocumen
 
 		setSysCaptureEnable(obj["systemInstanceEnable"].toBool(false));
 		_isCEC = obj["cecControl"].toBool(false);
-		emit GlobalSignals::getInstance()->SignalRequestComponent(hyperhdr::COMP_CEC, -int(_hyperhdr->getInstanceIndex()) - 2, _isCEC);
+		emit GlobalSignals::getInstance()->SignalRequestComponent(ambilightapp::COMP_CEC, -int(_ambilightapp->getInstanceIndex()) - 2, _isCEC);
 	}
 }
 
-void SystemControl::handleCompStateChangeRequest(hyperhdr::Components component, bool enable)
+void SystemControl::handleCompStateChangeRequest(ambilightapp::Components component, bool enable)
 {
-	if (component == hyperhdr::COMP_SYSTEMGRABBER)
+	if (component == ambilightapp::COMP_SYSTEMGRABBER)
 	{
 		setSysCaptureEnable(enable);
 	}
@@ -145,7 +145,7 @@ void SystemControl::handleCompStateChangeRequest(hyperhdr::Components component,
 void SystemControl::setSysInactive()
 {
 	if (!_alive)
-		_hyperhdr->setInputInactive(_sysCaptPrio);
+		_ambilightapp->setInputInactive(_sysCaptPrio);
 
 	_alive = false;
 }

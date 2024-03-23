@@ -38,7 +38,7 @@
 #include <sys/types.h>
 #include <limits.h>
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <base/AccessManager.h>
 
 #include <QDirIterator>
@@ -197,7 +197,7 @@ bool PipewireGrabber::init()
 
 		if (foundDevice.isNull() || foundDevice.isEmpty() || !_deviceProperties.contains(foundDevice))
 		{
-			Error(_log, "Could not find any capture device. Pipewire system grabber won't work if HyperHDR is run as a service due to security restrictions.");
+			Error(_log, "Could not find any capture device. Pipewire system grabber won't work if Ambilight App is run as a service due to security restrictions.");
 			return false;
 		}
 

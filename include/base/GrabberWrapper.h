@@ -49,7 +49,7 @@ public slots:
 	QJsonDocument getCalibrationInfo();
 
 private slots:
-	void signalRequestSourceHandler(hyperhdr::Components component, int instanceIndex, bool listen);
+	void signalRequestSourceHandler(ambilightapp::Components component, int instanceIndex, bool listen);
 
 signals:
 	///
@@ -60,7 +60,7 @@ signals:
 	void SignalCecKeyPressed(int key);
 	void SignalBenchmarkUpdate(int status, QString message);
 	void SignalInstancePauseChanged(int instance, bool isEnabled);
-	void SignalSetNewComponentStateToAllInstances(hyperhdr::Components component, bool enable);
+	void SignalSetNewComponentStateToAllInstances(ambilightapp::Components component, bool enable);
 	void SignalSaveCalibration(QString saveData);
 
 public slots:

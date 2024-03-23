@@ -14,12 +14,12 @@ FILE ( GLOB X11_SOURCES "${CURRENT_HEADER_DIR}/smartX11*.h" "${CURRENT_HEADER_DI
 add_library(X11-grabber ${X11_SOURCES} )
 
 target_link_libraries(X11-grabber
-	hyperhdr-base
+	ambilightapp-base
 	${QT_LIBRARIES}
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(X11-grabber REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(X11-grabber REUSE_FROM precompiled_ambilightapp_headers)
 endif()
 
 

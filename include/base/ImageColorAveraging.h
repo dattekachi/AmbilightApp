@@ -12,7 +12,7 @@
 
 #include <base/LedString.h>
 
-namespace hyperhdr
+namespace ambilightapp
 {
 	class ImageColorAveraging
 	{

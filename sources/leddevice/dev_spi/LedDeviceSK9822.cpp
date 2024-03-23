@@ -1,6 +1,6 @@
 #include "LedDeviceSK9822.h"
 
-// Local HyperHDR includes
+// Local Ambilight App includes
 #include <utils/Logger.h>
 
 namespace

@@ -10,7 +10,7 @@
 
 class HyperAPI;
 class QTcpSocket;
-class HyperHdrManager;
+class AmbilightAppManager;
 
 class JsonClientConnection : public QObject
 {

@@ -10,14 +10,14 @@ else()
 	LIST ( REMOVE_ITEM Utils_SOURCES "${CURRENT_SOURCE_DIR}/SystemPerformanceCounters.cpp" )
 endif()
 
-add_library(hyperhdr-utils
+add_library(ambilightapp-utils
 	${Utils_SOURCES}
 )
 
-target_include_directories(hyperhdr-utils PUBLIC ${TURBOJPEG_INCLUDE_DIRS})
+target_include_directories(ambilightapp-utils PUBLIC ${TURBOJPEG_INCLUDE_DIRS})
 
-target_link_libraries(hyperhdr-utils
-	hyperhdr-base
+target_link_libraries(ambilightapp-utils
+	ambilightapp-base
 	Qt${Qt_VERSION}::Core
 	Qt${Qt_VERSION}::Gui
 	Qt${Qt_VERSION}::Network
@@ -25,5 +25,5 @@ target_link_libraries(hyperhdr-utils
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(hyperhdr-utils REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(ambilightapp-utils REUSE_FROM precompiled_ambilightapp_headers)
 endif()

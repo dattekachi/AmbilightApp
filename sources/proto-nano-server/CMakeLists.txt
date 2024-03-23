@@ -22,7 +22,7 @@ add_library(proto-nano-server
 target_include_directories(proto-nano-server PRIVATE ${CURRENT_HEADER_DIR})
 
 target_link_libraries(proto-nano-server
-	hyperhdr-base
-	hyperhdr-utils
+	ambilightapp-base
+	ambilightapp-utils
 	Qt${Qt_VERSION}::Gui
 )

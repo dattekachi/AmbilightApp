@@ -1,7 +1,7 @@
-// Local-HyperHDR includes
+// Local-Ambilight App includes
 #include "LedDeviceWled.h"
 #include <utils/QStringUtils.h>
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 #include <QString>
 #ifdef ENABLE_BONJOUR
 	#include <bonjour/DiscoveryWrapper.h>
@@ -172,7 +172,7 @@ bool LedDeviceWled::powerOn()
 				Error(_log, "Serious warning: the power limiter in WLED is set which may lead to unexpected side effects. Use the right cabling & power supply with the appropriate power, not this half-measure.");
 
 			if (_ledCount != ledsNumber)
-				Warning(_log, "The number of LEDs defined in HyperHDR (%i) is different from that defined in WLED (%i)", _ledCount, ledsNumber);
+				Warning(_log, "The number of LEDs defined in Ambilight App (%i) is different from that defined in WLED (%i)", _ledCount, ledsNumber);
 			
 			_customInfo = QString("  %1%").arg(quality);
 
@@ -242,7 +242,7 @@ QJsonObject LedDeviceWled::discover(const QJsonObject& /*params*/)
 		}
 	}
 #else
-	Error(_log, "The Network Discovery Service was mysteriously disabled while the maintenair was compiling this version of HyperHDR");
+	Error(_log, "The Network Discovery Service was mysteriously disabled while the maintenair was compiling this version of Ambilight App");
 #endif	
 
 	devicesDiscovered.insert("devices", deviceList);

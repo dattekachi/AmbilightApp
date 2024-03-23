@@ -7,8 +7,8 @@
 #include <utils/Components.h>
 
 // flatbuffer FBS
-#include "hyperhdr_reply_generated.h"
-#include "hyperhdr_request_generated.h"
+#include "ambilightapp_reply_generated.h"
+#include "ambilightapp_request_generated.h"
 
 class QTcpSocket;
 class QLocalSocket;
@@ -23,8 +23,8 @@ public:
 
 signals:
 	void SignalClearGlobalInput(int priority, bool forceClearAll);
-	void SignalImageReceived(int priority, const Image<ColorRgb>& image, int timeout_ms, hyperhdr::Components origin, QString clientDescription);
-	void SignalSetGlobalColor(int priority, const std::vector<ColorRgb>& ledColor, int timeout_ms, hyperhdr::Components origin, QString clientDescription);
+	void SignalImageReceived(int priority, const Image<ColorRgb>& image, int timeout_ms, ambilightapp::Components origin, QString clientDescription);
+	void SignalSetGlobalColor(int priority, const std::vector<ColorRgb>& ledColor, int timeout_ms, ambilightapp::Components origin, QString clientDescription);
 	void SignalClientDisconnected(FlatBufferClient* client);
 
 public slots:
@@ -35,11 +35,11 @@ private slots:
 	void disconnected();
 
 private:
-	void handleMessage(const hyperhdrnet::Request* req);
-	void handleRegisterCommand(const hyperhdrnet::Register* regReq);
-	void handleColorCommand(const hyperhdrnet::Color* colorReq);
-	void handleImageCommand(const hyperhdrnet::Image* image);
-	void handleClearCommand(const hyperhdrnet::Clear* clear);
+	void handleMessage(const ambilightappnet::Request* req);
+	void handleRegisterCommand(const ambilightappnet::Register* regReq);
+	void handleColorCommand(const ambilightappnet::Color* colorReq);
+	void handleImageCommand(const ambilightappnet::Image* image);
+	void handleClearCommand(const ambilightappnet::Clear* clear);
 	void handleNotImplemented();
 	void sendMessage();
 	void sendSuccessReply();

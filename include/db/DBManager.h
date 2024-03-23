@@ -20,7 +20,7 @@ class QSqlQuery;
 typedef QPair<QString, QVariant> CPair;
 typedef QVector<CPair> VectorPair;
 
-#define CURRENT_HYPERHDR_DB_EXPORT_VERSION "HyperHDR_export_format_v20"
+#define CURRENT_AMBILIGHTAPP_DB_EXPORT_VERSION "Ambilight_App_export_format_v1"
 
 class DBManager
 {

@@ -6,18 +6,18 @@ include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}/../../sources/flatbufserver
 )
 
-FILE ( GLOB HyperHDR_SOURCES "${CURRENT_HEADER_DIR}/*.h"  "${CURRENT_SOURCE_DIR}/*.h"  "${CURRENT_SOURCE_DIR}/*.cpp" )
+FILE ( GLOB AmbilightAPP_SOURCES "${CURRENT_HEADER_DIR}/*.h"  "${CURRENT_SOURCE_DIR}/*.h"  "${CURRENT_SOURCE_DIR}/*.cpp" )
 
-SET(HyperHDR_RESOURCES ${CURRENT_SOURCE_DIR}/resource.qrc)
+SET(AmbilightAPP_RESOURCES ${CURRENT_SOURCE_DIR}/resource.qrc)
 
-add_library(hyperhdr-base
-	${HyperHDR_SOURCES}
-	${HyperHDR_RESOURCES}
+add_library(ambilightapp-base
+	${AmbilightAPP_SOURCES}
+	${AmbilightAPP_RESOURCES}
 )
 
-target_link_libraries(hyperhdr-base
+target_link_libraries(ambilightapp-base
 	blackborder
-	hyperhdr-utils
+	ambilightapp-utils
 	flatbufserver
 	flatbuffers
 	leddevice
@@ -27,13 +27,13 @@ target_link_libraries(hyperhdr-base
 )
 
 if(ENABLE_BOBLIGHT)
-	target_link_libraries(hyperhdr-base boblightserver)
+	target_link_libraries(ambilightapp-base boblightserver)
 endif()
 
 if (ENABLE_BONJOUR)
-	target_link_libraries(hyperhdr-base bonjour)
+	target_link_libraries(ambilightapp-base bonjour)
 endif ()
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(hyperhdr-base REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(ambilightapp-base REUSE_FROM precompiled_ambilightapp_headers)
 endif()

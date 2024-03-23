@@ -13,7 +13,7 @@ function changePassword(){
 
 	// fill default pw if default is set
 	if(window.defaultPasswordIsSet)
-		$('#oldPw').val('hyperhdr')
+		$('#oldPw').val('ambilightapp')
 
 	$('#id_btn_ok').off().on('click',function() {
 		var oldPw = $('#oldPw').val();
@@ -89,7 +89,7 @@ $(document).ready( function() {
 	});	
 });
 
-function compareHyperHdrVersion(compareA, compareB)
+function compareAmbilightAppVersion(compareA, compareB)
 {
 	if (compareA.length == 0 || compareB.length == 0)
 	{

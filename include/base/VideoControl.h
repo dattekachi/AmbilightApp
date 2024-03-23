@@ -9,14 +9,14 @@
 	#include <utils/Components.h>
 #endif
 
-class HyperHdrInstance;
+class AmbilightAppInstance;
 
 class VideoControl : public QObject
 {
 	Q_OBJECT
 
 public:
-	VideoControl(HyperHdrInstance* hyperhdr);
+	VideoControl(AmbilightAppInstance* ambilightapp);
 	~VideoControl();
 
 	quint8 getCapturePriority();
@@ -24,14 +24,14 @@ public:
 	void setUsbCaptureEnable(bool enable);
 
 private slots:
-	void handleCompStateChangeRequest(hyperhdr::Components component, bool enable);
+	void handleCompStateChangeRequest(ambilightapp::Components component, bool enable);
 	void handleSettingsUpdate(settings::type type, const QJsonDocument& config);
 	void handleUsbImage();
 	void handleIncomingUsbImage(const QString& name, const Image<ColorRgb>& image);
 	void setUsbInactive();
 
 private:
-	HyperHdrInstance* _hyperhdr;
+	AmbilightAppInstance* _ambilightapp;
 
 	bool	_usbCaptEnabled;
 	bool	_alive;

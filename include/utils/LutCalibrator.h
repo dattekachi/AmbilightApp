@@ -122,11 +122,11 @@ signals:
 	void SignalLutCalibrationUpdated(const QJsonObject& data);
 
 public slots:
-	void incomingCommand(QString rootpath, GrabberWrapper* grabberWrapper, hyperhdr::Components defaultComp, int checksum, ColorRgb startColor, ColorRgb endColor, bool limitedRange, double saturation, double luminance, double gammaR, double gammaG, double gammaB, int coef);
+	void incomingCommand(QString rootpath, GrabberWrapper* grabberWrapper, ambilightapp::Components defaultComp, int checksum, ColorRgb startColor, ColorRgb endColor, bool limitedRange, double saturation, double luminance, double gammaR, double gammaG, double gammaB, int coef);
 	void stopHandler();
 	void setVideoImage(const QString& name, const Image<ColorRgb>& image);
 	void setSystemImage(const QString& name, const Image<ColorRgb>& image);
-	void signalSetGlobalImageHandler(int priority, const Image<ColorRgb>& image, int timeout_ms, hyperhdr::Components origin);
+	void signalSetGlobalImageHandler(int priority, const Image<ColorRgb>& image, int timeout_ms, ambilightapp::Components origin);
 
 private:
 	void handleImage(const Image<ColorRgb>& image);

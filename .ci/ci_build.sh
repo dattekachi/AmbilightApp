@@ -59,7 +59,7 @@ if [[ "$CI_NAME" == 'osx' || "$CI_NAME" == 'darwin' ]]; then
 		make -j $(sysctl -n hw.ncpu) || exit 3
 		sudo cpack || exit 3
 		exit 0;
-		exit 1 || { echo "---> HyperHDR compilation failed! Abort"; exit 5; }
+		exit 1 || { echo "---> Ambilight App compilation failed! Abort"; exit 5; }
 	else
 		echo "Not using ccache"
 		mkdir build || exit 1
@@ -68,7 +68,7 @@ if [[ "$CI_NAME" == 'osx' || "$CI_NAME" == 'darwin' ]]; then
 		make -j $(sysctl -n hw.ncpu) || exit 3
 		sudo cpack || exit 3
 		exit 0;
-		exit 1 || { echo "---> HyperHDR compilation failed! Abort"; exit 5; }
+		exit 1 || { echo "---> Ambilight App compilation failed! Abort"; exit 5; }
 	fi
 elif [[ $CI_NAME == *"mingw64_nt"* || "$CI_NAME" == 'windows_nt' ]]; then
 	echo "Start: windows"
@@ -79,9 +79,9 @@ elif [[ $CI_NAME == *"mingw64_nt"* || "$CI_NAME" == 'windows_nt' ]]; then
 	cmake -G "Visual Studio 17 2022" -A x64 -DPLATFORM=${PLATFORM} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_GITHUB_ACTION=1 ${IS_ARCHIVE_SKIPPED} ../ || exit 2
 	cmake --build . --target package --config Release -- -nologo -v:m -maxcpucount || exit 3
 	exit 0;
-	exit 1 || { echo "---> Hyperhdr compilation failed! Abort"; exit 5; }
+	exit 1 || { echo "---> Ambilightapp compilation failed! Abort"; exit 5; }
 elif [[ "$CI_NAME" == 'linux' ]]; then
-	echo "Compile Hyperhdr with DOCKER_IMAGE = ${DOCKER_IMAGE}, DOCKER_TAG = ${DOCKER_TAG} and friendly name DOCKER_NAME = ${DOCKER_NAME}"
+	echo "Compile Ambilightapp with DOCKER_IMAGE = ${DOCKER_IMAGE}, DOCKER_TAG = ${DOCKER_TAG} and friendly name DOCKER_NAME = ${DOCKER_NAME}"
 	
 	# set GitHub Container Registry url
 	REGISTRY_URL="ghcr.io/awawa-dev/${DOCKER_IMAGE}"
@@ -131,14 +131,14 @@ elif [[ "$CI_NAME" == 'linux' ]]; then
 		-v "${CI_BUILD_DIR}/deploy:/deploy" \
 		-v "${CI_BUILD_DIR}:/source:ro" \
 		$REGISTRY_URL:$DOCKER_TAG \
-		/bin/bash -c "${cache_env} && cd / && mkdir -p hyperhdr && cp -r source/. /hyperhdr &&
-		cd /hyperhdr && mkdir build && (${executeCommand}) &&
-		(cp /hyperhdr/build/bin/h* /deploy/ 2>/dev/null || : ) &&
-		(cp /hyperhdr/build/Hyper* /deploy/ 2>/dev/null || : ) &&
-		(cp /hyperhdr/Hyper*.zst /deploy/ 2>/dev/null || : ) &&
+		/bin/bash -c "${cache_env} && cd / && mkdir -p ambilightapp && cp -r source/. /ambilightapp &&
+		cd /ambilightapp && mkdir build && (${executeCommand}) &&
+		(cp /ambilightapp/build/bin/h* /deploy/ 2>/dev/null || : ) &&
+		(cp /ambilightapp/build/Ambilight* /deploy/ 2>/dev/null || : ) &&
+		(cp /ambilightapp/Ambilight*.zst /deploy/ 2>/dev/null || : ) &&
 		ccache -s &&
 		exit 0;
-		exit 1 " || { echo "---> HyperHDR compilation failed! Abort"; exit 5; }
+		exit 1 " || { echo "---> Ambilight App compilation failed! Abort"; exit 5; }
 		ls -a .ccache
 	else
 		echo "Not using cache"
@@ -157,13 +157,13 @@ elif [[ "$CI_NAME" == 'linux' ]]; then
 		-v "${CI_BUILD_DIR}/deploy:/deploy" \
 		-v "${CI_BUILD_DIR}:/source:ro" \
 		$REGISTRY_URL:$DOCKER_TAG \
-		/bin/bash -c "cd / && mkdir -p hyperhdr && cp -r source/. /hyperhdr &&
-		cd /hyperhdr && mkdir build && (${executeCommand}) &&
-		(cp /hyperhdr/build/bin/h* /deploy/ 2>/dev/null || : ) &&
-		(cp /hyperhdr/build/Hyper* /deploy/ 2>/dev/null || : ) &&
-		(cp /hyperhdr/Hyper*.zst /deploy/ 2>/dev/null || : ) &&
+		/bin/bash -c "cd / && mkdir -p ambilightapp && cp -r source/. /ambilightapp &&
+		cd /ambilightapp && mkdir build && (${executeCommand}) &&
+		(cp /ambilightapp/build/bin/h* /deploy/ 2>/dev/null || : ) &&
+		(cp /ambilightapp/build/Ambilight* /deploy/ 2>/dev/null || : ) &&
+		(cp /ambilightapp/Ambilight*.zst /deploy/ 2>/dev/null || : ) &&
 		exit 0;
-		exit 1 " || { echo "---> HyperHDR compilation failed! Abort"; exit 5; }
+		exit 1 " || { echo "---> Ambilight App compilation failed! Abort"; exit 5; }
 	fi
 	
 	# overwrite file owner to current user

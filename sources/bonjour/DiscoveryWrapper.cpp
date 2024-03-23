@@ -98,14 +98,14 @@ QList<DiscoveryRecord> DiscoveryWrapper::getWLED()
 	return _wledDevices;
 }
 
-QList<DiscoveryRecord> DiscoveryWrapper::getHyperHDRServices()
+QList<DiscoveryRecord> DiscoveryWrapper::getAmbilightAPPServices()
 {
-	return _hyperhdrSessions;
+	return _ambilightappSessions;
 }
 
 QList<DiscoveryRecord> DiscoveryWrapper::getAllServices()
 {
-	return _hyperhdrSessions + _esp32s2Devices + _espDevices + _hueDevices + _picoDevices + _wledDevices;
+	return _ambilightappSessions + _esp32s2Devices + _espDevices + _hueDevices + _picoDevices + _wledDevices;
 }
 
 void DiscoveryWrapper::requestServicesScan()
@@ -114,8 +114,8 @@ void DiscoveryWrapper::requestServicesScan()
 	emit GlobalSignals::getInstance()->SignalDiscoveryRequestToScan(DiscoveryRecord::Service::WLED);
 	cleanUp(_hueDevices);
 	emit GlobalSignals::getInstance()->SignalDiscoveryRequestToScan(DiscoveryRecord::Service::PhilipsHue);
-	cleanUp(_hyperhdrSessions);
-	emit GlobalSignals::getInstance()->SignalDiscoveryRequestToScan(DiscoveryRecord::Service::HyperHDR);
+	cleanUp(_ambilightappSessions);
+	emit GlobalSignals::getInstance()->SignalDiscoveryRequestToScan(DiscoveryRecord::Service::AmbilightAPP);
 
 	cleanUp(_esp32s2Devices);
 	cleanUp(_espDevices);
@@ -167,8 +167,8 @@ void DiscoveryWrapper::gotMessage(QList<DiscoveryRecord>& target, DiscoveryRecor
 
 void DiscoveryWrapper::signalDiscoveryEventHandler(DiscoveryRecord message)
 {
-	if (message.type == DiscoveryRecord::Service::HyperHDR)
-		gotMessage(_hyperhdrSessions, message);
+	if (message.type == DiscoveryRecord::Service::AmbilightAPP)
+		gotMessage(_ambilightappSessions, message);
 	else if (message.type == DiscoveryRecord::Service::WLED)
 		gotMessage(_wledDevices, message);
 	else if (message.type == DiscoveryRecord::Service::PhilipsHue)
@@ -188,7 +188,7 @@ void DiscoveryWrapper::signalDiscoveryRequestToScanHandler(DiscoveryRecord::Serv
 		if (_serialDevice == nullptr)
 		{
 			QJsonObject deviceConfig;
-			deviceConfig["type"] = "adalight";
+			deviceConfig["type"] = "ambilightusb";
 
 			_serialDevice = std::unique_ptr<LedDevice>(LedDeviceFactory::construct(deviceConfig));
 		}

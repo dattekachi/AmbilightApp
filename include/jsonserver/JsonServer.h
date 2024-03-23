@@ -13,7 +13,7 @@ class QTcpSocket;
 class JsonClientConnection;
 class BonjourServiceRegister;
 class NetOrigin;
-class HyperHdrManager;
+class AmbilightAppManager;
 
 class JsonServer : public QObject
 {

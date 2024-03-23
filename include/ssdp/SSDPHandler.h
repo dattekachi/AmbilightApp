@@ -42,7 +42,7 @@ public slots:
 	void handleWebServerStateChange(bool newState);
 
 	///
-	/// @brief Handle settings update from Hyperhdr Settingsmanager emit
+	/// @brief Handle settings update from Ambilightapp Settingsmanager emit
 	/// @param type   settingyType from enum
 	/// @param config configuration object
 	///

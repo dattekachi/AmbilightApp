@@ -51,27 +51,27 @@ endif()
 # Apply to all packages, some of these can be overwritten with generator specific content
 # https://cmake.org/cmake/help/v3.5/module/CPack.html
 
-SET ( CPACK_PACKAGE_NAME "HyperHDR" )
-SET ( CPACK_PACKAGE_DESCRIPTION_SUMMARY "HyperHDR is an open source ambient light implementation" )
+SET ( CPACK_PACKAGE_NAME "Ambilight App" )
+SET ( CPACK_PACKAGE_DESCRIPTION_SUMMARY "Ambilight App is an open source ambient light implementation" )
 SET ( CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README.md" )
-SET ( CPACK_PACKAGE_FILE_NAME "HyperHDR-${HYPERHDR_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+SET ( CPACK_PACKAGE_FILE_NAME "AmbilightAPP-${AMBILIGHTAPP_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
 
-SET ( CPACK_PACKAGE_CONTACT "see_me_at@hyperhdr.eu")
-SET ( CPACK_PACKAGE_VENDOR "HyperHDR")
-SET ( CPACK_PACKAGE_EXECUTABLES "hyperhdr;HyperHDR" )
-SET ( CPACK_PACKAGE_INSTALL_DIRECTORY "HyperHDR" )
-SET ( CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/resources/icons/hyperhdr-icon-32px.png")
+SET ( CPACK_PACKAGE_CONTACT "see_me_at@ambilightapp.eu")
+SET ( CPACK_PACKAGE_VENDOR "Ambilight App")
+SET ( CPACK_PACKAGE_EXECUTABLES "ambilightapp;AmbilightAPP" )
+SET ( CPACK_PACKAGE_INSTALL_DIRECTORY "AmbilightAPP" )
+SET ( CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/resources/icons/ambilightapp-icon-32px.png")
 
-SET ( CPACK_PACKAGE_VERSION_MAJOR "${HYPERHDR_VERSION_MAJOR}")
-SET ( CPACK_PACKAGE_VERSION_MINOR "${HYPERHDR_VERSION_MINOR}")
-SET ( CPACK_PACKAGE_VERSION_PATCH "${HYPERHDR_VERSION_PATCH}")
+SET ( CPACK_PACKAGE_VERSION_MAJOR "${AMBILIGHTAPP_VERSION_MAJOR}")
+SET ( CPACK_PACKAGE_VERSION_MINOR "${AMBILIGHTAPP_VERSION_MINOR}")
+SET ( CPACK_PACKAGE_VERSION_PATCH "${AMBILIGHTAPP_VERSION_PATCH}")
 
 if(USE_STANDARD_INSTALLER_NAME AND UNIX AND NOT APPLE)
-	string(REPLACE "." ";" HYPERHDR_VERSION_LIST ${HYPERHDR_VERSION})
-	list(LENGTH HYPERHDR_VERSION_LIST HYPERHDR_VERSION_LIST_LEN)
-	if (HYPERHDR_VERSION_LIST_LEN EQUAL 4)
-		list(GET HYPERHDR_VERSION_LIST 2 H_ELEM_2)
-		list(GET HYPERHDR_VERSION_LIST 3 H_ELEM_3)
+	string(REPLACE "." ";" AMBILIGHTAPP_VERSION_LIST ${AMBILIGHTAPP_VERSION})
+	list(LENGTH AMBILIGHTAPP_VERSION_LIST AMBILIGHTAPP_VERSION_LIST_LEN)
+	if (AMBILIGHTAPP_VERSION_LIST_LEN EQUAL 4)
+		list(GET AMBILIGHTAPP_VERSION_LIST 2 H_ELEM_2)
+		list(GET AMBILIGHTAPP_VERSION_LIST 3 H_ELEM_3)
 		string(REPLACE "alfa" "~${DEBIAN_NAME_TAG}~alfa" H_ELEM_3a "${H_ELEM_3}")
 		string(REPLACE "beta" "~${DEBIAN_NAME_TAG}~beta" H_ELEM_3b "${H_ELEM_3a}")
 		string(CONCAT CPACK_PACKAGE_VERSION_PATCH "${H_ELEM_2}" "." "${H_ELEM_3b}")
@@ -79,7 +79,7 @@ if(USE_STANDARD_INSTALLER_NAME AND UNIX AND NOT APPLE)
 		if (foundTag EQUAL -1)
 			string(CONCAT CPACK_PACKAGE_VERSION_PATCH "${CPACK_PACKAGE_VERSION_PATCH}" "~${DEBIAN_NAME_TAG}")
 		endif()
-		SET ( CPACK_PACKAGE_FILE_NAME "HyperHDR-${HYPERHDR_VERSION_MAJOR}.${HYPERHDR_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${CMAKE_SYSTEM_PROCESSOR}")
+		SET ( CPACK_PACKAGE_FILE_NAME "AmbilightAPP-${AMBILIGHTAPP_VERSION_MAJOR}.${AMBILIGHTAPP_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${CMAKE_SYSTEM_PROCESSOR}")
 		message( warning "Package name: ${CPACK_PACKAGE_FILE_NAME}" )
 	endif()	
 endif()
@@ -92,13 +92,13 @@ ELSE()
 	SET ( CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE" )
 ENDIF()
 
-SET ( CPACK_PACKAGE_EXECUTABLES "hyperhdr;HyperHDR" )
-SET ( CPACK_CREATE_DESKTOP_LINKS "hyperhdr;HyperHDR" )
+SET ( CPACK_PACKAGE_EXECUTABLES "ambilightapp;AmbilightAPP" )
+SET ( CPACK_CREATE_DESKTOP_LINKS "ambilightapp;AmbilightAPP" )
 SET ( CPACK_ARCHIVE_THREADS 0 )
 
 # Define the install prefix path for cpack
 IF ( UNIX )
-	#SET ( CPACK_PACKAGING_INSTALL_PREFIX "share/hyperhdr")
+	#SET ( CPACK_PACKAGING_INSTALL_PREFIX "share/ambilightapp")
 ENDIF()
 
 # Specific CPack Package Generators
@@ -141,16 +141,16 @@ if ( APPLE )
 	SET ( CPACK_DMG_FORMAT "UDBZ" )
 	
 	unset(CPACK_PACKAGE_ICON)
-	set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/cmake/osxbundle/Hyperhdr.icns")
+	set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/cmake/osxbundle/Ambilightapp.icns")
 	
-	set_target_properties(hyperhdr PROPERTIES
+	set_target_properties(ambilightapp PROPERTIES
 	  MACOSX_BUNDLE TRUE
 	  MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/cmake/osxbundle/Info.plist
 	  XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "YES"
 	  XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "-"
 	  MACOSX_BUNDLE_COPYRIGHT "awawa-dev"
-	  MACOSX_BUNDLE_BUNDLE_VERSION ${HYPERHDR_VERSION}
-	  MACOSX_BUNDLE_ICON_FILE "Hyperhdr.icns"
+	  MACOSX_BUNDLE_BUNDLE_VERSION ${AMBILIGHTAPP_VERSION}
+	  MACOSX_BUNDLE_ICON_FILE "Ambilightapp.icns"
 	)
 endif()
 
@@ -163,8 +163,8 @@ if(WIN32)
 	STRING(REGEX REPLACE "\\\\" "\\\\\\\\" CPACK_PACKAGE_ICON ${CPACK_PACKAGE_ICON})
 endif()
 file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/nsis/installer.ico" NSIS_HYP_ICO)
-file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/nsis/hyperhdr-logo.bmp" NSIS_HYP_LOGO_HORI)
-file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/nsis/hyperhdr-logo-vert.bmp" NSIS_HYP_LOGO_VERT)
+file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/nsis/ambilightapp-logo.bmp" NSIS_HYP_LOGO_HORI)
+file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/nsis/ambilightapp-logo-vert.bmp" NSIS_HYP_LOGO_VERT)
 STRING(REGEX REPLACE "\\\\" "\\\\\\\\" NSIS_HYP_ICO "${NSIS_HYP_ICO}")
 STRING(REGEX REPLACE "\\\\" "\\\\\\\\" NSIS_HYP_LOGO_VERT "${NSIS_HYP_LOGO_VERT}")
 STRING(REGEX REPLACE "\\\\" "\\\\\\\\" NSIS_HYP_LOGO_HORI "${NSIS_HYP_LOGO_HORI}")
@@ -174,18 +174,18 @@ SET ( CPACK_NSIS_MUI_ICON ${NSIS_HYP_ICO})
 SET ( CPACK_NSIS_MUI_UNIICON ${NSIS_HYP_ICO})
 SET ( CPACK_NSIS_MUI_HEADERIMAGE ${NSIS_HYP_LOGO_HORI} )
 SET ( CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP ${NSIS_HYP_LOGO_VERT})
-SET ( CPACK_NSIS_DISPLAY_NAME "HyperHDR Ambient Light")
-SET ( CPACK_NSIS_PACKAGE_NAME "HyperHDR" )
-SET ( CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\hyperhdr.exe")
+SET ( CPACK_NSIS_DISPLAY_NAME "AmbilightAPP Ambient Light")
+SET ( CPACK_NSIS_PACKAGE_NAME "AmbilightAPP" )
+SET ( CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\ambilightapp.exe")
 SET ( CPACK_NSIS_HELP_LINK "http://www.hyperhdr.eu/")
 SET ( CPACK_NSIS_URL_INFO_ABOUT "https://github.com/awawa-dev/HyperHDR")
-SET ( CPACK_NSIS_MUI_FINISHPAGE_RUN "hyperhdr.exe")
-SET ( CPACK_NSIS_BRANDING_TEXT "HyperHDR-${HYPERHDR_VERSION}")
+SET ( CPACK_NSIS_MUI_FINISHPAGE_RUN "ambilightapp.exe")
+SET ( CPACK_NSIS_BRANDING_TEXT "AmbilightAPP-${AMBILIGHTAPP_VERSION}")
 # custom nsis plugin directory
 SET ( CPACK_NSIS_EXTRA_DEFS "!addplugindir ${CMAKE_SOURCE_DIR}/cmake/nsis/plugins")
-# additional hyperhdr startmenu link, won't be created if the user disables startmenu links
-SET ( CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\HyperHDR (Console).lnk' '$INSTDIR\\\\bin\\\\hyperhdr.exe' '-d -c'")
-SET ( CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '$SMPROGRAMS\\\\$MUI_TEMP\\\\HyperHDR (Console).lnk'")
+# additional ambilightapp startmenu link, won't be created if the user disables startmenu links
+SET ( CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\AmbilightAPP (Console).lnk' '$INSTDIR\\\\bin\\\\ambilightapp.exe' '-d -c'")
+SET ( CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '$SMPROGRAMS\\\\$MUI_TEMP\\\\AmbilightAPP (Console).lnk'")
 
 
 
@@ -196,9 +196,9 @@ SET ( CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '$SMPROGRAMS\\\\$MUI_TEMP\\\\HyperHD
 SET ( CPACK_COMPONENTS_GROUPING "ALL_COMPONENTS_IN_ONE")
 # Components base
 if (NOT APPLE)
-	SET ( CPACK_COMPONENTS_ALL "HyperHDR" "HyperHDR_remote" )
+	SET ( CPACK_COMPONENTS_ALL "AmbilightAPP" "AmbilightAPP_remote" )
 else()
-	SET ( CPACK_COMPONENTS_ALL "HyperHDR" )
+	SET ( CPACK_COMPONENTS_ALL "AmbilightAPP" )
 endif()
 
 SET ( CPACK_ARCHIVE_COMPONENT_INSTALL ON )
@@ -212,24 +212,24 @@ INCLUDE ( CPack )
 
 cpack_add_install_type(Full DISPLAY_NAME "Full")
 cpack_add_install_type(Min DISPLAY_NAME "Minimal")
-cpack_add_component_group(Runtime EXPANDED DESCRIPTION "HyperHdr runtime and HyperHdr_remote commandline tool")
+cpack_add_component_group(Runtime EXPANDED DESCRIPTION "AmbilightApp runtime and AmbilightApp_remote commandline tool")
 cpack_add_component_group(Screencapture EXPANDED DESCRIPTION "Standalone Screencapture commandline programs")
 # Components base
-cpack_add_component(HyperHDR
-	DISPLAY_NAME "HyperHDR"
-	DESCRIPTION "HyperHDR runtime"
+cpack_add_component(AmbilightAPP
+	DISPLAY_NAME "AmbilightAPP"
+	DESCRIPTION "AmbilightAPP runtime"
 	INSTALL_TYPES Full Min
 	GROUP Runtime
 	REQUIRED
 )
 
 if (NOT APPLE)
-	cpack_add_component(HyperHDR_remote
-		DISPLAY_NAME "HyperHdr Remote"
-		DESCRIPTION "HyperHdr remote cli tool"
+	cpack_add_component(AmbilightAPP_remote
+		DISPLAY_NAME "AmbilightApp Remote"
+		DESCRIPTION "AmbilightApp remote cli tool"
 		INSTALL_TYPES Full
 		GROUP Runtime
-		DEPENDS HyperHDR
+		DEPENDS AmbilightAPP
 	)
 endif()
 

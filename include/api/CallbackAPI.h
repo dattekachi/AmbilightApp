@@ -17,7 +17,7 @@
 #endif
 
 
-class HyperHdrInstance;
+class AmbilightAppInstance;
 class ComponentRegister;
 class BonjourBrowserWrapper;
 class PriorityMuxer;
@@ -49,11 +49,11 @@ protected slots:
 	virtual void handlerInstanceImageUpdated(const Image<ColorRgb>& image) = 0;
 
 private slots:
-	void componentStateHandler(hyperhdr::Components comp, bool state);
+	void componentStateHandler(ambilightapp::Components comp, bool state);
 	void priorityUpdateHandler();
 	void imageToLedsMappingChangeHandler(int mappingType);
 	void signalAdjustmentUpdatedHandler(const QJsonArray& newConfig);
-	void videoModeHdrChangeHandler(hyperhdr::Components component, bool enable);
+	void videoModeHdrChangeHandler(ambilightapp::Components component, bool enable);
 	void videoStreamChangedHandler(QString device, QString videoMode);
 	void settingsChangeHandler(settings::type type, const QJsonDocument& data);
 	void ledsConfigChangeHandler(settings::type type, const QJsonDocument& data);

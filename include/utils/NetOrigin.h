@@ -20,7 +20,7 @@ private slots:
 	void settingsChangedHandler(settings::type type, const QJsonDocument& config);
 
 private:
-	friend class HyperHdrDaemon;
+	friend class AmbilightAppDaemon;
 	NetOrigin(QObject* parent = nullptr, Logger* log = Logger::getInstance("NETWORK"));
 
 	Logger* _log;

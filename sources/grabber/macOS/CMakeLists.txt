@@ -7,10 +7,10 @@ FILE ( GLOB MACOS_SOURCES "${CURRENT_HEADER_DIR}/*.h"  "${CURRENT_SOURCE_DIR}/*.
 add_library(MACOS-grabber ${MACOS_SOURCES} )
 
 target_link_libraries(MACOS-grabber
-	hyperhdr-base
+	ambilightapp-base
 	${QT_LIBRARIES}
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(MACOS-grabber REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(MACOS-grabber REUSE_FROM precompiled_ambilightapp_headers)
 endif()

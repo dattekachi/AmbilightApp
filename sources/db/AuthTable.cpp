@@ -1,7 +1,7 @@
 #include <QCryptographicHash>
 
 #include <db/AuthTable.h>
-using namespace hyperhdr;
+using namespace ambilightapp;
 
 AuthTable::AuthTable(bool readonlyMode)
 	: DBManager()
@@ -110,7 +110,7 @@ bool AuthTable::updateUserPassword(const QString& user, const QString& newPw)
 }
 
 
-bool AuthTable::resetHyperhdrUser()
+bool AuthTable::resetAmbilightappUser()
 {
 	QVariantMap map;
 	map["password"] = calcPasswordHashOfUser(DEFAULT_CONFIG_USER, DEFAULT_CONFIG_PASSWORD);

@@ -10,11 +10,11 @@ add_library(bonjour ${Bonjour_SOURCES} )
 target_include_directories(bonjour PUBLIC ${CMAKE_SOURCE_DIR}/external/mdns)
 
 target_link_libraries(bonjour
-		hyperhdr-base
-		hyperhdr-utils
+		ambilightapp-base
+		ambilightapp-utils
 		Qt${Qt_VERSION}::Network
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(bonjour REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(bonjour REUSE_FROM precompiled_ambilightapp_headers)
 endif()

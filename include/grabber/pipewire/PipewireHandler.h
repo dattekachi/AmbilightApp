@@ -13,7 +13,7 @@
 #include <spa/debug/types.h>
 #include <grabber/pipewire/smartPipewire.h>
 #include <linux/types.h>
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 
 #if !PW_CHECK_VERSION(0, 3, 29)
 #define SPA_POD_PROP_FLAG_MANDATORY (1u << 3)

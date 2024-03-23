@@ -1,7 +1,7 @@
-// Local-HyperHDR includes
+// Local-Ambilight App includes
 #include "LedDevicePhilipsHue.h"
 #include <utils/QStringUtils.h>
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 #ifdef ENABLE_BONJOUR
 	#include <bonjour/DiscoveryWrapper.h>
 #endif
@@ -2216,7 +2216,7 @@ QJsonObject LedDevicePhilipsHue::discover(const QJsonObject& /*params*/)
 		}
 	}
 #else
-	Error(_log, "The Network Discovery Service was mysteriously disabled while the maintainer was compiling this version of HyperHDR");
+	Error(_log, "The Network Discovery Service was mysteriously disabled while the maintainer was compiling this version of Ambilight App");
 #endif
 	if (deviceList.isEmpty())
 	{

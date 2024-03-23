@@ -8,10 +8,10 @@ FILE ( GLOB Blackborder_SOURCES "${CURRENT_HEADER_DIR}/*.h"  "${CURRENT_SOURCE_D
 add_library(blackborder	${Blackborder_SOURCES} )
 
 target_link_libraries(blackborder
- 	hyperhdr-utils
-	hyperhdr-base
+ 	ambilightapp-utils
+	ambilightapp-base
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(blackborder REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(blackborder REUSE_FROM precompiled_ambilightapp_headers)
 endif()

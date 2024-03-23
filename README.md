@@ -4,7 +4,7 @@ Open source ambient lighting implementation for television and music sets based 
   
 ![v20](https://github.com/awawa-dev/HyperHDR/assets/69086569/9bc7999d-1515-4a96-ba5e-8a732cf7d8a4)
 
-## Main features of HyperHDR
+## Main features of Ambilight App
 
 * **Really low CPU** usage on SoCs like Raspberry Pi
 * Lightweight, we don't use bindings to heavy components like Python or Java
@@ -59,11 +59,11 @@ https://github.com/awawa-dev/HyperHDR/actions
 
 ## Forum
 
-[HyperHDR's support section](https://github.com/awawa-dev/HyperHDR/discussions)
+[Ambilight App's support section](https://github.com/awawa-dev/HyperHDR/discussions)
 
 ## How to compile
 
-[Building HyperHDR from sources](https://github.com/awawa-dev/HyperHDR/wiki/Compiling-HyperHDR)
+[Building Ambilight App from sources](https://github.com/awawa-dev/HyperHDR/wiki/Compiling-HyperHDR)
 
 ## Press mentions
 

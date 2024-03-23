@@ -33,7 +33,7 @@ Muxer::Muxer(int instanceIndex, int ledCount, QObject* parent)
 	_lowestPriorityInfo.priority = Muxer::LOWEST_PRIORITY;
 	_lowestPriorityInfo.timeout = -1;
 	_lowestPriorityInfo.staticColor = ColorRgb::BLACK;
-	_lowestPriorityInfo.componentId = hyperhdr::COMP_COLOR;
+	_lowestPriorityInfo.componentId = ambilightapp::COMP_COLOR;
 	_lowestPriorityInfo.origin = "System";
 	_lowestPriorityInfo.owner = "";
 
@@ -173,12 +173,12 @@ const QMap<int, Muxer::InputInfo>& Muxer::getInputInfoTable() const
 	return _activeInputs;
 }
 
-hyperhdr::Components Muxer::getComponentOfPriority(int priority) const
+ambilightapp::Components Muxer::getComponentOfPriority(int priority) const
 {
 	return _activeInputs[priority].componentId;
 }
 
-void Muxer::registerInput(int priority, hyperhdr::Components component, const QString& origin, const ColorRgb& staticColor, unsigned smooth_cfg, const QString& owner)
+void Muxer::registerInput(int priority, ambilightapp::Components component, const QString& origin, const ColorRgb& staticColor, unsigned smooth_cfg, const QString& owner)
 {
 	// detect new registers
 	bool newInput = false;
@@ -199,14 +199,14 @@ void Muxer::registerInput(int priority, hyperhdr::Components component, const QS
 
 	if (newInput)
 	{
-		Info(_log, "Register new input '%s/%s' with priority %d as inactive", QSTRING_CSTR(origin), hyperhdr::componentToIdString(component), priority);
+		Info(_log, "Register new input '%s/%s' with priority %d as inactive", QSTRING_CSTR(origin), ambilightapp::componentToIdString(component), priority);
 		// emit 'prioritiesChanged' only if _sourceAutoSelectEnabled is false
 		if (!_sourceAutoSelectEnabled)
 			emit SignalPrioritiesChanged();
 		return;
 	}
 
-	if (reusedInput && component!= hyperhdr::Components::COMP_FLATBUFSERVER)
+	if (reusedInput && component!= ambilightapp::Components::COMP_FLATBUFSERVER)
 	{
 		emit SignalTimeRunner_Internal();
 	}
@@ -248,7 +248,7 @@ void Muxer::clearAll(bool forceClearAll)
 		for (auto key : _activeInputs.keys())
 		{
 			const InputInfo& info = getInputInfo(key);
-			if ((info.componentId == hyperhdr::COMP_COLOR || info.componentId == hyperhdr::COMP_EFFECT || info.componentId == hyperhdr::COMP_IMAGE) && key < Muxer::LOWEST_PRIORITY - 1)
+			if ((info.componentId == ambilightapp::COMP_COLOR || info.componentId == ambilightapp::COMP_EFFECT || info.componentId == ambilightapp::COMP_IMAGE) && key < Muxer::LOWEST_PRIORITY - 1)
 			{
 				clearInput(key);
 			}
@@ -279,7 +279,7 @@ void Muxer::setCurrentTime()
 			// call timeTrigger when effect or color is running with timeout > 0, blacklist prio 255
 			if (infoIt->priority < Muxer::LOWEST_EFFECT_PRIORITY &&
 				infoIt->timeout > 0 &&
-				(infoIt->componentId == hyperhdr::COMP_EFFECT || infoIt->componentId == hyperhdr::COMP_COLOR || infoIt->componentId == hyperhdr::COMP_IMAGE))
+				(infoIt->componentId == ambilightapp::COMP_EFFECT || infoIt->componentId == ambilightapp::COMP_COLOR || infoIt->componentId == ambilightapp::COMP_IMAGE))
 				emit SignalTimeTrigger_Internal(); // as signal to prevent Threading issues
 
 			++infoIt;
@@ -300,7 +300,7 @@ void Muxer::setCurrentTime()
 		}
 	}
 	// apply & emit on change (after apply!)
-	hyperhdr::Components comp = getComponentOfPriority(newPriority);
+	ambilightapp::Components comp = getComponentOfPriority(newPriority);
 	if (_currentPriority != newPriority || comp != _prevVisComp)
 	{
 		_previousPriority = _currentPriority;

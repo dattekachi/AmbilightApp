@@ -18,7 +18,7 @@
 
 #include <QHostInfo>
 
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 #include <api/BaseAPI.h>
 #include <base/ImageToLedManager.h>
 #include <base/GrabberWrapper.h>
@@ -39,7 +39,7 @@
 	#include <QProcess>
 #endif
 
-using namespace hyperhdr;
+using namespace ambilightapp;
 
 BaseAPI::BaseAPI(Logger* log, bool localConnection, QObject* parent)
 	: QObject(parent),
@@ -85,10 +85,10 @@ BaseAPI::BaseAPI(Logger* log, bool localConnection, QObject* parent)
 	emit GlobalSignals::getInstance()->SignalGetSystemGrabber(_systemGrabber);
 	emit GlobalSignals::getInstance()->SignalGetDiscoveryWrapper(_discoveryWrapper);	
 	
-	SAFE_CALL_1_RET(_instanceManager.get(), getHyperHdrInstance, std::shared_ptr<HyperHdrInstance>, _hyperhdr, quint8, 0);
-	if (_hyperhdr == nullptr)
+	SAFE_CALL_1_RET(_instanceManager.get(), getAmbilightAppInstance, std::shared_ptr<AmbilightAppInstance>, _ambilightapp, quint8, 0);
+	if (_ambilightapp == nullptr)
 	{
-		Error(_log, "Could not get HyperHDR first instance");
+		Error(_log, "Could not get Ambilight App first instance");
 		return;
 	}	
 
@@ -100,7 +100,7 @@ BaseAPI::BaseAPI(Logger* log, bool localConnection, QObject* parent)
 		});
 
 	// connect to possible startInstance responses that has been requested
-	connect(_instanceManager.get(), &HyperHdrManager::SignalStartInstanceResponse, this, [this](QObject* caller, const int& tan)
+	connect(_instanceManager.get(), &AmbilightAppManager::SignalStartInstanceResponse, this, [this](QObject* caller, const int& tan)
 		{
 			if (this == caller)
 				emit SignalInstanceStartedClientNotification(tan);
@@ -112,7 +112,7 @@ void BaseAPI::init()
 	bool apiAuthRequired = _accessManager->isAuthRequired();
 
 	// For security we block external connections if default PW is set
-	if (!_localConnection && BaseAPI::hasHyperhdrDefaultPw())
+	if (!_localConnection && BaseAPI::hasAmbilightappDefaultPw())
 	{
 		emit SignalPerformClientDisconnection();
 	}
@@ -131,17 +131,17 @@ void BaseAPI::init()
 	}
 }
 
-bool BaseAPI::setHyperhdrInstance(quint8 inst)
+bool BaseAPI::setAmbilightappInstance(quint8 inst)
 {
 	if (_currentInstanceIndex == inst)
 		return true;
 
-	if (_hyperhdr != nullptr)
-		disconnect(_hyperhdr.get(), nullptr, this, nullptr);
+	if (_ambilightapp != nullptr)
+		disconnect(_ambilightapp.get(), nullptr, this, nullptr);
 
 	removeSubscriptions();
 
-	SAFE_CALL_1_RET(_instanceManager.get(), getHyperHdrInstance, std::shared_ptr<HyperHdrInstance>, _hyperhdr, quint8, inst);
+	SAFE_CALL_1_RET(_instanceManager.get(), getAmbilightAppInstance, std::shared_ptr<AmbilightAppInstance>, _ambilightapp, quint8, inst);
 	_currentInstanceIndex = inst;
 
 	addSubscriptions();
@@ -200,7 +200,7 @@ QString BaseAPI::setInstanceName(quint8 index, const QString& name)
 	return NO_AUTH;
 }
 
-void BaseAPI::setColor(int priority, const std::vector<uint8_t>& ledColors, int timeout_ms, const QString& origin, hyperhdr::Components callerComp)
+void BaseAPI::setColor(int priority, const std::vector<uint8_t>& ledColors, int timeout_ms, const QString& origin, ambilightapp::Components callerComp)
 {
 	std::vector<ColorRgb> fledColors;
 	if (ledColors.size() % 3 == 0)
@@ -209,11 +209,11 @@ void BaseAPI::setColor(int priority, const std::vector<uint8_t>& ledColors, int 
 		{
 			fledColors.emplace_back(ColorRgb{ ledColors[i], ledColors[i + 1], ledColors[i + 2] });
 		}
-		QUEUE_CALL_4(_hyperhdr.get(), setColor, int, priority, std::vector<ColorRgb>, fledColors, int, timeout_ms, QString, origin);
+		QUEUE_CALL_4(_ambilightapp.get(), setColor, int, priority, std::vector<ColorRgb>, fledColors, int, timeout_ms, QString, origin);
 	}
 }
 
-bool BaseAPI::setImage(ImageCmdData& data, hyperhdr::Components comp, QString& replyMsg, hyperhdr::Components callerComp)
+bool BaseAPI::setImage(ImageCmdData& data, ambilightapp::Components comp, QString& replyMsg, ambilightapp::Components callerComp)
 {
 	// truncate name length
 	data.imgName.truncate(16);
@@ -287,17 +287,17 @@ bool BaseAPI::setImage(ImageCmdData& data, hyperhdr::Components comp, QString& r
 	memcpy(image.rawMem(), data.data.data(), data.data.size());
 
 
-	QUEUE_CALL_4(_hyperhdr.get(), registerInput, int, data.priority, hyperhdr::Components, comp, QString, data.origin, QString, data.imgName);
-	QUEUE_CALL_3(_hyperhdr.get(), setInputImage, int, data.priority, Image<ColorRgb>, image, int64_t, data.duration);
+	QUEUE_CALL_4(_ambilightapp.get(), registerInput, int, data.priority, ambilightapp::Components, comp, QString, data.origin, QString, data.imgName);
+	QUEUE_CALL_3(_ambilightapp.get(), setInputImage, int, data.priority, Image<ColorRgb>, image, int64_t, data.duration);
 
 	return true;
 }
 
-bool BaseAPI::clearPriority(int priority, QString& replyMsg, hyperhdr::Components callerComp)
+bool BaseAPI::clearPriority(int priority, QString& replyMsg, ambilightapp::Components callerComp)
 {
 	if (priority < 0 || (priority > 0 && priority < Muxer::LOWEST_EFFECT_PRIORITY))
 	{
-		QUEUE_CALL_1(_hyperhdr.get(), clear, int, priority);
+		QUEUE_CALL_1(_ambilightapp.get(), clear, int, priority);
 	}
 	else
 	{
@@ -307,7 +307,7 @@ bool BaseAPI::clearPriority(int priority, QString& replyMsg, hyperhdr::Component
 	return true;
 }
 
-bool BaseAPI::setComponentState(const QString& comp, bool& compState, QString& replyMsg, hyperhdr::Components callerComp)
+bool BaseAPI::setComponentState(const QString& comp, bool& compState, QString& replyMsg, ambilightapp::Components callerComp)
 {
 	QString input(comp);
 	if (input == "GRABBER")
@@ -328,21 +328,21 @@ bool BaseAPI::setComponentState(const QString& comp, bool& compState, QString& r
 	}
 	else if (component != COMP_INVALID)
 	{
-		QUEUE_CALL_2(_hyperhdr.get(), SignalRequestComponent, hyperhdr::Components, component, bool, compState);
+		QUEUE_CALL_2(_ambilightapp.get(), SignalRequestComponent, ambilightapp::Components, component, bool, compState);
 		return true;
 	}
 	replyMsg = QString("Unknown component name: %1").arg(comp);
 	return false;
 }
 
-void BaseAPI::setLedMappingType(int type, hyperhdr::Components callerComp)
+void BaseAPI::setLedMappingType(int type, ambilightapp::Components callerComp)
 {
-	QUEUE_CALL_1(_hyperhdr.get(), setLedMappingType, int, type);
+	QUEUE_CALL_1(_ambilightapp.get(), setLedMappingType, int, type);
 }
 
-void BaseAPI::setVideoModeHdr(int hdr, hyperhdr::Components callerComp)
+void BaseAPI::setVideoModeHdr(int hdr, ambilightapp::Components callerComp)
 {
-	emit GlobalSignals::getInstance()->SignalRequestComponent(hyperhdr::Components::COMP_HDR, -1, hdr);
+	emit GlobalSignals::getInstance()->SignalRequestComponent(ambilightapp::Components::COMP_HDR, -1, hdr);
 }
 
 void BaseAPI::setFlatbufferUserLUT(QString userLUTfile)
@@ -353,36 +353,36 @@ void BaseAPI::setFlatbufferUserLUT(QString userLUTfile)
 	emit _instanceManager->SignalSettingsChanged(settings::type::FLATBUFSERVER, updateSettings);
 }
 
-bool BaseAPI::setEffect(const EffectCmdData& dat, hyperhdr::Components callerComp)
+bool BaseAPI::setEffect(const EffectCmdData& dat, ambilightapp::Components callerComp)
 {
 	int res = -1;
 
 	if (dat.args.isEmpty())
 	{
-		SAFE_CALL_4_RET(_hyperhdr.get(), setEffect, int, res, QString, dat.effectName, int, dat.priority, int, dat.duration, QString, dat.origin);
+		SAFE_CALL_4_RET(_ambilightapp.get(), setEffect, int, res, QString, dat.effectName, int, dat.priority, int, dat.duration, QString, dat.origin);
 	}
 
 	return res >= 0;
 }
 
-void BaseAPI::setSourceAutoSelect(bool state, hyperhdr::Components callerComp)
+void BaseAPI::setSourceAutoSelect(bool state, ambilightapp::Components callerComp)
 {
-	QUEUE_CALL_1(_hyperhdr.get(), setSourceAutoSelect, bool, state);
+	QUEUE_CALL_1(_ambilightapp.get(), setSourceAutoSelect, bool, state);
 }
 
-void BaseAPI::setVisiblePriority(int priority, hyperhdr::Components callerComp)
+void BaseAPI::setVisiblePriority(int priority, ambilightapp::Components callerComp)
 {
-	QUEUE_CALL_1(_hyperhdr.get(), setVisiblePriority, int, priority);
+	QUEUE_CALL_1(_ambilightapp.get(), setVisiblePriority, int, priority);
 }
 
-void BaseAPI::registerInput(int priority, hyperhdr::Components component, const QString& origin, const QString& owner, hyperhdr::Components callerComp)
+void BaseAPI::registerInput(int priority, ambilightapp::Components component, const QString& origin, const QString& owner, ambilightapp::Components callerComp)
 {
 	if (_activeRegisters.count(priority))
 		_activeRegisters.erase(priority);
 
 	_activeRegisters.insert({ priority, registerData{component, origin, owner, callerComp} });
 	
-	QUEUE_CALL_4(_hyperhdr.get(), registerInput, int, priority, hyperhdr::Components, component, QString, origin, QString, owner);
+	QUEUE_CALL_4(_ambilightapp.get(), registerInput, int, priority, ambilightapp::Components, component, QString, origin, QString, owner);
 }
 
 void BaseAPI::unregisterInput(int priority)
@@ -391,18 +391,18 @@ void BaseAPI::unregisterInput(int priority)
 		_activeRegisters.erase(priority);
 }
 
-std::map<hyperhdr::Components, bool> BaseAPI::getAllComponents()
+std::map<ambilightapp::Components, bool> BaseAPI::getAllComponents()
 {
-	std::map<hyperhdr::Components, bool> comps;
-	//QMetaObject::invokeMethod(_hyperhdr, "getAllComponents", Qt::BlockingQueuedConnection, Q_RETURN_ARG(std::map<hyperhdr::Components, bool>, comps));
+	std::map<ambilightapp::Components, bool> comps;
+	//QMetaObject::invokeMethod(_ambilightapp, "getAllComponents", Qt::BlockingQueuedConnection, Q_RETURN_ARG(std::map<ambilightapp::Components, bool>, comps));
 	return comps;
 }
 
-bool BaseAPI::isHyperhdrEnabled()
+bool BaseAPI::isAmbilightappEnabled()
 {
 	int res = false;
 
-	SAFE_CALL_1_RET(_hyperhdr.get(), isComponentEnabled, int, res, hyperhdr::Components, hyperhdr::COMP_ALL);
+	SAFE_CALL_1_RET(_ambilightapp.get(), isComponentEnabled, int, res, ambilightapp::Components, ambilightapp::COMP_ALL);
 
 	return res > 0;
 }
@@ -437,7 +437,7 @@ bool BaseAPI::saveSettings(const QJsonObject& data)
 	bool rc = false;
 	if (_adminAuthorized)
 	{
-		SAFE_CALL_2_RET(_hyperhdr.get(), saveSettings, bool, rc, QJsonObject, data, bool, true);
+		SAFE_CALL_2_RET(_ambilightapp.get(), saveSettings, bool, rc, QJsonObject, data, bool, true);
 	}
 	return rc;
 }
@@ -542,7 +542,7 @@ bool BaseAPI::isAdminAuthorized()
 	return _adminAuthorized;
 };
 
-bool BaseAPI::updateHyperhdrPassword(const QString& password, const QString& newPassword)
+bool BaseAPI::updateAmbilightappPassword(const QString& password, const QString& newPassword)
 {
 	if (!_adminAuthorized)
 		return false;
@@ -666,7 +666,7 @@ bool BaseAPI::isUserBlocked()
 	return res;
 }
 
-bool BaseAPI::hasHyperhdrDefaultPw()
+bool BaseAPI::hasAmbilightappDefaultPw()
 {
 	bool res = false;
 	SAFE_CALL_2_RET(_accessManager.get(), isUserAuthorized, bool, res, QString, DEFAULT_CONFIG_USER, QString, DEFAULT_CONFIG_PASSWORD);

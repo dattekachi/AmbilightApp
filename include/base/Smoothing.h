@@ -12,14 +12,14 @@
 
 class QTimer;
 class Logger;
-class HyperHdrInstance;
+class AmbilightAppInstance;
 
 class Smoothing : public QObject
 {
 	Q_OBJECT
 
 public:
-	Smoothing(const QJsonDocument& config, HyperHdrInstance* hyperhdr);
+	Smoothing(const QJsonDocument& config, AmbilightAppInstance* ambilightapp);
 
 	void SetEnable(bool enable);
 	bool isPaused() const;
@@ -40,7 +40,7 @@ public slots:
 private slots:
 
 	void updateLeds();
-	void componentStateChange(hyperhdr::Components component, bool state);
+	void componentStateChange(ambilightapp::Components component, bool state);
 
 private:
 
@@ -58,7 +58,7 @@ private:
 	void debugOutput(std::vector<ColorRgb>& _targetValues);
 
 	Logger* _log;
-	HyperHdrInstance* _hyperhdr;
+	AmbilightAppInstance* _ambilightapp;
 	int64_t _updateInterval;
 	int64_t _settlingTime;
 	QMutex _setupSynchro, _dataSynchro;

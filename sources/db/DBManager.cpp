@@ -40,7 +40,7 @@
 #include <QTextStream>
 #include <QIODevice>
 
-#include <HyperhdrConfig.h> // Required to determine the cmake options
+#include <AmbilightappConfig.h> // Required to determine the cmake options
 
 #ifdef USE_STATIC_QT_PLUGINS
 	#include <QtPlugin>
@@ -504,7 +504,7 @@ const QJsonObject DBManager::getBackup()
 	QJsonObject backup;
 	QSqlDatabase idb = getDB();
 	QStringList instanceKeys({ "enabled", "friendly_name", "instance" });
-	QStringList settingsKeys({ "config", "hyperhdr_instance", "type" });
+	QStringList settingsKeys({ "config", "ambilightapp_instance", "type" });
 
 	bool rm = _readonlyMode;
 
@@ -575,7 +575,7 @@ const QJsonObject DBManager::getBackup()
 			allSettings.append(entry);
 	}
 
-	backup["version"] = CURRENT_HYPERHDR_DB_EXPORT_VERSION;
+	backup["version"] = CURRENT_AMBILIGHTAPP_DB_EXPORT_VERSION;
 	backup["instances"] = allInstances;
 	backup["settings"] = allSettings;
 

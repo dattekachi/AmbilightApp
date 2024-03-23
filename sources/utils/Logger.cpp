@@ -157,7 +157,7 @@ Logger::Logger(const QString& name, LogLevel minLevel)
 #ifndef _WIN32
 		if (_syslogEnabled)
 		{
-			openlog("HyperHDR", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);
+			openlog("Ambilight App", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);
 		}
 #endif
 	}
@@ -426,7 +426,7 @@ std::shared_ptr<LoggerManager> LoggerManager::getInstance()
 		result = std::shared_ptr<LoggerManager>(
 			new LoggerManager(),
 			[](LoggerManager* oldManager) {				
-				hyperhdr::SMARTPOINTER_MESSAGE("LoggerManager");
+				ambilightapp::SMARTPOINTER_MESSAGE("LoggerManager");
 				delete oldManager;
 			}
 		);

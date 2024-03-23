@@ -7,8 +7,8 @@ FILE ( GLOB FRAMEBUFFER_SOURCES "${CURRENT_HEADER_DIR}/*.h" "${CURRENT_SOURCE_DI
 
 add_library(framebuffer-grabber ${FRAMEBUFFER_SOURCES} )
 
-target_link_libraries(framebuffer-grabber hyperhdr-base ${QT_LIBRARIES} )
+target_link_libraries(framebuffer-grabber ambilightapp-base ${QT_LIBRARIES} )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(framebuffer-grabber REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(framebuffer-grabber REUSE_FROM precompiled_ambilightapp_headers)
 endif()

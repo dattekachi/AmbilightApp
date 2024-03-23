@@ -9,8 +9,8 @@
 #endif
 
 #include <api/CallbackAPI.h>
-#include <base/HyperHdrInstance.h>
-#include <base/HyperHdrManager.h>
+#include <base/AmbilightAppInstance.h>
+#include <base/AmbilightAppManager.h>
 
 class QNetworkReply;
 
@@ -26,7 +26,7 @@ public:
 public slots:
 	void streamLedcolorsUpdate(const std::vector<ColorRgb>& ledColors);
 	void incommingLogMessage(const Logger::T_LOG_MESSAGE&);
-	hyperhdr::Components getActiveComponent();
+	ambilightapp::Components getActiveComponent();
 
 private slots:
 	void newPendingTokenRequest(const QString& id, const QString& comment);

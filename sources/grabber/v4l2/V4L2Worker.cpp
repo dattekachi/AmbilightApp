@@ -47,7 +47,7 @@
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 
 #include <QDirIterator>
 #include <QFileInfo>

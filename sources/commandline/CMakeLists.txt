@@ -7,10 +7,10 @@ FILE ( GLOB Parser_SOURCES "${CURRENT_HEADER_DIR}/*.h"  "${CURRENT_SOURCE_DIR}/*
 add_library(commandline ${Parser_SOURCES} )
 
 target_link_libraries(commandline
-	hyperhdr-base
+	ambilightapp-base
 	Qt${Qt_VERSION}::Gui
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(commandline REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(commandline REUSE_FROM precompiled_ambilightapp_headers)
 endif()

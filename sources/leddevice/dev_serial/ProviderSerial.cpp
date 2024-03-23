@@ -1,4 +1,4 @@
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 
 #ifdef ENABLE_BONJOUR
 	#include <bonjour/DiscoveryWrapper.h>	

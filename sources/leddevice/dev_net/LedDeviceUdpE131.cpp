@@ -6,7 +6,7 @@
 
 #include <QHostInfo>
 
-// hyperhdr local includes
+// ambilightapp local includes
 #include "LedDeviceUdpE131.h"
 
 union e131_packet_t
@@ -74,7 +74,7 @@ bool LedDeviceUdpE131::init(const QJsonObject& deviceConfig)
 	if (ProviderUdp::init(deviceConfig))
 	{
 		_e131_universe = deviceConfig["universe"].toInt(1);
-		_e131_source_name = deviceConfig["source-name"].toString("hyperhdr on " + QHostInfo::localHostName());
+		_e131_source_name = deviceConfig["source-name"].toString("ambilightapp on " + QHostInfo::localHostName());
 		QString _json_cid = deviceConfig["cid"].toString("");
 
 		if (_json_cid.isEmpty())

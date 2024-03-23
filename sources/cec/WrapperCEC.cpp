@@ -16,14 +16,14 @@ WrapperCEC::~WrapperCEC()
 	enable(false);
 }
 
-void WrapperCEC::sourceRequestHandler(hyperhdr::Components component, int hyperhdrInd, bool listen)
+void WrapperCEC::sourceRequestHandler(ambilightapp::Components component, int ambilightappInd, bool listen)
 {
-	if (component == hyperhdr::Components::COMP_CEC)
+	if (component == ambilightapp::Components::COMP_CEC)
 	{
-		if (listen && !CEC_CLIENTS.contains(hyperhdrInd))
-			CEC_CLIENTS.append(hyperhdrInd);
+		if (listen && !CEC_CLIENTS.contains(ambilightappInd))
+			CEC_CLIENTS.append(ambilightappInd);
 		else if (!listen)
-			CEC_CLIENTS.removeOne(hyperhdrInd);
+			CEC_CLIENTS.removeOne(ambilightappInd);
 
 		if (CEC_CLIENTS.empty())
 			enable(false);

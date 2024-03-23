@@ -12,7 +12,7 @@
 class BonjourServiceRegister;
 class StaticFileServing;
 class QtHttpServer;
-class HyperHdrManager;
+class AmbilightAppManager;
 class NetOrigin;
 
 class WebServer : public QObject
@@ -53,8 +53,8 @@ private:
 	std::shared_ptr<NetOrigin> _netOrigin;
 
 	const QString        WEBSERVER_DEFAULT_PATH = ":/www";
-	const QString        WEBSERVER_DEFAULT_CRT_PATH = ":/hyperhdrcrt.pem";
-	const QString        WEBSERVER_DEFAULT_KEY_PATH = ":/hyperhdrkey.pem";
+	const QString        WEBSERVER_DEFAULT_CRT_PATH = ":/ambilightappcrt.pem";
+	const QString        WEBSERVER_DEFAULT_KEY_PATH = ":/ambilightappkey.pem";
 	quint16              WEBSERVER_DEFAULT_PORT = 8090;
 
 	BonjourServiceRegister* _serviceRegister = nullptr;

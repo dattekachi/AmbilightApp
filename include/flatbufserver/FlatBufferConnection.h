@@ -15,12 +15,12 @@
 
 #include <flatbuffers/flatbuffers.h>
 
-namespace hyperhdrnet
+namespace ambilightappnet
 {
 	struct Reply;
 }
 
-#define HYPERHDR_DOMAIN_SERVER QStringLiteral("hyperhdr-domain")
+#define AMBILIGHTAPP_DOMAIN_SERVER QStringLiteral("ambilightapp-domain")
 
 class FlatBufferConnection : public QObject
 {
@@ -49,7 +49,7 @@ signals:
 	void SignalImageToSend(const Image<ColorRgb>& image);
 
 private:
-	bool parseReply(const hyperhdrnet::Reply* reply);
+	bool parseReply(const ambilightappnet::Reply* reply);
 
 	QTcpSocket*		_socket;
 	QLocalSocket*	_domain;

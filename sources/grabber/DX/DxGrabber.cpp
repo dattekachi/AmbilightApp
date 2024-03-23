@@ -40,7 +40,7 @@
 #include <limits.h>
 #include <DirectXMath.h>
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 
 #include <QDirIterator>
 #include <QFileInfo>

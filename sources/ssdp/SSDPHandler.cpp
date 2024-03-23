@@ -2,8 +2,8 @@
 
 #include <webserver/WebServer.h>
 #include "SSDPDescription.h"
-#include <base/HyperHdrInstance.h>
-#include <HyperhdrConfig.h>
+#include <base/AmbilightAppInstance.h>
+#include <AmbilightappConfig.h>
 #include <base/AccessManager.h>
 #include <QNetworkInterface>
 
@@ -13,7 +13,7 @@
 
 #define DEFAULT_RETRY 10
 
-static const QString SSDP_IDENTIFIER("urn:hyperhdr.eu:device:basic:1");
+static const QString SSDP_IDENTIFIER("urn:ambilightapp.eu:device:basic:1");
 
 SSDPHandler::SSDPHandler(QString uuid, quint16 flatBufPort, quint16 protoBufPort, quint16 jsonServerPort, quint16 sslPort, quint16 webPort, const QString& name, QObject* parent)
 	: SSDPServer(parent)
@@ -27,7 +27,7 @@ SSDPHandler::SSDPHandler(QString uuid, quint16 flatBufPort, quint16 protoBufPort
 	setJsonServerPort(jsonServerPort);
 	setSSLServerPort(sslPort);
 	setWebServerPort(webPort);
-	setHyperhdrName(name);
+	setAmbilightappName(name);
 	Debug(_log, "SSDPHandler is initialized");
 }
 
@@ -156,9 +156,9 @@ void SSDPHandler::handleSettingsUpdate(settings::type type, const QJsonDocument&
 
 	if (type == settings::type::GENERAL)
 	{
-		if (obj["name"].toString() != SSDPServer::getHyperhdrName())
+		if (obj["name"].toString() != SSDPServer::getAmbilightappName())
 		{
-			SSDPServer::setHyperhdrName(obj["name"].toString());
+			SSDPServer::setAmbilightappName(obj["name"].toString());
 		}
 	}
 }
@@ -243,7 +243,7 @@ QString SSDPHandler::getBaseAddress() const
 QString SSDPHandler::buildDesc() const
 {
 	/// %1 base url                   http://192.168.1.26:8090/
-	/// %2 friendly name              HyperHDR (192.168.1.26)
+	/// %2 friendly name              Ambilight App (192.168.1.26)
 	/// %3 modelNumber                17.0.0
 	/// %4 serialNumber / UDN (H ID)  Fjsa723dD0....
 	/// %5 json port                  19444
@@ -253,8 +253,8 @@ QString SSDPHandler::buildDesc() const
 
 	return SSDP_DESCRIPTION.arg(
 		getBaseAddress(),
-		QString("HyperHDR (%1)").arg(_localAddress),
-		QString(HYPERHDR_VERSION),
+		QString("Ambilight App (%1)").arg(_localAddress),
+		QString(AMBILIGHTAPP_VERSION),
 		_uuid,
 		QString::number(SSDPServer::getJsonServerPort()),
 		QString::number(SSDPServer::getSSLServerPort()),

@@ -253,12 +253,12 @@ void PipewireHandler::releaseWorkingFrame()
 
 QString PipewireHandler::getSessionToken()
 {
-	return QString("hyperhdr_s%1").arg(QUuid::createUuid().toString(QUuid::Id128));
+	return QString("ambilightapp_s%1").arg(QUuid::createUuid().toString(QUuid::Id128));
 }
 
 QString PipewireHandler::getRequestToken()
 {
-	return QString("hyperhdr_r%1").arg(QUuid::createUuid().toString(QUuid::Id128));
+	return QString("ambilightapp_r%1").arg(QUuid::createUuid().toString(QUuid::Id128));
 }
 
 void PipewireHandler::reportError(const QString& input)
@@ -527,7 +527,7 @@ void PipewireHandler::startResponse(uint response, const QVariantMap& results)
 
 	pw_init(nullptr, nullptr);
 	
-	if ( nullptr == (_pwMainThreadLoop = pw_thread_loop_new("pipewire-hyperhdr-loop", nullptr)))
+	if ( nullptr == (_pwMainThreadLoop = pw_thread_loop_new("pipewire-ambilightapp-loop", nullptr)))
 	{
 		reportError("Pipewire: failed to create new Pipewire thread loop");
 		return;
@@ -972,14 +972,14 @@ void PipewireHandler::initEGL()
 
 	if (_libEglHandle == NULL && (_libEglHandle = dlopen("libEGL.so.1", RTLD_NOW | RTLD_GLOBAL)) == NULL)
 	{
-		printf("PipewireEGL: HyperHDR could not open EGL library\n");
+		printf("PipewireEGL: Ambilight App could not open EGL library\n");
 		return;
 	}
 
 	if (_libGlHandle == NULL && ((_libGlHandle = dlopen("libGL.so.1", RTLD_NOW | RTLD_GLOBAL)) == NULL)
 							 && ((_libGlHandle = dlopen("libGL.so", RTLD_NOW | RTLD_GLOBAL)) == NULL))
 	{
-		printf("PipewireEGL: HyperHDR could not open GL library\n");
+		printf("PipewireEGL: Ambilight App could not open GL library\n");
 		return;
 	}
 
@@ -1127,7 +1127,7 @@ void PipewireHandler::initEGL()
 			EGLint major, minor;
 			if (eglInitialize(displayEgl, &major, &minor))
 			{
-				printf("PipewireEGL: EGL initialized for HyperHDR. Version: %d.%d\n", major, minor);
+				printf("PipewireEGL: EGL initialized for Ambilight App. Version: %d.%d\n", major, minor);
 			}
 			else
 			{
@@ -1202,7 +1202,7 @@ void PipewireHandler::initEGL()
 
 		if (!found)
 		{
-			printf("PipewireEGL: Found unsupported by HyperHDR '%s' DMA format\n", fourCCtoString(val).toLocal8Bit().constData());
+			printf("PipewireEGL: Found unsupported by Ambilight App '%s' DMA format\n", fourCCtoString(val).toLocal8Bit().constData());
 		}
 	}	
 }
@@ -1264,7 +1264,7 @@ pw_stream* PipewireHandler::createCapturingStream()
 	
 	pw_core_add_listener(_pwContextConnection, &_pwCoreListener, &pwCoreEvents, this);
 
-	pw_stream* stream = pw_stream_new(_pwContextConnection, "hyperhdr-stream-receiver", reuseProps);
+	pw_stream* stream = pw_stream_new(_pwContextConnection, "ambilightapp-stream-receiver", reuseProps);
 
 	if (stream != nullptr)
 	{

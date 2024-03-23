@@ -1,11 +1,11 @@
 #include <flatbufserver/FlatBufferServer.h>
 #include "FlatBufferClient.h"
-#include "HyperhdrConfig.h"
+#include "AmbilightappConfig.h"
 
 // util
 #include <utils/NetOrigin.h>
 #include <utils/GlobalSignals.h>
-#include <base/HyperHdrManager.h>
+#include <base/AmbilightAppManager.h>
 #include <utils/FrameDecoder.h>
 
 // qt
@@ -60,9 +60,9 @@ void FlatBufferServer::initServer()
 	loadLutFile();
 }
 
-void FlatBufferServer::signalRequestSourceHandler(hyperhdr::Components component, int instanceIndex, bool listen)
+void FlatBufferServer::signalRequestSourceHandler(ambilightapp::Components component, int instanceIndex, bool listen)
 {
-	if (component == hyperhdr::Components::COMP_HDR)
+	if (component == ambilightapp::Components::COMP_HDR)
 	{
 		if (instanceIndex < 0)
 		{
@@ -73,7 +73,7 @@ void FlatBufferServer::signalRequestSourceHandler(hyperhdr::Components component
 
 			_realHdrToneMappingMode = (_lutBufferInit && status) ? listen : 0;
 		}
-		emit SignalSetNewComponentStateToAllInstances(hyperhdr::Components::COMP_HDR, (_realHdrToneMappingMode != 0));
+		emit SignalSetNewComponentStateToAllInstances(ambilightapp::Components::COMP_HDR, (_realHdrToneMappingMode != 0));
 	}
 }
 
@@ -109,7 +109,7 @@ void FlatBufferServer::handleSettingsUpdate(settings::type type, const QJsonDocu
 		// HDR tone mapping
 		_hdrToneMappingMode = obj["hdrToneMapping"].toBool(false) ? obj["hdrToneMappingMode"].toInt(1) : 0;
 
-		signalRequestSourceHandler(hyperhdr::Components::COMP_HDR, -1, _hdrToneMappingMode);
+		signalRequestSourceHandler(ambilightapp::Components::COMP_HDR, -1, _hdrToneMappingMode);
 
 		// new timeout just for new connections
 		_timeout = obj["timeout"].toInt(5000);
@@ -180,8 +180,8 @@ void FlatBufferServer::startServer()
 	}
 	if (_domain != nullptr && !_domain->isListening())
 	{
-		if (!_domain->listen(HYPERHDR_DOMAIN_SERVER))
-			Error(_log, "Could not start local domain socket server '%s'", QSTRING_CSTR(QString(HYPERHDR_DOMAIN_SERVER)));
+		if (!_domain->listen(AMBILIGHTAPP_DOMAIN_SERVER))
+			Error(_log, "Could not start local domain socket server '%s'", QSTRING_CSTR(QString(AMBILIGHTAPP_DOMAIN_SERVER)));
 		else
 			Info(_log, "Started local domain socket server: '%s'", QSTRING_CSTR(_domain->serverName()));
 	}
@@ -232,8 +232,8 @@ void FlatBufferServer::loadLutFile()
 	QList<QString> files({ fileName01, fileName02, fileName1, fileName2 });
 
 #ifdef __linux__
-	QString fileName03 = QString("/usr/share/hyperhdr/lut/flat_lut_lin_tables.3d");
-	QString fileName3 = QString("/usr/share/hyperhdr/lut/lut_lin_tables.3d");
+	QString fileName03 = QString("/usr/share/ambilightapp/lut/flat_lut_lin_tables.3d");
+	QString fileName3 = QString("/usr/share/ambilightapp/lut/lut_lin_tables.3d");
 	files.append(fileName03);
 	files.append(fileName3);
 #endif
@@ -298,10 +298,10 @@ void FlatBufferServer::handlerImportFromProto(int priority, int duration, const 
 	if (getHdrToneMappingEnabled())
 		FrameDecoder::applyLUT((uint8_t*)image.rawMem(), image.width(), image.height(), _lut.data(), getHdrToneMappingEnabled());
 
-	emit GlobalSignals::getInstance()->SignalSetGlobalImage(priority, image, duration, hyperhdr::Components::COMP_PROTOSERVER, clientDescription);
+	emit GlobalSignals::getInstance()->SignalSetGlobalImage(priority, image, duration, ambilightapp::Components::COMP_PROTOSERVER, clientDescription);
 }
 
-void FlatBufferServer::handlerImageReceived(int priority, const Image<ColorRgb>& image, int timeout_ms, hyperhdr::Components origin, QString clientDescription)
+void FlatBufferServer::handlerImageReceived(int priority, const Image<ColorRgb>& image, int timeout_ms, ambilightapp::Components origin, QString clientDescription)
 {
 	if (getHdrToneMappingEnabled())
 		FrameDecoder::applyLUT((uint8_t*)image.rawMem(), image.width(), image.height(), _lut.data(), getHdrToneMappingEnabled());

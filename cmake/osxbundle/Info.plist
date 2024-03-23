@@ -5,19 +5,19 @@
 		<key>CFBundleIdentifier</key>
 		<string>com.awawa-dev.hyperhdr</string>
 		<key>CFBundleName</key>
-		<string>HyperHDR</string>
+		<string>Ambilight App</string>
 		<key>CFBundleExecutable</key>
-		<string>hyperhdr</string>
+		<string>ambilightapp</string>
 		<key>CFBundleIconFile</key>
-		<string>Hyperhdr.icns</string>
+		<string>Ambilightapp.icns</string>
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>NSCameraUsageDescription</key>
-		<string>HyperHDR needs your permission to access the video capture devices.</string>
+		<string>Ambilight App needs your permission to access the video capture devices.</string>
 		<key>NSMicrophoneUsageDescription</key>
-		<string>HyperHDR needs your permission to access the sound capture devices.
-NEXT PLEASE RESTART HYPERHDR!</string>		
+		<string>Ambilight App needs your permission to access the sound capture devices.
+NEXT PLEASE RESTART AMBILIGHTAPP!</string>		
 	</dict>
 </plist>

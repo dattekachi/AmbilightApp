@@ -8,12 +8,12 @@ FILE ( GLOB BoblightServer_SOURCES "${CURRENT_HEADER_DIR}/*.h"  "${CURRENT_SOURC
 add_library(boblightserver ${BoblightServer_SOURCES} )
 
 target_link_libraries(boblightserver
-	hyperhdr-base
-	hyperhdr-utils
+	ambilightapp-base
+	ambilightapp-utils
 	${QT_LIBRARIES}
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(boblightserver REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(boblightserver REUSE_FROM precompiled_ambilightapp_headers)
 endif()
 

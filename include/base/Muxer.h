@@ -29,7 +29,7 @@ public:
 		int priority;
 		int64_t timeout;
 		ColorRgb staticColor;
-		hyperhdr::Components componentId;
+		ambilightapp::Components componentId;
 		QString origin;
 		unsigned smooth_cfg;
 		QString owner;
@@ -52,7 +52,7 @@ public:
 	QList<int> getPriorities() const;
 	const InputInfo& getInputInfo(int priority) const;
 	const QMap<int, InputInfo>& getInputInfoTable() const;
-	void registerInput(int priority, hyperhdr::Components component, const QString& origin = "System", const ColorRgb& staticColor = ColorRgb::BLACK, unsigned smooth_cfg = SMOOTHING_DEFAULT_CONFIG, const QString& owner = "");
+	void registerInput(int priority, ambilightapp::Components component, const QString& origin = "System", const ColorRgb& staticColor = ColorRgb::BLACK, unsigned smooth_cfg = SMOOTHING_DEFAULT_CONFIG, const QString& owner = "");
 	bool setInput(int priority, int64_t timeout_ms);
 	bool setInputInactive(int priority);
 	bool clearInput(int priority);
@@ -61,7 +61,7 @@ public:
 signals:
 	void SignalTimeRunner_Internal();
 	void SignalVisiblePriorityChanged(quint8 priority);
-	void SignalVisibleComponentChanged(hyperhdr::Components comp);
+	void SignalVisibleComponentChanged(ambilightapp::Components comp);
 	void SignalPrioritiesChanged();
 	void SignalTimeTrigger_Internal();
 
@@ -70,13 +70,13 @@ private slots:
 	void setCurrentTime();
 
 private:
-	hyperhdr::Components getComponentOfPriority(int priority) const;
+	ambilightapp::Components getComponentOfPriority(int priority) const;
 
 	Logger* _log;
 	int _currentPriority;
 	int _previousPriority;
 	int _manualSelectedPriority;
-	hyperhdr::Components _prevVisComp = hyperhdr::COMP_INVALID;
+	ambilightapp::Components _prevVisComp = ambilightapp::COMP_INVALID;
 	QMap<int, InputInfo> _activeInputs;
 	InputInfo _lowestPriorityInfo;
 	bool _sourceAutoSelectEnabled;

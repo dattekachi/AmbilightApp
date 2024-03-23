@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
-// Local HyperHDR includes
+// Local Ambilight App includes
 #include "ProviderSpi.h"
 #include <utils/Logger.h>
 

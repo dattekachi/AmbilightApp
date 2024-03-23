@@ -48,7 +48,7 @@ public:
 signals:
 	void SignalClearGlobalInput(int priority, bool forceClearAll);
 	void SignalImportFromProto(int priority, int duration, const Image<ColorRgb>& image, QString clientDescription);
-	void SignalSetGlobalColor(int priority, const std::vector<ColorRgb>& ledColor, int timeout_ms, hyperhdr::Components origin, QString clientDescription);
+	void SignalSetGlobalColor(int priority, const std::vector<ColorRgb>& ledColor, int timeout_ms, ambilightapp::Components origin, QString clientDescription);
 	void SignalClientConnectionClosed(ProtoNanoClientConnection* client);
 
 public slots:
@@ -61,7 +61,7 @@ private slots:
 private:
 	void handleImageCommand(const proto_ImageRequest& message, Image<ColorRgb>& image);
 	void handleClearCommand(const proto_ClearRequest& message);
-	void sendMessage(const proto_HyperhdrReply& message);
+	void sendMessage(const proto_AmbilightappReply& message);
 	void sendSuccessReply();
 	void sendErrorReply(const std::string& error);
 	void processData(const uint8_t* buffer, uint32_t messageSize);

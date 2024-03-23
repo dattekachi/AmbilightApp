@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 // project includes
-#include "HyperhdrConfig.h"
+#include "AmbilightappConfig.h"
 #include <jsonserver/JsonServer.h>
 #include "JsonClientConnection.h"
 

@@ -3,7 +3,7 @@
 #include <map>
 
 // Build configuration
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 
 // Leddevice includes
 #include <leddevice/LedDeviceFactory.h>

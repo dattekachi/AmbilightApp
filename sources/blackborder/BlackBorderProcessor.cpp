@@ -1,13 +1,13 @@
 #include <iostream>
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 
 // Blackborder includes
 #include <blackborder/BlackBorderProcessor.h>
 
-using namespace hyperhdr;
+using namespace ambilightapp;
 
-BlackBorderProcessor::BlackBorderProcessor(HyperHdrInstance* hyperhdr, QObject* parent)
+BlackBorderProcessor::BlackBorderProcessor(AmbilightAppInstance* ambilightapp, QObject* parent)
 	: QObject(parent)
 	, _enabled(false)
 	, _unknownSwitchCnt(600)
@@ -24,12 +24,12 @@ BlackBorderProcessor::BlackBorderProcessor(HyperHdrInstance* hyperhdr, QObject* 
 	, _hardDisabled(false)
 	, _userEnabled(false)
 {
-	connect(this, &BlackBorderProcessor::setNewComponentState, hyperhdr, &HyperHdrInstance::setNewComponentState);
+	connect(this, &BlackBorderProcessor::setNewComponentState, ambilightapp, &AmbilightAppInstance::setNewComponentState);
 
-	handleSettingsUpdate(settings::type::BLACKBORDER, hyperhdr->getSetting(settings::type::BLACKBORDER));
+	handleSettingsUpdate(settings::type::BLACKBORDER, ambilightapp->getSetting(settings::type::BLACKBORDER));
 
-	connect(hyperhdr, &HyperHdrInstance::SignalInstanceSettingsChanged, this, &BlackBorderProcessor::handleSettingsUpdate);
-	connect(hyperhdr, &HyperHdrInstance::SignalRequestComponent, this, &BlackBorderProcessor::handleCompStateChangeRequest);
+	connect(ambilightapp, &AmbilightAppInstance::SignalInstanceSettingsChanged, this, &BlackBorderProcessor::handleSettingsUpdate);
+	connect(ambilightapp, &AmbilightAppInstance::SignalRequestComponent, this, &BlackBorderProcessor::handleCompStateChangeRequest);
 }
 
 BlackBorderProcessor::~BlackBorderProcessor()
@@ -59,13 +59,13 @@ void BlackBorderProcessor::handleSettingsUpdate(settings::type type, const QJson
 		Info(Logger::getInstance("BLACKBORDER"), "Set mode to: %s", QSTRING_CSTR(_detectionMode));
 
 		// eval the comp state
-		handleCompStateChangeRequest(hyperhdr::COMP_BLACKBORDER, obj["enable"].toBool(true));
+		handleCompStateChangeRequest(ambilightapp::COMP_BLACKBORDER, obj["enable"].toBool(true));
 	}
 }
 
-void BlackBorderProcessor::handleCompStateChangeRequest(hyperhdr::Components component, bool enable)
+void BlackBorderProcessor::handleCompStateChangeRequest(ambilightapp::Components component, bool enable)
 {
-	if (component == hyperhdr::COMP_BLACKBORDER)
+	if (component == ambilightapp::COMP_BLACKBORDER)
 	{
 		_userEnabled = enable;
 		if (enable)
@@ -79,7 +79,7 @@ void BlackBorderProcessor::handleCompStateChangeRequest(hyperhdr::Components com
 			_enabled = enable;
 		}
 
-		emit setNewComponentState(hyperhdr::COMP_BLACKBORDER, enable);
+		emit setNewComponentState(ambilightapp::COMP_BLACKBORDER, enable);
 	}
 }
 

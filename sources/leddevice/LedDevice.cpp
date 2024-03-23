@@ -9,7 +9,7 @@
 #endif
 
 #include <leddevice/LedDevice.h>
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <utils/JsonUtils.h>
 #include <utils/GlobalSignals.h>
 
@@ -471,7 +471,7 @@ void LedDevice::updateLeds(std::vector<ColorRgb> ledValues)
 
 		if (diff >= 59000 && diff <= 65000)
 			emit GlobalSignals::getInstance()->SignalPerformanceNewReport(
-				PerformanceReport(hyperhdr::PerformanceReportType::LED, _computeStats.token, this->_activeDeviceType + _customInfo, _computeStats.frames / qMax(diff / 1000.0, 1.0), _computeStats.frames, _computeStats.incomingframes, _computeStats.droppedFrames, _instanceIndex));
+				PerformanceReport(ambilightapp::PerformanceReportType::LED, _computeStats.token, this->_activeDeviceType + _customInfo, _computeStats.frames / qMax(diff / 1000.0, 1.0), _computeStats.frames, _computeStats.incomingframes, _computeStats.droppedFrames, _instanceIndex));
 
 		_computeStats.reset(now);
 	}

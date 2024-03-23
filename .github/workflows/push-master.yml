@@ -1,4 +1,4 @@
-name: HyperHDR CI Build
+name: Ambilight App CI Build
 
 on:
   push:
@@ -82,7 +82,7 @@ jobs:
   #       uses: actions/upload-artifact@v4
   #       with:
   #           name: release-artifact-${{ matrix.JOB_RUNNER }}      
-  #           path: build/Hyper*.dmg
+  #           path: build/Ambilight*.dmg
 
   #     # Upload artifacts from commit
   #     - name: Upload artifacts from commit
@@ -90,7 +90,7 @@ jobs:
   #       uses: actions/upload-artifact@v4
   #       with:
   #           name: Apple_macOS_${{ matrix.NICE_NAME }}_DMG_installer
-  #           path: build/Hyper*.dmg
+  #           path: build/Ambilight*.dmg
 
 ######################
 ###### Windows #######
@@ -142,7 +142,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-artifact-windows
-          path: build/Hyper*
+          path: build/Ambilight*
           
       # Upload artifacts from commit
       # - name: Upload artifacts from commit
@@ -150,7 +150,7 @@ jobs:
       #   uses: actions/upload-artifact@v4
       #   with:
       #     name: Windows_x64_setup
-      #     path: build/Hyper*.exe
+      #     path: build/Ambilight*.exe
 
 ################################
 ####### CodeQL support #########
@@ -220,7 +220,7 @@ jobs:
   #     - name: Create draft release
   #       uses: softprops/action-gh-release@v1
   #       with:
-  #         name: HyperHDR ${{ env.VERSION }}
+  #         name: AmbilightApp ${{ env.VERSION }}
   #         tag_name: ${{ env.TAG }}
   #         files: "artifacts/**"
   #         draft: true

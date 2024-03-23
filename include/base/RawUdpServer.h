@@ -36,7 +36,7 @@
 
 class QUdpSocket;
 class NetOrigin;
-class HyperHdrInstance;
+class AmbilightAppInstance;
 class QTimer;
 
 class RawUdpServer : public QObject
@@ -44,7 +44,7 @@ class RawUdpServer : public QObject
 	Q_OBJECT
 
 public:
-	RawUdpServer(HyperHdrInstance* ownerInstance, const QJsonDocument& config);
+	RawUdpServer(AmbilightAppInstance* ownerInstance, const QJsonDocument& config);
 	~RawUdpServer() override;
 
 public slots:
@@ -63,7 +63,7 @@ private:
 	int				_priority;
 	bool			_initialized;
 
-	HyperHdrInstance*		_ownerInstance;
+	AmbilightAppInstance*		_ownerInstance;
 	const QJsonDocument		_config;
 	QTimer*					_inactiveTimer;
 };

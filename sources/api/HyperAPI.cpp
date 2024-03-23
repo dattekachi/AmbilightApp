@@ -18,7 +18,7 @@
 #include <QHostInfo>
 #include <QBuffer>
 
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 #include <api/HyperAPI.h>
 #include <leddevice/LedDeviceWrapper.h>
 #include <leddevice/LedDevice.h>
@@ -42,7 +42,7 @@
 	#include <bonjour/DiscoveryWrapper.h>
 #endif
 
-using namespace hyperhdr;
+using namespace ambilightapp;
 
 HyperAPI::HyperAPI(QString peerAddress, Logger* log, bool localConnection, QObject* parent, bool noListener)
 	: CallbackAPI(log, localConnection, parent)
@@ -64,7 +64,7 @@ void HyperAPI::handleMessage(const QString& messageString, const QString& httpAu
 {
 	try
 	{
-		if (HyperHdrInstance::isTerminated())
+		if (AmbilightAppInstance::isTerminated())
 			return;
 
 		const QString ident = "JsonRpc@" + _peerAddress;
@@ -72,7 +72,7 @@ void HyperAPI::handleMessage(const QString& messageString, const QString& httpAu
 		// parse the message
 		if (!JsonUtils::parse(ident, messageString, message, _log))
 		{
-			sendErrorReply("Errors during message parsing, please consult the HyperHDR Log.");
+			sendErrorReply("Errors during message parsing, please consult the Ambilight App Log.");
 			return;
 		}
 
@@ -83,7 +83,7 @@ void HyperAPI::handleMessage(const QString& messageString, const QString& httpAu
 		// check basic message
 		if (!JsonUtils::validate(ident, message, ":schema", _log))
 		{
-			sendErrorReply("Errors during message validation, please consult the HyperHDR Log.", "" /*command*/, tan);
+			sendErrorReply("Errors during message validation, please consult the Ambilight App Log.", "" /*command*/, tan);
 			return;
 		}
 
@@ -91,7 +91,7 @@ void HyperAPI::handleMessage(const QString& messageString, const QString& httpAu
 		const QString command = message["command"].toString();
 		if (!JsonUtils::validate(ident, message, QString(":schema-%1").arg(command), _log))
 		{
-			sendErrorReply("Errors during specific message validation, please consult the HyperHDR Log", command, tan);
+			sendErrorReply("Errors during specific message validation, please consult the Ambilight App Log", command, tan);
 			return;
 		}
 
@@ -125,7 +125,7 @@ void HyperAPI::handleMessage(const QString& messageString, const QString& httpAu
 		quint8 currentIndex = getCurrentInstanceIndex();
 
 		SAFE_CALL_1_RET(_instanceManager.get(), IsInstanceRunning, bool, isRunning, quint8, currentIndex);
-		if (_hyperhdr == nullptr || !isRunning)
+		if (_ambilightapp == nullptr || !isRunning)
 		{
 			sendErrorReply("Not ready", command, tan);
 			return;
@@ -214,21 +214,21 @@ void HyperAPI::initialize()
 	connect(this, &BaseAPI::SignalTokenClientNotification, this, &HyperAPI::handleTokenResponse);
 
 	// listen for killed instances
-	connect(_instanceManager.get(), &HyperHdrManager::SignalInstanceStateChanged, this, &HyperAPI::handleInstanceStateChange);
+	connect(_instanceManager.get(), &AmbilightAppManager::SignalInstanceStateChanged, this, &HyperAPI::handleInstanceStateChange);
 
 	// pipe callbacks from subscriptions to parent
 	connect(this, &CallbackAPI::SignalCallbackToClient, this, &HyperAPI::SignalCallbackJsonMessage);
 
-	// notify hyperhdr about a jsonMessageForward
-	if (_hyperhdr != nullptr)
-		connect(this, &HyperAPI::SignalForwardJsonMessage, _hyperhdr.get(), &HyperHdrInstance::SignalForwardJsonMessage);
+	// notify ambilightapp about a jsonMessageForward
+	if (_ambilightapp != nullptr)
+		connect(this, &HyperAPI::SignalForwardJsonMessage, _ambilightapp.get(), &AmbilightAppInstance::SignalForwardJsonMessage);
 }
 
 bool HyperAPI::handleInstanceSwitch(quint8 inst, bool forced)
 {
-	if (BaseAPI::setHyperhdrInstance(inst))
+	if (BaseAPI::setAmbilightappInstance(inst))
 	{		
-		Debug(_log, "Client '%s' switch to HyperHDR instance %d", QSTRING_CSTR(_peerAddress), inst);
+		Debug(_log, "Client '%s' switch to Ambilight App instance %d", QSTRING_CSTR(_peerAddress), inst);
 		return true;
 	}
 	return false;
@@ -296,11 +296,11 @@ void HyperAPI::handleEffectCommand(const QJsonObject& message, const QString& co
 		sendErrorReply("Effect '" + dat.effectName + "' not found", command, tan);
 }
 
-hyperhdr::Components HyperAPI::getActiveComponent()
+ambilightapp::Components HyperAPI::getActiveComponent()
 {
-	hyperhdr::Components active;
+	ambilightapp::Components active;
 
-	SAFE_CALL_0_RET(_hyperhdr.get(), getCurrentPriorityActiveComponent, hyperhdr::Components, active);
+	SAFE_CALL_0_RET(_ambilightapp.get(), getCurrentPriorityActiveComponent, ambilightapp::Components, active);
 
 	return active;
 }
@@ -329,7 +329,7 @@ void HyperAPI::handleServerInfoCommand(const QJsonObject& message, const QString
 			// Instance report //
 			/////////////////////
 
-			BLOCK_CALL_2(_hyperhdr.get(), putJsonInfo, QJsonObject&, info, bool, true);
+			BLOCK_CALL_2(_ambilightapp.get(), putJsonInfo, QJsonObject&, info, bool, true);
 
 			///////////////////////////
 			// Available LED devices //
@@ -556,13 +556,13 @@ void HyperAPI::lutDownloaded(QNetworkReply* reply, int hardware_brightness, int 
 		BaseAPI::setVideoModeHdr(1);
 
 		QJsonDocument newSet;
-		SAFE_CALL_1_RET(_hyperhdr.get(), getSetting, QJsonDocument, newSet, settings::type, settings::type::VIDEOGRABBER);
+		SAFE_CALL_1_RET(_ambilightapp.get(), getSetting, QJsonDocument, newSet, settings::type, settings::type::VIDEOGRABBER);
 		QJsonObject grabber = QJsonObject(newSet.object());
 		grabber["hardware_brightness"] = hardware_brightness;
 		grabber["hardware_contrast"] = hardware_contrast;
 		grabber["hardware_saturation"] = hardware_saturation;
 		QString newConfig = QJsonDocument(grabber).toJson(QJsonDocument::Compact);
-		BLOCK_CALL_2(_hyperhdr.get(), setSetting, settings::type, settings::type::VIDEOGRABBER, QString, newConfig);
+		BLOCK_CALL_2(_ambilightapp.get(), setSetting, settings::type, settings::type::VIDEOGRABBER, QString, newConfig);
 
 		Info(_log, "New LUT has been installed as: %s (from: %s)", QSTRING_CSTR(fileName), QSTRING_CSTR(reply->url().toString()));
 	}
@@ -626,7 +626,7 @@ void HyperAPI::handleSmoothingCommand(const QJsonObject& message, const QString&
 	if (subc=="all")
 		QUEUE_CALL_1(_instanceManager.get(), setSmoothing, int, time)
 	else
-		QUEUE_CALL_1(_hyperhdr.get(), setSmoothing, int, time);
+		QUEUE_CALL_1(_ambilightapp.get(), setSmoothing, int, time);
 
 	sendSuccessReply(command, tan);
 }
@@ -684,7 +684,7 @@ void HyperAPI::handleSaveDB(const QJsonObject& message, const QString& command, 
 		if (!backup.empty())
 			sendSuccessDataReply(QJsonDocument(backup), command, tan);
 		else
-			sendErrorReply("Error while generating the backup file, please consult the HyperHDR logs.", command, tan);
+			sendErrorReply("Error while generating the backup file, please consult the Ambilight App logs.", command, tan);
 	}
 	else
 		sendErrorReply("No Authorization", command, tan);
@@ -701,11 +701,11 @@ void HyperAPI::handleLoadDB(const QJsonObject& message, const QString& command, 
 		if (error.isEmpty())
 		{
 #ifdef __linux__
-			Info(_log, "Exiting now. If HyperHDR is running as a service, systemd should restart the process.");
-			HyperHdrInstance::signalTerminateTriggered();
+			Info(_log, "Exiting now. If Ambilight App is running as a service, systemd should restart the process.");
+			AmbilightAppInstance::signalTerminateTriggered();
 			QTimer::singleShot(0, _instanceManager.get(), []() {QCoreApplication::exit(1); });
 #else
-			HyperHdrInstance::signalTerminateTriggered();
+			AmbilightAppInstance::signalTerminateTriggered();
 			QTimer::singleShot(0, _instanceManager.get(), []() {QCoreApplication::quit(); });
 #endif
 		}
@@ -793,7 +793,7 @@ void HyperAPI::handleConfigCommand(const QJsonObject& message, const QString& co
 		if (_adminAuthorized)
 		{
 			QJsonObject getconfig;
-			BLOCK_CALL_1(_hyperhdr.get(), putJsonConfig, QJsonObject&, getconfig);
+			BLOCK_CALL_1(_ambilightapp.get(), putJsonConfig, QJsonObject&, getconfig);
 			sendSuccessDataReply(QJsonDocument(getconfig), full_command, tan);
 		}
 		else
@@ -810,7 +810,7 @@ void HyperAPI::handleConfigSetCommand(const QJsonObject& message, const QString&
 	if (message.contains("config"))
 	{
 		QJsonObject config = message["config"].toObject();
-		if (BaseAPI::isHyperhdrEnabled())
+		if (BaseAPI::isAmbilightappEnabled())
 		{
 			if (BaseAPI::saveSettings(config))
 			{
@@ -822,7 +822,7 @@ void HyperAPI::handleConfigSetCommand(const QJsonObject& message, const QString&
 			}
 		}
 		else
-			sendErrorReply("Saving configuration while HyperHDR is disabled isn't possible", command, tan);
+			sendErrorReply("Saving configuration while Ambilight App is disabled isn't possible", command, tan);
 	}
 }
 
@@ -834,8 +834,8 @@ void HyperAPI::handleSchemaGetCommand(const QJsonObject& message, const QString&
 	// make sure the resources are loaded (they may be left out after static linking)
 	Q_INIT_RESOURCE(resource);
 
-	// read the hyperhdr json schema from the resource
-	QString schemaFile = ":/hyperhdr-schema";
+	// read the ambilightapp json schema from the resource
+	QString schemaFile = ":/ambilightapp-schema";
 
 	try
 	{
@@ -905,7 +905,7 @@ void HyperAPI::handleLedColorsCommand(const QJsonObject& message, const QString&
 		if (!_ledStreamTimer->isActive() || _ledStreamTimer->interval() != _colorsStreamingInterval)
 			_ledStreamTimer->start(_colorsStreamingInterval);
 
-		QUEUE_CALL_0(_hyperhdr.get(), update);
+		QUEUE_CALL_0(_ambilightapp.get(), update);
 	}
 	else if (subcommand == "ledstream-stop")
 	{
@@ -1048,7 +1048,7 @@ void HyperAPI::handleInstanceCommand(const QJsonObject& message, const QString& 
 			sendSuccessDataReply(QJsonDocument(obj), command + "-" + subc, tan);
 		}
 		else
-			sendErrorReply("Selected HyperHDR instance isn't running", command + "-" + subc, tan);
+			sendErrorReply("Selected Ambilight App instance isn't running", command + "-" + subc, tan);
 		return;
 	}
 
@@ -1057,7 +1057,7 @@ void HyperAPI::handleInstanceCommand(const QJsonObject& message, const QString& 
 		connect(this, &BaseAPI::SignalInstanceStartedClientNotification,
 				this, [this, command, subc](const int& tan) { sendSuccessReply(command + "-" + subc, tan); });
 		if (!BaseAPI::startInstance(inst, tan))
-			sendErrorReply("Can't start HyperHDR instance index " + QString::number(inst), command + "-" + subc, tan);
+			sendErrorReply("Can't start Ambilight App instance index " + QString::number(inst), command + "-" + subc, tan);
 		return;
 	}
 
@@ -1150,7 +1150,7 @@ void HyperAPI::handleLedDeviceCommand(const QJsonObject& message, const QString&
 
 			if (devType == "philipshuev2" || devType == "blink")
 			{
-				QUEUE_CALL_1(_hyperhdr.get(), identifyLed, QJsonObject, params);
+				QUEUE_CALL_1(_ambilightapp.get(), identifyLed, QJsonObject, params);
 			}
 			else
 			{
@@ -1164,7 +1164,7 @@ void HyperAPI::handleLedDeviceCommand(const QJsonObject& message, const QString&
 		{
 			int hasLedClock = 0;
 			QJsonObject ret;
-			SAFE_CALL_0_RET(_hyperhdr.get(), hasLedClock, int, hasLedClock);
+			SAFE_CALL_0_RET(_ambilightapp.get(), hasLedClock, int, hasLedClock);
 			ret["hasLedClock"] = hasLedClock;
 			sendSuccessDataReply(QJsonDocument(ret), "hasLedClock-update", tan);
 		}
@@ -1290,7 +1290,7 @@ void HyperAPI::stopDataConnections()
 	_streaming_logging_activated = false;
 	CallbackAPI::removeSubscriptions();
 	// led stream colors
-	disconnect(_hyperhdr.get(), &HyperHdrInstance::SignalRawColorsChanged, this, 0);
+	disconnect(_ambilightapp.get(), &AmbilightAppInstance::SignalRawColorsChanged, this, 0);
 	_ledStreamTimer->stop();
 }
 
@@ -1329,7 +1329,7 @@ void HyperAPI::handleTunnel(const QJsonObject& message, const QString& command, 
 
 			if (!isLocal(url.host()))
 			{
-				Error(_log, "Could not resolve '%s' as IP local address at your HyperHDR host device.", QSTRING_CSTR(url.host()));
+				Error(_log, "Could not resolve '%s' as IP local address at your Ambilight App host device.", QSTRING_CSTR(url.host()));
 				sendErrorReply("The Philips Hue wizard supports only valid IP addresses in the LOCAL network.\nIt may be preferable to use the IP4 address instead of the host name if you are having problems with DNS resolution.", full_command, tan);
 				return;
 			}
@@ -1437,18 +1437,18 @@ void HyperAPI::handleSysInfoCommand(const QJsonObject&, const QString& command, 
 	putSystemInfo(system);
 	info["system"] = system;
 
-	QJsonObject hyperhdr;
-	hyperhdr["version"] = QString(HYPERHDR_VERSION);
-	hyperhdr["build"] = QString(HYPERHDR_BUILD_ID);
-	hyperhdr["gitremote"] = QString(HYPERHDR_GIT_REMOTE);
-	hyperhdr["time"] = QString(__DATE__ " " __TIME__);
-	hyperhdr["id"] = _accessManager->getID();
+	QJsonObject ambilightapp;
+	ambilightapp["version"] = QString(AMBILIGHTAPP_VERSION);
+	ambilightapp["build"] = QString(AMBILIGHTAPP_BUILD_ID);
+	ambilightapp["gitremote"] = QString(AMBILIGHTAPP_GIT_REMOTE);
+	ambilightapp["time"] = QString(__DATE__ " " __TIME__);
+	ambilightapp["id"] = _accessManager->getID();
 
 	bool readOnly = true;
-	SAFE_CALL_0_RET(_hyperhdr.get(), getReadOnlyMode, bool, readOnly);
-	hyperhdr["readOnlyMode"] = readOnly;
+	SAFE_CALL_0_RET(_ambilightapp.get(), getReadOnlyMode, bool, readOnly);
+	ambilightapp["readOnlyMode"] = readOnly;
 
-	info["hyperhdr"] = hyperhdr;
+	info["ambilightapp"] = ambilightapp;
 
 	// send the result
 	result["info"] = info;
@@ -1459,7 +1459,7 @@ void HyperAPI::handleAdjustmentCommand(const QJsonObject& message, const QString
 {
 	const QJsonObject& adjustment = message["adjustment"].toObject();
 
-	QUEUE_CALL_1(_hyperhdr.get(), updateAdjustments, QJsonObject, adjustment);
+	QUEUE_CALL_1(_ambilightapp.get(), updateAdjustments, QJsonObject, adjustment);
 
 	sendSuccessReply(command, tan);
 }
@@ -1491,11 +1491,11 @@ void HyperAPI::handleAuthorizeCommand(const QJsonObject& message, const QString&
 		return;
 	}
 
-	// default hyperhdr password is a security risk, replace it asap
+	// default ambilightapp password is a security risk, replace it asap
 	if (subc == "newPasswordRequired")
 	{
 		QJsonObject req;
-		req["newPasswordRequired"] = BaseAPI::hasHyperhdrDefaultPw();
+		req["newPasswordRequired"] = BaseAPI::hasAmbilightappDefaultPw();
 		sendSuccessDataReply(QJsonDocument(req), command + "-" + subc, tan);
 		return;
 	}
@@ -1514,7 +1514,7 @@ void HyperAPI::handleAuthorizeCommand(const QJsonObject& message, const QString&
 		// use password, newPassword
 		if (BaseAPI::isAdminAuthorized())
 		{
-			if (BaseAPI::updateHyperhdrPassword(password, newPassword))
+			if (BaseAPI::updateAmbilightappPassword(password, newPassword))
 			{
 				sendSuccessReply(command + "-" + subc, tan);
 				return;
@@ -1685,13 +1685,13 @@ void HyperAPI::handleAuthorizeCommand(const QJsonObject& message, const QString&
 			QString userTokenRep;
 			if (BaseAPI::isUserAuthorized(password) && BaseAPI::getUserToken(userTokenRep))
 			{
-				// Return the current valid HyperHDR user token
+				// Return the current valid Ambilight App user token
 				QJsonObject obj;
 				obj["token"] = userTokenRep;
 				sendSuccessDataReply(QJsonDocument(obj), command + "-" + subc, tan);
 			}
 			else if (BaseAPI::isUserBlocked())
-				sendErrorReply("Too many login attempts detected. Please restart HyperHDR.", command + "-" + subc, tan);
+				sendErrorReply("Too many login attempts detected. Please restart Ambilight App.", command + "-" + subc, tan);
 			else
 				sendErrorReply("No Authorization", command + "-" + subc, tan);
 		}

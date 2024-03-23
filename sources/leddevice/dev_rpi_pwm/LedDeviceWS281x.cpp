@@ -99,7 +99,7 @@ int LedDeviceWS281x::open()
 	{
 		QString errortext = QString("Failed to open. Error message: %1").arg(ws2811_get_return_t_str(rc));
 		if (errortext.contains("mmap()", Qt::CaseInsensitive))
-			errortext += ". YOUR NEED TO RUN HYPERHDR AS A ROOT USER FOR MMAP TO WORK. SUCH CONFIGURATION IS NOT OFFICIALLY SUPPORTED.";
+			errortext += ". YOUR NEED TO RUN AMBILIGHTAPP AS A ROOT USER FOR MMAP TO WORK. SUCH CONFIGURATION IS NOT OFFICIALLY SUPPORTED.";
 		this->setInError(errortext);
 	}
 	else

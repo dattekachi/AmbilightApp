@@ -31,7 +31,7 @@
 						"type":"object",
 						"properties": {						
 							"config":            { "type" : "string"  },
-							"hyperhdr_instance": { "type" : "integer" },
+							"ambilightapp_instance": { "type" : "integer" },
 							"type":              { "type" : "string"  }
 						}
 					},
@@ -40,7 +40,7 @@
 				"version": {
 					"type" : "string",
 					"required" : true,
-					"enum" : ["HyperHDR_export_format_v17", "HyperHDR_export_format_v20"]
+					"enum" : ["Ambilight_App_export_format_v1", "Ambilight_App_export_format_v2"]
 				}
 			}
 		}

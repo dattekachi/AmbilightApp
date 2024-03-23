@@ -11,10 +11,10 @@ macro(DeployApple TARGET)
 			message( STATUS "LUT tar.xz tar extracted")			
 		endif()
 
-		install(FILES "${CMAKE_CURRENT_BINARY_DIR}/lut_lin_tables.3d" DESTINATION "hyperhdr.app/Contents/lut" COMPONENT "HyperHDR")			
-		install(FILES "${PROJECT_SOURCE_DIR}/cmake/osxbundle/Hyperhdr.icns" DESTINATION "hyperhdr.app/Contents/Resources" COMPONENT "HyperHDR")
-		install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION "hyperhdr.app/Contents/Resources" COMPONENT "HyperHDR")
-		install(FILES "${PROJECT_SOURCE_DIR}/3RD_PARTY_LICENSES" DESTINATION "hyperhdr.app/Contents/Resources" COMPONENT "HyperHDR")
+		install(FILES "${CMAKE_CURRENT_BINARY_DIR}/lut_lin_tables.3d" DESTINATION "ambilightapp.app/Contents/lut" COMPONENT "AmbilightAPP")			
+		install(FILES "${PROJECT_SOURCE_DIR}/cmake/osxbundle/Ambilightapp.icns" DESTINATION "ambilightapp.app/Contents/Resources" COMPONENT "AmbilightAPP")
+		install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION "ambilightapp.app/Contents/Resources" COMPONENT "AmbilightAPP")
+		install(FILES "${PROJECT_SOURCE_DIR}/3RD_PARTY_LICENSES" DESTINATION "ambilightapp.app/Contents/Resources" COMPONENT "AmbilightAPP")
 
 		if ( Qt5Core_FOUND )			
 			get_target_property(MYQT_QMAKE_EXECUTABLE ${Qt5Core_QMAKE_EXECUTABLE} IMPORTED_LOCATION)		
@@ -27,11 +27,11 @@ macro(DeployApple TARGET)
 			OUTPUT_VARIABLE MYQT_PLUGINS_DIR
 			OUTPUT_STRIP_TRAILING_WHITESPACE
 		)
-		install(CODE "set(MYQT_PLUGINS_DIR \"${MYQT_PLUGINS_DIR}\")"     COMPONENT "HyperHDR")
-		install(CODE "set(MY_DEPENDENCY_PATHS \"${TARGET_FILE}\")"       COMPONENT "HyperHDR")
-		install(CODE "set(MY_SYSTEM_LIBS_SKIP \"${SYSTEM_LIBS_SKIP}\")"  COMPONENT "HyperHDR")
-		install(CODE "set(SCOPE_Qt_VERSION ${Qt_VERSION})"               COMPONENT "HyperHDR")
-		install(CODE "set(SCOPE_CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR})" COMPONENT "HyperHDR")
+		install(CODE "set(MYQT_PLUGINS_DIR \"${MYQT_PLUGINS_DIR}\")"     COMPONENT "AmbilightAPP")
+		install(CODE "set(MY_DEPENDENCY_PATHS \"${TARGET_FILE}\")"       COMPONENT "AmbilightAPP")
+		install(CODE "set(MY_SYSTEM_LIBS_SKIP \"${SYSTEM_LIBS_SKIP}\")"  COMPONENT "AmbilightAPP")
+		install(CODE "set(SCOPE_Qt_VERSION ${Qt_VERSION})"               COMPONENT "AmbilightAPP")
+		install(CODE "set(SCOPE_CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR})" COMPONENT "AmbilightAPP")
 		install(CODE [[
 				execute_process(
 					COMMAND brew --prefix openssl@3
@@ -70,13 +70,13 @@ macro(DeployApple TARGET)
 						string(FIND ${openssl_lib} "dylib" _indexSSL)
 						if (${_indexSSL} GREATER -1)
 							file(INSTALL
-								DESTINATION "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/Frameworks"
+								DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/Frameworks"
 								TYPE SHARED_LIBRARY
 								FILES "${openssl_lib}"
 							)
 						else()
 							file(INSTALL
-								DESTINATION "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/lib"
+								DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
 								TYPE SHARED_LIBRARY
 								FILES "${openssl_lib}"
 							)
@@ -96,13 +96,13 @@ macro(DeployApple TARGET)
 					string(FIND ${_file} "dylib" _index)
 					if (${_index} GREATER -1)
 						file(INSTALL
-							DESTINATION "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/Frameworks"
+							DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/Frameworks"
 							TYPE SHARED_LIBRARY
 							FILES "${_file}"
 						)
 					else()
 						file(INSTALL
-							DESTINATION "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/lib"
+							DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
 							TYPE SHARED_LIBRARY
 							FILES "${_file}"
 						)
@@ -111,7 +111,7 @@ macro(DeployApple TARGET)
 				
 				if (NOT Qt5Core_FOUND AND EXISTS "/usr/local/lib/libbrotlicommon.1.dylib")
 					file(INSTALL
-						DESTINATION "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/lib"
+						DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
 						TYPE SHARED_LIBRARY
 						FOLLOW_SYMLINK_CHAIN
 						FILES "/usr/local/lib/libbrotlicommon.1.dylib")
@@ -119,7 +119,7 @@ macro(DeployApple TARGET)
 
 				if (EXISTS "/usr/local/lib/libsharpyuv.0.dylib")
 					file(INSTALL
-						DESTINATION "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/lib"
+						DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
 						TYPE SHARED_LIBRARY
 						FOLLOW_SYMLINK_CHAIN
 						FILES "/usr/local/lib/libsharpyuv.0.dylib")
@@ -142,16 +142,16 @@ macro(DeployApple TARGET)
 
 						foreach(DEPENDENCY ${PLUGINS})
 								file(INSTALL
-									DESTINATION "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/lib"
+									DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
 									TYPE SHARED_LIBRARY
 									FILES ${DEPENDENCY}
 								)									
 						endforeach()
 							
 						get_filename_component(singleQtLib ${file} NAME)
-						list(APPEND MYQT_PLUGINS "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/plugins/${PLUGIN}/${singleQtLib}")
+						list(APPEND MYQT_PLUGINS "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/plugins/${PLUGIN}/${singleQtLib}")
 						file(INSTALL
-							DESTINATION "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/plugins/${PLUGIN}"
+							DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/plugins/${PLUGIN}"
 							TYPE SHARED_LIBRARY
 							FILES ${file}
 						)
@@ -161,9 +161,9 @@ macro(DeployApple TARGET)
 			endforeach()
 			
 			include(BundleUtilities)							
-			fixup_bundle("${CMAKE_INSTALL_PREFIX}/hyperhdr.app" "${MYQT_PLUGINS}" "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/lib")
+			fixup_bundle("${CMAKE_INSTALL_PREFIX}/ambilightapp.app" "${MYQT_PLUGINS}" "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib")
 				
-			file(REMOVE_RECURSE "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/lib")			
+			file(REMOVE_RECURSE "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib")			
 			file(REMOVE_RECURSE "${CMAKE_INSTALL_PREFIX}/share")
 
 			message( "Detected architecture: '${SCOPE_CMAKE_SYSTEM_PROCESSOR}'")
@@ -171,10 +171,10 @@ macro(DeployApple TARGET)
 				cmake_policy(PUSH)
 					cmake_policy(SET CMP0009 NEW)
 					message( "Re-signing bundle's components...")
-					file(GLOB_RECURSE libSignFramework LIST_DIRECTORIES false "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/Frameworks/*")
-					file(GLOB_RECURSE libSignPlugins LIST_DIRECTORIES false "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/plugins/*")
+					file(GLOB_RECURSE libSignFramework LIST_DIRECTORIES false "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/Frameworks/*")
+					file(GLOB_RECURSE libSignPlugins LIST_DIRECTORIES false "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/plugins/*")
 					list(APPEND libSignFramework ${libSignPlugins})
-					list(APPEND libSignFramework "${CMAKE_INSTALL_PREFIX}/hyperhdr.app/Contents/MacOS/hyperhdr")
+					list(APPEND libSignFramework "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/MacOS/ambilightapp")
 					foreach(_fileToSign ${libSignFramework})
 						string(FIND ${_fileToSign} ".framework/Resources" isResources)
 						if (${isResources} EQUAL -1)
@@ -185,13 +185,13 @@ macro(DeployApple TARGET)
 						endif()			
 					endforeach()
 					message( "Perform final verification...")
-					execute_process(COMMAND bash -c "codesign --verify --deep -vvvv ${CMAKE_INSTALL_PREFIX}/hyperhdr.app" RESULT_VARIABLE CODESIGN_VERIFY)
+					execute_process(COMMAND bash -c "codesign --verify --deep -vvvv ${CMAKE_INSTALL_PREFIX}/ambilightapp.app" RESULT_VARIABLE CODESIGN_VERIFY)
 					if(NOT CODESIGN_VERIFY EQUAL 0)
 						message(WARNING "Failed to repair the bundle signature: verification failed")
 					endif()
 				cmake_policy(POP)
 			endif()
-		]] COMPONENT "HyperHDR")
+		]] COMPONENT "AmbilightAPP")
 	else()		
 		# Run CMake after target was built to run get_prerequisites on ${TARGET_FILE}
 		add_custom_command(
@@ -461,7 +461,7 @@ macro(DeployUnix TARGET)
 			message(STATUS "libGLX not found")
 		endif()
 
-		# Copy Qt plugins to 'share/hyperhdr/lib'
+		# Copy Qt plugins to 'share/ambilightapp/lib'
 		if(QT_PLUGINS_DIR)
 			foreach(PLUGIN "platforms" "sqldrivers" "imageformats")
 				if(EXISTS ${QT_PLUGINS_DIR}/${PLUGIN})
@@ -499,36 +499,36 @@ macro(DeployUnix TARGET)
 
 						install(
 							FILES ${file}
-							DESTINATION "share/hyperhdr/lib/${PLUGIN}"
-							COMPONENT "HyperHDR"
+							DESTINATION "share/ambilightapp/lib/${PLUGIN}"
+							COMPONENT "AmbilightAPP"
 						)
 					endforeach()
 				endif()
 			endforeach()
 		endif(QT_PLUGINS_DIR)
 
-		# Create a qt.conf file in 'share/hyperhdr/bin' to override hard-coded search paths in Qt plugins
+		# Create a qt.conf file in 'share/ambilightapp/bin' to override hard-coded search paths in Qt plugins
 		file(WRITE "${CMAKE_BINARY_DIR}/qt.conf" "[Paths]\nPlugins=../lib/\n")
 		install(
 			FILES "${CMAKE_BINARY_DIR}/qt.conf"
-			DESTINATION "share/hyperhdr/bin"
-			COMPONENT "HyperHDR"
+			DESTINATION "share/ambilightapp/bin"
+			COMPONENT "AmbilightAPP"
 		)
 
-		# Copy dependencies to 'share/hyperhdr/lib'
+		# Copy dependencies to 'share/ambilightapp/lib'
 		foreach(PREREQUISITE_LIB ${PREREQUISITE_LIBS})
 			message("Installing: " ${PREREQUISITE_LIB})
 			install(
 				FILES ${PREREQUISITE_LIB}
-				DESTINATION "share/hyperhdr/lib"
-				COMPONENT "HyperHDR"
+				DESTINATION "share/ambilightapp/lib"
+				COMPONENT "AmbilightAPP"
 			)
 		endforeach()
 		
 		# install LUT		
-		install(FILES "${PROJECT_SOURCE_DIR}/resources/lut/lut_lin_tables.tar.xz" DESTINATION "share/hyperhdr/lut" COMPONENT "HyperHDR")
-		install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION "share/hyperhdr" COMPONENT "HyperHDR")
-		install(FILES "${PROJECT_SOURCE_DIR}/3RD_PARTY_LICENSES" DESTINATION "share/hyperhdr" COMPONENT "HyperHDR")
+		install(FILES "${PROJECT_SOURCE_DIR}/resources/lut/lut_lin_tables.tar.xz" DESTINATION "share/ambilightapp/lut" COMPONENT "AmbilightAPP")
+		install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION "share/ambilightapp" COMPONENT "AmbilightAPP")
+		install(FILES "${PROJECT_SOURCE_DIR}/3RD_PARTY_LICENSES" DESTINATION "share/ambilightapp" COMPONENT "AmbilightAPP")
 	else()
 		# Run CMake after target was built to run get_prerequisites on ${TARGET_FILE}
 		add_custom_command(
@@ -568,7 +568,7 @@ macro(DeployWindows TARGET)
 		separate_arguments(DEPENDENCIES WINDOWS_COMMAND ${DEPS})
 		string(REPLACE "\\" "/" DEPENDENCIES "${DEPENDENCIES}")
 
-		# Copy dependencies to 'hyperhdr/lib' or 'hyperhdr'
+		# Copy dependencies to 'ambilightapp/lib' or 'ambilightapp'
 		while (DEPENDENCIES)
 			list(GET DEPENDENCIES 0 src)
 			list(GET DEPENDENCIES 1 dst)
@@ -578,13 +578,13 @@ macro(DeployWindows TARGET)
 				install(
 					FILES ${src}
 					DESTINATION "lib/${dst}"
-					COMPONENT "HyperHDR"
+					COMPONENT "AmbilightAPP"
 				)
 			else()
 				install(
 					FILES ${src}
 					DESTINATION "bin"
-					COMPONENT "HyperHDR"
+					COMPONENT "AmbilightAPP"
 				)
 			endif()
 
@@ -608,7 +608,7 @@ macro(DeployWindows TARGET)
 			install(
 				FILES ${TurboJPEG_DLL}
 				DESTINATION "bin"
-				COMPONENT "HyperHDR"
+				COMPONENT "AmbilightAPP"
 			)
 		endif()
 
@@ -631,7 +631,7 @@ macro(DeployWindows TARGET)
 			install(
 				FILES ${MQTT_DLL}
 				DESTINATION "bin"
-				COMPONENT "HyperHDR"
+				COMPONENT "AmbilightAPP"
 			)
 		endif()
 
@@ -641,7 +641,7 @@ macro(DeployWindows TARGET)
 		install(
 			FILES "${CMAKE_BINARY_DIR}/qt.conf"
 			DESTINATION "bin"
-			COMPONENT "HyperHDR"
+			COMPONENT "AmbilightAPP"
 		)
 
 		execute_process(
@@ -669,7 +669,7 @@ macro(DeployWindows TARGET)
 		install(
 			FILES ${CMAKE_CURRENT_BINARY_DIR}/lut_lin_tables.3d
 			DESTINATION "bin"
-			COMPONENT "HyperHDR"
+			COMPONENT "AmbilightAPP"
 		)
 
 
@@ -692,16 +692,16 @@ macro(DeployWindows TARGET)
 			install(
 				FILES ${OPENSSL_SSL} ${OPENSSL_CRYPTO}
 				DESTINATION "bin"
-				COMPONENT "HyperHDR"
+				COMPONENT "AmbilightAPP"
 			)
 		else()
-			message( WARNING "OpenSSL NOT found (HyperHDR's https instance will not work)")
+			message( WARNING "OpenSSL NOT found (AmbilightAPP's https instance will not work)")
 		endif()
 
-		INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION bin COMPONENT "HyperHDR")
+		INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION bin COMPONENT "AmbilightAPP")
 		
-		install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION bin COMPONENT "HyperHDR")
-		install(FILES "${PROJECT_SOURCE_DIR}/3RD_PARTY_LICENSES" DESTINATION bin COMPONENT "HyperHDR")
+		install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION bin COMPONENT "AmbilightAPP")
+		install(FILES "${PROJECT_SOURCE_DIR}/3RD_PARTY_LICENSES" DESTINATION bin COMPONENT "AmbilightAPP")
 
 	else()
 		# Run CMake after target was built

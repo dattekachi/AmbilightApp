@@ -6,7 +6,7 @@
 #error Regenerate this file with the current version of nanopb generator.
 #endif
 
-PB_BIND(proto_HyperhdrRequest, proto_HyperhdrRequest, AUTO)
+PB_BIND(proto_AmbilightappRequest, proto_AmbilightappRequest, AUTO)
 
 
 PB_BIND(proto_ColorRequest, proto_ColorRequest, AUTO)
@@ -18,7 +18,7 @@ PB_BIND(proto_ImageRequest, proto_ImageRequest, AUTO)
 PB_BIND(proto_ClearRequest, proto_ClearRequest, AUTO)
 
 
-PB_BIND(proto_HyperhdrReply, proto_HyperhdrReply, AUTO)
+PB_BIND(proto_AmbilightappReply, proto_AmbilightappReply, AUTO)
 
 
 /* Definition for extension field proto_ColorRequest_colorRequest */

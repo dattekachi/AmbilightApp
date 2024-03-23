@@ -41,7 +41,7 @@ public slots:
 	void stop();
 
 private slots:
-	void signalRequestSourceHandler(hyperhdr::Components component, int hyperHdrInd, bool listen);
+	void signalRequestSourceHandler(ambilightapp::Components component, int hyperHdrInd, bool listen);
 
 signals:
 	void SignalSystemImage(const QString& name, const Image<ColorRgb>& image);

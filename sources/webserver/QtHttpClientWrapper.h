@@ -12,7 +12,7 @@ class QtHttpReply;
 class QtHttpServer;
 class WebSocketClient;
 class WebJsonRpc;
-class HyperHdrManager;
+class AmbilightAppManager;
 
 class QtHttpClientWrapper : public QObject {
 	Q_OBJECT

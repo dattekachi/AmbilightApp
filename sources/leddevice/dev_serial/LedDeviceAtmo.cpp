@@ -1,4 +1,4 @@
-// HyperHDR local includes
+// Ambilight App local includes
 #include "LedDeviceAtmo.h"
 
 LedDeviceAtmo::LedDeviceAtmo(const QJsonObject& deviceConfig)

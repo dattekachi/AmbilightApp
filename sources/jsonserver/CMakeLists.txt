@@ -8,12 +8,12 @@ FILE ( GLOB JsonServer_SOURCES "${CURRENT_HEADER_DIR}/*.h"  "${CURRENT_SOURCE_DI
 add_library(jsonserver ${JsonServer_SOURCES} )
 
 target_link_libraries(jsonserver
-	hyperhdr-api
-	hyperhdr-base
+	ambilightapp-api
+	ambilightapp-base
 	Qt${Qt_VERSION}::Network
 	Qt${Qt_VERSION}::Gui
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(jsonserver REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(jsonserver REUSE_FROM precompiled_ambilightapp_headers)
 endif()

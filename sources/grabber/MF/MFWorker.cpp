@@ -44,7 +44,7 @@
 #include <QDirIterator>
 #include <QFileInfo>
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <grabber/MF/MFWorker.h>
 #include <utils/GlobalSignals.h>
 

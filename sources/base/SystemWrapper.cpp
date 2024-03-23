@@ -30,12 +30,12 @@
 	#include <QThread>
 #endif
 
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 #include <base/SystemWrapper.h>
 #include <base/Grabber.h>
 #include <utils/GlobalSignals.h>
 #include <utils/QStringUtils.h>
-#include <base/HyperHdrManager.h>
+#include <base/AmbilightAppManager.h>
 
 SystemWrapper::SystemWrapper(const QString& grabberName, Grabber* ggrabber)
 	: _grabberName(grabberName)
@@ -71,14 +71,14 @@ SystemWrapper::~SystemWrapper()
 	Debug(_log, "Closing grabber: %s", QSTRING_CSTR(_grabberName));
 }
 
-void SystemWrapper::signalRequestSourceHandler(hyperhdr::Components component, int hyperhdrInd, bool listen)
+void SystemWrapper::signalRequestSourceHandler(ambilightapp::Components component, int ambilightappInd, bool listen)
 {
-	if (component == hyperhdr::Components::COMP_SYSTEMGRABBER)
+	if (component == ambilightapp::Components::COMP_SYSTEMGRABBER)
 	{
-		if (listen && !GRABBER_SYSTEM_CLIENTS.contains(hyperhdrInd))
-			GRABBER_SYSTEM_CLIENTS.append(hyperhdrInd);
+		if (listen && !GRABBER_SYSTEM_CLIENTS.contains(ambilightappInd))
+			GRABBER_SYSTEM_CLIENTS.append(ambilightappInd);
 		else if (!listen)
-			GRABBER_SYSTEM_CLIENTS.removeOne(hyperhdrInd);
+			GRABBER_SYSTEM_CLIENTS.removeOne(ambilightappInd);
 
 		if (GRABBER_SYSTEM_CLIENTS.empty())
 			stop();

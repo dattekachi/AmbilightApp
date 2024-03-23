@@ -16,8 +16,8 @@
 #include <QHostInfo>
 
 #include <base/Muxer.h>
-#include <HyperhdrConfig.h>
-#include <base/HyperHdrInstance.h>
+#include <AmbilightappConfig.h>
+#include <base/AmbilightAppInstance.h>
 #include <utils/QStringUtils.h>
 
 
@@ -50,14 +50,14 @@ namespace QStringUtils {
 #endif
 }
 
-BoblightClientConnection::BoblightClientConnection(HyperHdrInstance* hyperhdr, QTcpSocket* socket, int priority)
+BoblightClientConnection::BoblightClientConnection(AmbilightAppInstance* ambilightapp, QTcpSocket* socket, int priority)
 	: QObject()
 	, _locale(QLocale::C)
 	, _socket(socket)
-	, _hyperhdr(hyperhdr)
+	, _ambilightapp(ambilightapp)
 	, _receiveBuffer()
 	, _priority(priority)
-	, _ledColors(hyperhdr->getLedCount(), ColorRgb::BLACK)
+	, _ledColors(ambilightapp->getLedCount(), ColorRgb::BLACK)
 	, _log(Logger::getInstance("BOBLIGHT"))
 	, _clientAddress(QHostInfo::fromName(socket->peerAddress().toString()).hostName())
 {
@@ -73,7 +73,7 @@ BoblightClientConnection::~BoblightClientConnection()
 {
 	// clear the current channel
 	if (_priority != 0 && _priority >= 128 && _priority < Muxer::LOWEST_EFFECT_PRIORITY)
-		_hyperhdr->clear(_priority);
+		_ambilightapp->clear(_priority);
 
 	delete _socket;
 }
@@ -135,7 +135,7 @@ void BoblightClientConnection::socketClosed()
 {
 	// clear the current channel
 	if (_priority >= 128 && _priority < 254)
-		_hyperhdr->clear(_priority);
+		_ambilightapp->clear(_priority);
 
 	emit connectionClosed(this);
 }
@@ -198,10 +198,10 @@ void BoblightClientConnection::handleMessage(const QString& message)
 							if (_priority == 0 || _priority < 128 || _priority >= 254)
 								return;
 
-							// send current color values to HyperHDR if this is the last led assuming leds values are send in order of id
+							// send current color values to Ambilight App if this is the last led assuming leds values are send in order of id
 							if (ledIndex == _ledColors.size() - 1)
 							{
-								_hyperhdr->setColor(_priority, _ledColors);
+								_ambilightapp->setColor(_priority, _ledColors);
 							}
 
 							return;
@@ -212,7 +212,7 @@ void BoblightClientConnection::handleMessage(const QString& message)
 						messageParts[3] == QStringLiteral("use") ||
 						messageParts[3] == QStringLiteral("singlechange"))
 					{
-						// these message are ignored by HyperHDR
+						// these message are ignored by Ambilight App
 						return;
 					}
 				}
@@ -223,13 +223,13 @@ void BoblightClientConnection::handleMessage(const QString& message)
 				const int prio = static_cast<int>(parseUInt(messageParts[2], &rc));
 				if (rc && prio != _priority)
 				{
-					if (_priority != 0 && _hyperhdr->getComponentForPriority(_priority) == hyperhdr::COMP_BOBLIGHTSERVER)
-						_hyperhdr->clear(_priority);
+					if (_priority != 0 && _ambilightapp->getComponentForPriority(_priority) == ambilightapp::COMP_BOBLIGHTSERVER)
+						_ambilightapp->clear(_priority);
 
 					if (prio < 128 || prio >= Muxer::LOWEST_PRIORITY)
 					{
 						_priority = 128;
-						while (_hyperhdr->getComponentForPriority(_priority) != hyperhdr::COMP_COLOR && _priority < Muxer::LOWEST_PRIORITY - 1)
+						while (_ambilightapp->getComponentForPriority(_priority) != ambilightapp::COMP_COLOR && _priority < Muxer::LOWEST_PRIORITY - 1)
 						{
 							_priority += 1;
 						}
@@ -237,12 +237,12 @@ void BoblightClientConnection::handleMessage(const QString& message)
 						// warn against invalid priority
 						Warning(_log, "The priority %i is not in the priority range between 128 and 253. Priority %i is used instead.", prio, _priority);
 						// register new priority (previously modified)
-						_hyperhdr->registerInput(_priority, hyperhdr::COMP_BOBLIGHTSERVER, QString("Boblight@%1").arg(_socket->peerAddress().toString()));
+						_ambilightapp->registerInput(_priority, ambilightapp::COMP_BOBLIGHTSERVER, QString("Boblight@%1").arg(_socket->peerAddress().toString()));
 					}
 					else
 					{
 						// register new priority
-						_hyperhdr->registerInput(prio, hyperhdr::COMP_BOBLIGHTSERVER, QString("Boblight@%1").arg(_socket->peerAddress().toString()));
+						_ambilightapp->registerInput(prio, ambilightapp::COMP_BOBLIGHTSERVER, QString("Boblight@%1").arg(_socket->peerAddress().toString()));
 						_priority = prio;
 					}
 
@@ -253,7 +253,7 @@ void BoblightClientConnection::handleMessage(const QString& message)
 		else if (messageParts[0] == QStringLiteral("sync"))
 		{
 			if (_priority >= 128 && _priority < 254)
-				_hyperhdr->setColor(_priority, _ledColors); // send current color values to HyperHDR
+				_ambilightapp->setColor(_priority, _ledColors); // send current color values to Ambilight App
 
 			return;
 		}
@@ -406,13 +406,13 @@ void BoblightClientConnection::sendLightMessage()
 {
 	char buffer[256];
 
-	int n = snprintf(buffer, sizeof(buffer), "lights %d\n", _hyperhdr->getLedCount());
+	int n = snprintf(buffer, sizeof(buffer), "lights %d\n", _ambilightapp->getLedCount());
 	sendMessage(QByteArray(buffer, n));
 
 	double h0, h1, v0, v1;
-	for (int i = 0; i < _hyperhdr->getLedCount(); ++i)
+	for (int i = 0; i < _ambilightapp->getLedCount(); ++i)
 	{
-		_hyperhdr->getScanParameters(i, h0, h1, v0, v1);
+		_ambilightapp->getScanParameters(i, h0, h1, v0, v1);
 		n = snprintf(buffer, sizeof(buffer), "light %03d scan %f %f %f %f\n", i, 100 * v0, 100 * v1, 100 * h0, 100 * h1);
 		sendMessage(QByteArray(buffer, n));
 	}

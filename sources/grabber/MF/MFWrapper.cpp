@@ -27,7 +27,7 @@
 
 #include <QMetaType>
 #include <grabber/MF/MFWrapper.h>
-#include <base/HyperHdrManager.h>
+#include <base/AmbilightAppManager.h>
 
 
 MFWrapper::MFWrapper(const QString& device,

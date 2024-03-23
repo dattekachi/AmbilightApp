@@ -7,7 +7,7 @@
 #include "LedDevice_headers.h"
 
 // util
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <utils/JsonUtils.h>
 #include <utils/Macros.h>
 
@@ -22,7 +22,7 @@ LedDeviceRegistry LedDeviceWrapper::_ledDeviceMap{};
 QMutex LedDeviceWrapper::_ledDeviceMapLock;
 
 
-LedDeviceWrapper::LedDeviceWrapper(HyperHdrInstance* ownerInstance)
+LedDeviceWrapper::LedDeviceWrapper(AmbilightAppInstance* ownerInstance)
 	: QObject(ownerInstance)
 	, _ownerInstance(ownerInstance)
 	, _ledDevice(nullptr, nullptr)
@@ -36,7 +36,7 @@ LedDeviceWrapper::LedDeviceWrapper(HyperHdrInstance* ownerInstance)
 
 #undef REGISTER
 
-	_ownerInstance->setNewComponentState(hyperhdr::COMP_LEDDEVICE, false);
+	_ownerInstance->setNewComponentState(ambilightapp::COMP_LEDDEVICE, false);
 }
 
 LedDeviceWrapper::~LedDeviceWrapper()
@@ -57,7 +57,7 @@ void LedDeviceWrapper::createLedDevice(QJsonObject config, int smoothingInterval
 		LedDeviceFactory::construct(config),
 		[](LedDevice* oldLed) {
 			oldLed->stop();
-			hyperhdr::THREAD_REMOVER(QString("LedDevice"), oldLed->thread(), oldLed);
+			ambilightapp::THREAD_REMOVER(QString("LedDevice"), oldLed->thread(), oldLed);
 		}
 	);
 	_ledDevice->setInstanceIndex(_ownerInstance->getInstanceIndex());
@@ -67,19 +67,19 @@ void LedDeviceWrapper::createLedDevice(QJsonObject config, int smoothingInterval
 	if (!disableOnStartup)
 		connect(thread, &QThread::started, _ledDevice.get(), &LedDevice::start);
 	connect(thread, &QThread::finished, _ledDevice.get(), &LedDevice::stop);
-	connect(_ownerInstance, &HyperHdrInstance::SignalSmoothingRestarted, _ledDevice.get(), &LedDevice::smoothingRestarted, Qt::QueuedConnection);
+	connect(_ownerInstance, &AmbilightAppInstance::SignalSmoothingRestarted, _ledDevice.get(), &LedDevice::smoothingRestarted, Qt::QueuedConnection);
 	connect(_ledDevice.get(), &LedDevice::SignalEnableStateChanged, this, &LedDeviceWrapper::handleInternalEnableState, Qt::QueuedConnection);
 
 	// start the thread
 	thread->start();
 }
 
-void LedDeviceWrapper::handleComponentState(hyperhdr::Components component, bool state)
+void LedDeviceWrapper::handleComponentState(ambilightapp::Components component, bool state)
 {
 	if (_ledDevice == nullptr)
 		return;
 
-	if (component == hyperhdr::COMP_LEDDEVICE)
+	if (component == ambilightapp::COMP_LEDDEVICE)
 	{
 		if (state)
 		{
@@ -91,7 +91,7 @@ void LedDeviceWrapper::handleComponentState(hyperhdr::Components component, bool
 		}
 	}
 
-	if (component == hyperhdr::COMP_ALL)
+	if (component == ambilightapp::COMP_ALL)
 	{
 		QUEUE_CALL_1(_ledDevice.get(), pauseRetryTimer, bool, (!state));
 	}
@@ -104,16 +104,16 @@ void LedDeviceWrapper::handleInternalEnableState(bool newState)
 
 	if (newState)
 	{
-		connect(_ledDevice.get(), &LedDevice::SignalSmoothingClockTick, _ownerInstance, &HyperHdrInstance::SignalSmoothingClockTick, static_cast<Qt::ConnectionType>(Qt::DirectConnection | Qt::UniqueConnection));
-		connect(_ownerInstance, &HyperHdrInstance::SignalUpdateLeds, _ledDevice.get(), &LedDevice::updateLeds, Qt::UniqueConnection);
+		connect(_ledDevice.get(), &LedDevice::SignalSmoothingClockTick, _ownerInstance, &AmbilightAppInstance::SignalSmoothingClockTick, static_cast<Qt::ConnectionType>(Qt::DirectConnection | Qt::UniqueConnection));
+		connect(_ownerInstance, &AmbilightAppInstance::SignalUpdateLeds, _ledDevice.get(), &LedDevice::updateLeds, Qt::UniqueConnection);
 	}
 	else
 	{
-		disconnect(_ledDevice.get(), &LedDevice::SignalSmoothingClockTick, _ownerInstance, &HyperHdrInstance::SignalSmoothingClockTick);
-		disconnect(_ownerInstance, &HyperHdrInstance::SignalUpdateLeds, _ledDevice.get(), &LedDevice::updateLeds);
+		disconnect(_ledDevice.get(), &LedDevice::SignalSmoothingClockTick, _ownerInstance, &AmbilightAppInstance::SignalSmoothingClockTick);
+		disconnect(_ownerInstance, &AmbilightAppInstance::SignalUpdateLeds, _ledDevice.get(), &LedDevice::updateLeds);
 	}
 
-	_ownerInstance->setNewComponentState(hyperhdr::COMP_LEDDEVICE, newState);
+	_ownerInstance->setNewComponentState(ambilightapp::COMP_LEDDEVICE, newState);
 	_enabled = newState;
 
 	if (_enabled)

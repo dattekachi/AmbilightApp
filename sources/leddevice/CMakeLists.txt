@@ -78,8 +78,8 @@ ENDFOREACH()
 add_library(leddevice ${CMAKE_BINARY_DIR}/LedDevice_headers.h ${Leddevice_SOURCES} )
 
 target_link_libraries(leddevice
-	hyperhdr-base
-	hyperhdr-utils
+	ambilightapp-base
+	ambilightapp-utils
 	${CMAKE_THREAD_LIBS_INIT}
 	Qt${Qt_VERSION}::Network
 	ssdp
@@ -111,5 +111,5 @@ if (NOT EXISTS "${MBEDTLS_INCLUDE_DIR}/mbedtls/build_info.h")
 endif()
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
-    target_precompile_headers(leddevice REUSE_FROM precompiled_hyperhdr_headers)
+    target_precompile_headers(leddevice REUSE_FROM precompiled_ambilightapp_headers)
 endif()

@@ -224,7 +224,7 @@ inline void SAFE_CALL_TEST_FUN() {};
 
 #define QSTRING_CSTR(str) str.toLocal8Bit().constData()
 
-namespace hyperhdr {
+namespace ambilightapp {
 	void THREAD_REMOVER(QString message, QThread* parentThread, QObject* client);
 	void THREAD_MULTI_REMOVER(QString message, QThread* parentThread, std::vector<QObject*> clients);
 	void SMARTPOINTER_MESSAGE(QString message);

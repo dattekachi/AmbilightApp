@@ -34,7 +34,7 @@ const QString DiscoveryRecord::getmDnsHeader(Service service)
 	{
 		case(Service::PhilipsHue): return QLatin1String("_hue._tcp"); break;
 		case(Service::WLED): return QLatin1String("_wled._tcp"); break;
-		case(Service::HyperHDR): return QLatin1String("_hyperhdr-http._tcp"); break;
+		case(Service::AmbilightAPP): return QLatin1String("_ambilightapp-http._tcp"); break;
 		default: return "SERVICE_UNKNOWN";
 	}
 }
@@ -50,7 +50,7 @@ const QString DiscoveryRecord::getName(Service _type)
 	{
 		case(Service::PhilipsHue): return "Hue bridge"; break;
 		case(Service::WLED): return "WLED"; break;
-		case(Service::HyperHDR): return "HyperHDR"; break;
+		case(Service::AmbilightAPP): return "AmbilightAPP"; break;
 		case(Service::Pico): return "Pico/RP2040"; break;
 		case(Service::ESP32_S2): return "ESP32-S2"; break;
 		case(Service::ESP): return "ESP board"; break;

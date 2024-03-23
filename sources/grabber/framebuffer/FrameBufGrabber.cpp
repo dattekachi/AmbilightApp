@@ -41,7 +41,7 @@
 #include <sys/mman.h>
 #include <linux/fb.h>
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <base/AccessManager.h>
 
 #include <QDirIterator>

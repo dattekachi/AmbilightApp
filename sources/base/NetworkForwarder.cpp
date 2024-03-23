@@ -36,10 +36,10 @@
 #include <QTcpSocket>
 
 #include <base/NetworkForwarder.h>
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <flatbufserver/FlatBufferConnection.h>
 #include <utils/GlobalSignals.h>
-#include <base/HyperHdrManager.h>
+#include <base/AmbilightAppManager.h>
 #include <base/Muxer.h>
 
 NetworkForwarder::NetworkForwarder()
@@ -54,7 +54,7 @@ NetworkForwarder::NetworkForwarder()
 
 void NetworkForwarder::startedHandler()
 {
-	std::shared_ptr<HyperHdrManager> instanceManager;
+	std::shared_ptr<AmbilightAppManager> instanceManager;
 	emit GlobalSignals::getInstance()->SignalGetInstanceManager(instanceManager);
 	if (instanceManager == nullptr)
 	{
@@ -62,29 +62,29 @@ void NetworkForwarder::startedHandler()
 		return;
 	}
 
-	std::shared_ptr<HyperHdrInstance> hyperhdr;	
-	SAFE_CALL_1_RET(instanceManager.get(), getHyperHdrInstance, std::shared_ptr<HyperHdrInstance>, hyperhdr, quint8, 0);
-	if (hyperhdr == nullptr)
+	std::shared_ptr<AmbilightAppInstance> ambilightapp;	
+	SAFE_CALL_1_RET(instanceManager.get(), getAmbilightAppInstance, std::shared_ptr<AmbilightAppInstance>, ambilightapp, quint8, 0);
+	if (ambilightapp == nullptr)
 	{
 		Error(_log, "Could not get first instance");
 		return;
 	}
 
-	_instanceZero = hyperhdr;
+	_instanceZero = ambilightapp;
 
 	connect(this, &NetworkForwarder::SignalForwardImage, this, &NetworkForwarder::signalForwardImageHandler, Qt::QueuedConnection);
-	connect(hyperhdr.get(), &HyperHdrInstance::SignalInstanceSettingsChanged, this, &NetworkForwarder::handleSettingsUpdate);
-	connect(hyperhdr.get(), &HyperHdrInstance::SignalRequestComponent, this, &NetworkForwarder::handleCompStateChangeRequest);
+	connect(ambilightapp.get(), &AmbilightAppInstance::SignalInstanceSettingsChanged, this, &NetworkForwarder::handleSettingsUpdate);
+	connect(ambilightapp.get(), &AmbilightAppInstance::SignalRequestComponent, this, &NetworkForwarder::handleCompStateChangeRequest);
 
-	handleCompStateChangeRequest(hyperhdr::COMP_FORWARDER, true);
+	handleCompStateChangeRequest(ambilightapp::COMP_FORWARDER, true);
 }
 
 NetworkForwarder::~NetworkForwarder()
 {
-	auto hyperhdr = _instanceZero.lock();
-	if (hyperhdr != nullptr)
+	auto ambilightapp = _instanceZero.lock();
+	if (ambilightapp != nullptr)
 	{
-		disconnect(hyperhdr.get(), nullptr, this, nullptr);
+		disconnect(ambilightapp.get(), nullptr, this, nullptr);
 	}
 
 	Debug(_log, "NetworkForwarder has been removed");
@@ -94,8 +94,8 @@ void NetworkForwarder::handleSettingsUpdate(settings::type type, const QJsonDocu
 {
 	if (type == settings::type::NETFORWARD)
 	{
-		auto hyperhdr = _instanceZero.lock();
-		if (hyperhdr == nullptr)
+		auto ambilightapp = _instanceZero.lock();
+		if (ambilightapp == nullptr)
 			return;
 
 		_jsonSlaves.clear();
@@ -103,8 +103,8 @@ void NetworkForwarder::handleSettingsUpdate(settings::type type, const QJsonDocu
 		while (!_forwardClients.isEmpty())
 			_forwardClients.takeFirst()->deleteLater();
 
-		disconnect(hyperhdr.get(), &HyperHdrInstance::SignalForwardJsonMessage, this, nullptr);
-		disconnect(hyperhdr.get(), &HyperHdrInstance::SignalInstanceImageUpdated, this, nullptr);
+		disconnect(ambilightapp.get(), &AmbilightAppInstance::SignalForwardJsonMessage, this, nullptr);
+		disconnect(ambilightapp.get(), &AmbilightAppInstance::SignalInstanceImageUpdated, this, nullptr);
 		disconnect(GlobalSignals::getInstance(), nullptr, this, nullptr);
 
 		_hasImage = false;
@@ -115,14 +115,14 @@ void NetworkForwarder::handleSettingsUpdate(settings::type type, const QJsonDocu
 		if (!obj["enable"].toBool() || !_forwarderEnabled)
 		{
 			_forwarderEnabled = false;
-			QUEUE_CALL_2(hyperhdr.get(), setNewComponentState,hyperhdr::Components, hyperhdr::COMP_FORWARDER, bool, _forwarderEnabled);
+			QUEUE_CALL_2(ambilightapp.get(), setNewComponentState,ambilightapp::Components, ambilightapp::COMP_FORWARDER, bool, _forwarderEnabled);
 			return;
 		}
 
 		if (!obj["json"].isNull())
 		{
 			QJsonDocument jsonConf;
-			SAFE_CALL_1_RET(hyperhdr.get(), getSetting, QJsonDocument, jsonConf, settings::type, settings::type::JSONSERVER);
+			SAFE_CALL_1_RET(ambilightapp.get(), getSetting, QJsonDocument, jsonConf, settings::type, settings::type::JSONSERVER);
 			for (auto&& entry : obj["json"].toArray())
 			{
 				addJsonSlave(entry.toString(), jsonConf.object());
@@ -132,7 +132,7 @@ void NetworkForwarder::handleSettingsUpdate(settings::type type, const QJsonDocu
 		if (!obj["flat"].isNull())
 		{
 			QJsonDocument flatConf;
-			SAFE_CALL_1_RET(hyperhdr.get(), getSetting, QJsonDocument, flatConf, settings::type, settings::type::FLATBUFSERVER);
+			SAFE_CALL_1_RET(ambilightapp.get(), getSetting, QJsonDocument, flatConf, settings::type, settings::type::FLATBUFSERVER);
 			for (auto&& entry : obj["flat"].toArray())
 			{
 				addFlatbufferSlave(entry.toString(), flatConf.object());
@@ -142,28 +142,28 @@ void NetworkForwarder::handleSettingsUpdate(settings::type type, const QJsonDocu
 		if (!_jsonSlaves.isEmpty())
 		{
 			Info(_log, "Forward now to json targets '%s'", QSTRING_CSTR(_jsonSlaves.join(", ")));
-			connect(hyperhdr.get(), &HyperHdrInstance::SignalForwardJsonMessage, this, &NetworkForwarder::forwardJsonMessage, Qt::UniqueConnection);
+			connect(ambilightapp.get(), &AmbilightAppInstance::SignalForwardJsonMessage, this, &NetworkForwarder::forwardJsonMessage, Qt::UniqueConnection);
 		}			
 
 		if (!_flatSlaves.isEmpty())
 		{
-			connect(hyperhdr.get(), &HyperHdrInstance::SignalInstanceImageUpdated, this, &NetworkForwarder::handlerInstanceImageUpdated, Qt::DirectConnection);
+			connect(ambilightapp.get(), &AmbilightAppInstance::SignalInstanceImageUpdated, this, &NetworkForwarder::handlerInstanceImageUpdated, Qt::DirectConnection);
 		}
 
-		QUEUE_CALL_2(hyperhdr.get(), setNewComponentState, hyperhdr::Components, hyperhdr::COMP_FORWARDER, bool, _forwarderEnabled);
+		QUEUE_CALL_2(ambilightapp.get(), setNewComponentState, ambilightapp::Components, ambilightapp::COMP_FORWARDER, bool, _forwarderEnabled);
 	}
 }
 
-void NetworkForwarder::handleCompStateChangeRequest(hyperhdr::Components component, bool enable)
+void NetworkForwarder::handleCompStateChangeRequest(ambilightapp::Components component, bool enable)
 {
-	if (component == hyperhdr::COMP_FORWARDER && _forwarderEnabled != enable)
+	if (component == ambilightapp::COMP_FORWARDER && _forwarderEnabled != enable)
 	{
-		auto hyperhdr = _instanceZero.lock();
-		if (hyperhdr == nullptr)
+		auto ambilightapp = _instanceZero.lock();
+		if (ambilightapp == nullptr)
 			return;		
 
 		QJsonDocument netForConf;
-		SAFE_CALL_1_RET(hyperhdr.get(), getSetting, QJsonDocument, netForConf, settings::type, settings::type::NETFORWARD);
+		SAFE_CALL_1_RET(ambilightapp.get(), getSetting, QJsonDocument, netForConf, settings::type, settings::type::NETFORWARD);
 
 		_forwarderEnabled = enable;
 		handleSettingsUpdate(settings::type::NETFORWARD, netForConf);
@@ -201,7 +201,7 @@ void NetworkForwarder::addJsonSlave(const QString& slave, const QJsonObject& obj
 
 void NetworkForwarder::addFlatbufferSlave(const QString& slave, const QJsonObject& obj)
 {
-	if (slave != HYPERHDR_DOMAIN_SERVER)
+	if (slave != AMBILIGHTAPP_DOMAIN_SERVER)
 	{
 		QStringList parts = slave.split(":");
 		if (parts.size() != 2)

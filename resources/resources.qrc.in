@@ -1,5 +1,5 @@
 <RCC>
 	<qresource prefix="/">
-		${HYPERHDR_RES}
+		${AMBILIGHTAPP_RES}
 	</qresource>
 </RCC>

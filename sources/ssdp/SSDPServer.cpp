@@ -1,8 +1,8 @@
 #include <ssdp/SSDPServer.h>
 #include <utils/QStringUtils.h>
 
-// HyperHDR
-#include <HyperhdrConfig.h>
+// Ambilight App
+#include <AmbilightappConfig.h>
 
 #include <QUdpSocket>
 #include <QDateTime>
@@ -24,9 +24,9 @@ static const QString UPNP_ALIVE_MESSAGE =	"NOTIFY * HTTP/1.1\r\n"
 											"NTS: ssdp:alive\r\n"
 											"SERVER: %4\r\n"
 											"USN: uuid:%5\r\n"
-											"HYPERHDR-FBS-PORT: %6\r\n"
-											"HYPERHDR-JSS-PORT: %7\r\n"
-											"HYPERHDR-NAME: %8\r\n"
+											"AMBILIGHTAPP-FBS-PORT: %6\r\n"
+											"AMBILIGHTAPP-JSS-PORT: %7\r\n"
+											"AMBILIGHTAPP-NAME: %8\r\n"
 											"\r\n";
 
 // Implement ssdp:update as per spec 1.1, section 1.2.4
@@ -69,9 +69,9 @@ static const QString UPNP_MSEARCH_RESPONSE ="HTTP/1.1 200 OK\r\n"
 											"SERVER: %4\r\n"
 											"ST: %5\r\n"
 											"USN: uuid:%6\r\n"
-											"HYPERHDR-FBS-PORT: %7\r\n"
-											"HYPERHDR-JSS-PORT: %8\r\n"
-											"HYPERHDR-NAME: %9\r\n"
+											"AMBILIGHTAPP-FBS-PORT: %7\r\n"
+											"AMBILIGHTAPP-JSS-PORT: %8\r\n"
+											"AMBILIGHTAPP-NAME: %9\r\n"
 											"\r\n";
 
 SSDPServer::SSDPServer(QObject* parent)
@@ -97,8 +97,8 @@ void SSDPServer::initServer()
 	_udpSocket = new QUdpSocket(this);
 
 	// create SERVER String
-	_serverHeader = QString("%1/%2 UPnP/1.0 HyperHDR/%3")
-		.arg(QSysInfo::prettyProductName(), QSysInfo::productVersion(), HYPERHDR_VERSION);
+	_serverHeader = QString("%1/%2 UPnP/1.0 Ambilight App/%3")
+		.arg(QSysInfo::prettyProductName(), QSysInfo::productVersion(), AMBILIGHTAPP_VERSION);
 
 	connect(_udpSocket, &QUdpSocket::readyRead, this, &SSDPServer::readPendingDatagrams);
 }
@@ -287,13 +287,13 @@ quint16 SSDPServer::getWebServerPort() const
 }
 
 
-void SSDPServer::setHyperhdrName(const QString& name)
+void SSDPServer::setAmbilightappName(const QString& name)
 {
 	_name = name;
 }
 
 
-QString SSDPServer::getHyperhdrName() const
+QString SSDPServer::getAmbilightappName() const
 {
 	return _name;
 }

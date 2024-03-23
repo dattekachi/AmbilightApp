@@ -1,6 +1,6 @@
 #pragma once
 
-// HyperHDR includes
+// Ambilight App includes
 #include "ProviderSpi.h"
 
 class LedDeviceSk6812SPI : public ProviderSpi

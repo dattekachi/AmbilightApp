@@ -2,11 +2,11 @@
 	#include <QVariant>
 #endif
 
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 #include <api/CallbackAPI.h>
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <base/GrabberWrapper.h>
-#include <base/HyperHdrManager.h>
+#include <base/AmbilightAppManager.h>
 #include <base/ComponentController.h>
 #include <base/Muxer.h>
 #include <base/ImageToLedManager.h>
@@ -14,7 +14,7 @@
 #include <utils/ColorSys.h>
 #include <utils/PerformanceCounters.h>
 
-using namespace hyperhdr;
+using namespace ambilightapp;
 
 CallbackAPI::CallbackAPI(Logger* log, bool localConnection, QObject* parent)
 	: BaseAPI(log, localConnection, parent)
@@ -51,12 +51,12 @@ bool CallbackAPI::subscribeFor(const QString& type, bool unsubscribe)
 	else
 		_subscribedCommands << type;
 
-	if (type == "components-update" && _hyperhdr != nullptr)
+	if (type == "components-update" && _ambilightapp != nullptr)
 	{
 		if (unsubscribe)
-			disconnect(_hyperhdr.get(), &HyperHdrInstance::SignalComponentStateChanged, this, &CallbackAPI::componentStateHandler);
+			disconnect(_ambilightapp.get(), &AmbilightAppInstance::SignalComponentStateChanged, this, &CallbackAPI::componentStateHandler);
 		else
-			connect(_hyperhdr.get(), &HyperHdrInstance::SignalComponentStateChanged, this, &CallbackAPI::componentStateHandler, Qt::UniqueConnection);
+			connect(_ambilightapp.get(), &AmbilightAppInstance::SignalComponentStateChanged, this, &CallbackAPI::componentStateHandler, Qt::UniqueConnection);
 	}
 
 	if (type == "performance-update")
@@ -95,28 +95,28 @@ bool CallbackAPI::subscribeFor(const QString& type, bool unsubscribe)
 #endif
 	}
 
-	if (type == "priorities-update" && _hyperhdr != nullptr)
+	if (type == "priorities-update" && _ambilightapp != nullptr)
 	{
 		if (unsubscribe)
-			disconnect(_hyperhdr.get(), &HyperHdrInstance::SignalPrioritiesChanged, this, &CallbackAPI::priorityUpdateHandler);
+			disconnect(_ambilightapp.get(), &AmbilightAppInstance::SignalPrioritiesChanged, this, &CallbackAPI::priorityUpdateHandler);
 		else
-			connect(_hyperhdr.get(), &HyperHdrInstance::SignalPrioritiesChanged, this, &CallbackAPI::priorityUpdateHandler, Qt::UniqueConnection);
+			connect(_ambilightapp.get(), &AmbilightAppInstance::SignalPrioritiesChanged, this, &CallbackAPI::priorityUpdateHandler, Qt::UniqueConnection);
 	}
 
-	if (type == "imageToLedMapping-update" && _hyperhdr != nullptr)
+	if (type == "imageToLedMapping-update" && _ambilightapp != nullptr)
 	{
 		if (unsubscribe)
-			disconnect(_hyperhdr.get(), &HyperHdrInstance::SignalImageToLedsMappingChanged, this, &CallbackAPI::imageToLedsMappingChangeHandler);
+			disconnect(_ambilightapp.get(), &AmbilightAppInstance::SignalImageToLedsMappingChanged, this, &CallbackAPI::imageToLedsMappingChangeHandler);
 		else
-			connect(_hyperhdr.get(), &HyperHdrInstance::SignalImageToLedsMappingChanged, this, &CallbackAPI::imageToLedsMappingChangeHandler, Qt::UniqueConnection);
+			connect(_ambilightapp.get(), &AmbilightAppInstance::SignalImageToLedsMappingChanged, this, &CallbackAPI::imageToLedsMappingChangeHandler, Qt::UniqueConnection);
 	}
 
-	if (type == "adjustment-update" && _hyperhdr != nullptr)
+	if (type == "adjustment-update" && _ambilightapp != nullptr)
 	{
 		if (unsubscribe)
-			disconnect(_hyperhdr.get(), &HyperHdrInstance::SignalAdjustmentUpdated, this, &CallbackAPI::signalAdjustmentUpdatedHandler);
+			disconnect(_ambilightapp.get(), &AmbilightAppInstance::SignalAdjustmentUpdated, this, &CallbackAPI::signalAdjustmentUpdatedHandler);
 		else
-			connect(_hyperhdr.get(), &HyperHdrInstance::SignalAdjustmentUpdated, this, &CallbackAPI::signalAdjustmentUpdatedHandler, Qt::UniqueConnection);
+			connect(_ambilightapp.get(), &AmbilightAppInstance::SignalAdjustmentUpdated, this, &CallbackAPI::signalAdjustmentUpdatedHandler, Qt::UniqueConnection);
 	}
 
 	if (type == "grabberstate-update" && grabberWrapper != nullptr)
@@ -130,52 +130,52 @@ bool CallbackAPI::subscribeFor(const QString& type, bool unsubscribe)
 	if (type == "videomodehdr-update")
 	{
 		if (unsubscribe)
-			disconnect(_instanceManager.get(), &HyperHdrManager::SignalSetNewComponentStateToAllInstances, this, &CallbackAPI::videoModeHdrChangeHandler);
+			disconnect(_instanceManager.get(), &AmbilightAppManager::SignalSetNewComponentStateToAllInstances, this, &CallbackAPI::videoModeHdrChangeHandler);
 		else
-			connect(_instanceManager.get(), &HyperHdrManager::SignalSetNewComponentStateToAllInstances, this, &CallbackAPI::videoModeHdrChangeHandler, Qt::UniqueConnection);
+			connect(_instanceManager.get(), &AmbilightAppManager::SignalSetNewComponentStateToAllInstances, this, &CallbackAPI::videoModeHdrChangeHandler, Qt::UniqueConnection);
 	}
 
-	if (type == "settings-update" && _hyperhdr != nullptr)
+	if (type == "settings-update" && _ambilightapp != nullptr)
 	{
 		if (unsubscribe)
-			disconnect(_hyperhdr.get(), &HyperHdrInstance::SignalInstanceSettingsChanged, this, &CallbackAPI::settingsChangeHandler);
+			disconnect(_ambilightapp.get(), &AmbilightAppInstance::SignalInstanceSettingsChanged, this, &CallbackAPI::settingsChangeHandler);
 		else
-			connect(_hyperhdr.get(), &HyperHdrInstance::SignalInstanceSettingsChanged, this, &CallbackAPI::settingsChangeHandler, Qt::UniqueConnection);
+			connect(_ambilightapp.get(), &AmbilightAppInstance::SignalInstanceSettingsChanged, this, &CallbackAPI::settingsChangeHandler, Qt::UniqueConnection);
 	}
 
-	if (type == "leds-update" && _hyperhdr != nullptr)
+	if (type == "leds-update" && _ambilightapp != nullptr)
 	{
 		if (unsubscribe)
-			disconnect(_hyperhdr.get(), &HyperHdrInstance::SignalInstanceSettingsChanged, this, &CallbackAPI::ledsConfigChangeHandler);
+			disconnect(_ambilightapp.get(), &AmbilightAppInstance::SignalInstanceSettingsChanged, this, &CallbackAPI::ledsConfigChangeHandler);
 		else
-			connect(_hyperhdr.get(), &HyperHdrInstance::SignalInstanceSettingsChanged, this, &CallbackAPI::ledsConfigChangeHandler, Qt::UniqueConnection);
+			connect(_ambilightapp.get(), &AmbilightAppInstance::SignalInstanceSettingsChanged, this, &CallbackAPI::ledsConfigChangeHandler, Qt::UniqueConnection);
 	}
 
-	if (type == "leds-colors" && _hyperhdr != nullptr)
+	if (type == "leds-colors" && _ambilightapp != nullptr)
 	{
 		if (unsubscribe)
-			disconnect(_hyperhdr.get(), &HyperHdrInstance::SignalRawColorsChanged, this, &CallbackAPI::handleIncomingColors);
+			disconnect(_ambilightapp.get(), &AmbilightAppInstance::SignalRawColorsChanged, this, &CallbackAPI::handleIncomingColors);
 		else
-			connect(_hyperhdr.get(), &HyperHdrInstance::SignalRawColorsChanged, this, &CallbackAPI::handleIncomingColors, Qt::UniqueConnection);
+			connect(_ambilightapp.get(), &AmbilightAppInstance::SignalRawColorsChanged, this, &CallbackAPI::handleIncomingColors, Qt::UniqueConnection);
 	}
 
-	if (type == "live-video" && _hyperhdr != nullptr)
+	if (type == "live-video" && _ambilightapp != nullptr)
 	{
 		if (unsubscribe)
 		{
 			_liveImage = Image<ColorRgb>();
-			disconnect(_hyperhdr.get(), &HyperHdrInstance::SignalInstanceImageUpdated, this, &CallbackAPI::handlerInstanceImageUpdated);
+			disconnect(_ambilightapp.get(), &AmbilightAppInstance::SignalInstanceImageUpdated, this, &CallbackAPI::handlerInstanceImageUpdated);
 		}
 		else
-			connect(_hyperhdr.get(), &HyperHdrInstance::SignalInstanceImageUpdated, this, &CallbackAPI::handlerInstanceImageUpdated, Qt::UniqueConnection);
+			connect(_ambilightapp.get(), &AmbilightAppInstance::SignalInstanceImageUpdated, this, &CallbackAPI::handlerInstanceImageUpdated, Qt::UniqueConnection);
 	}
 
 	if (type == "instance-update")
 	{
 		if (unsubscribe)
-			disconnect(_instanceManager.get(), &HyperHdrManager::SignalInstancesListChanged, this, &CallbackAPI::instancesListChangedHandler);
+			disconnect(_instanceManager.get(), &AmbilightAppManager::SignalInstancesListChanged, this, &CallbackAPI::instancesListChangedHandler);
 		else
-			connect(_instanceManager.get(), &HyperHdrManager::SignalInstancesListChanged, this, &CallbackAPI::instancesListChangedHandler, Qt::UniqueConnection);
+			connect(_instanceManager.get(), &AmbilightAppManager::SignalInstancesListChanged, this, &CallbackAPI::instancesListChangedHandler, Qt::UniqueConnection);
 	}
 
 	if (type == "token-update")
@@ -222,7 +222,7 @@ void CallbackAPI::subscribe(QJsonArray subsArr)
 
 void CallbackAPI::removeSubscriptions()
 {
-	if (_hyperhdr != nullptr)
+	if (_ambilightapp != nullptr)
 	{
 		QStringList toRemove(_subscribedCommands);
 
@@ -246,7 +246,7 @@ void CallbackAPI::doCallback(const QString& cmd, const QVariant& data)
 	emit SignalCallbackToClient(obj);
 }
 
-void CallbackAPI::componentStateHandler(hyperhdr::Components comp, bool state)
+void CallbackAPI::componentStateHandler(ambilightapp::Components comp, bool state)
 {
 	QJsonObject data;
 	data["name"] = componentToIdString(comp);
@@ -282,10 +282,10 @@ void CallbackAPI::priorityUpdateHandler()
 	QJsonObject info;
 	QJsonArray priorities;
 
-	if (_hyperhdr == nullptr)
+	if (_ambilightapp == nullptr)
 		return;
 
-	BLOCK_CALL_2(_hyperhdr.get(), putJsonInfo, QJsonObject&, info, bool, false);
+	BLOCK_CALL_2(_ambilightapp.get(), putJsonInfo, QJsonObject&, info, bool, false);
 
 	doCallback("priorities-update", QVariant(info));
 }
@@ -303,9 +303,9 @@ void CallbackAPI::signalAdjustmentUpdatedHandler(const QJsonArray& newConfig)
 	doCallback("adjustment-update", QVariant(newConfig));
 }
 
-void CallbackAPI::videoModeHdrChangeHandler(hyperhdr::Components component, bool enable)
+void CallbackAPI::videoModeHdrChangeHandler(ambilightapp::Components component, bool enable)
 {
-	if (component == hyperhdr::Components::COMP_HDR)
+	if (component == ambilightapp::Components::COMP_HDR)
 	{
 		QJsonObject data;
 		data["videomodehdr"] = enable;

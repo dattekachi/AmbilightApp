@@ -18,7 +18,7 @@ class V4L2Grabber : public Grabber
 	Q_OBJECT
 
 public:
-	struct HyperHdrFormat
+	struct AmbilightAppFormat
 	{
 		__u32		v4l2Format;
 		PixelFormat innerFormat;

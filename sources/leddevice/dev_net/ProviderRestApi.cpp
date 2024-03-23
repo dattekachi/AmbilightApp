@@ -25,7 +25,7 @@
 *  SOFTWARE.
  */
 
-// Local-HyperHDR includes
+// Local-Ambilight App includes
 #include "ProviderRestApi.h"
 #include <leddevice/LedDevice.h>
 
@@ -222,7 +222,7 @@ std::shared_ptr<QThread> NetworkHelper::threadFactory()
 	if (!result)
 	{
 		result = std::shared_ptr<QThread>(new QThread(), [](QThread* thread) {
-			hyperhdr::THREAD_REMOVER(QString("NetworkHelperThread"), thread, nullptr);
+			ambilightapp::THREAD_REMOVER(QString("NetworkHelperThread"), thread, nullptr);
 		});
 		result->start();
 		persist = result;

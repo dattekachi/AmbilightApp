@@ -25,7 +25,7 @@
 *  SOFTWARE.
  */
 
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 #include <bonjour/BonjourServiceRegister.h>
 #include <bonjour/DiscoveryWrapper.h>
 #include <bonjour/BonjourServiceHelper.h>
@@ -86,7 +86,7 @@ void BonjourServiceRegister::requestToScanHandler(DiscoveryRecord::Service type)
 {
 	switch (type)
 	{
-		case (DiscoveryRecord::Service::HyperHDR): _helper->_scanService |= (1 << DiscoveryRecord::Service::HyperHDR); break;
+		case (DiscoveryRecord::Service::AmbilightAPP): _helper->_scanService |= (1 << DiscoveryRecord::Service::AmbilightAPP); break;
 		case (DiscoveryRecord::Service::WLED): _helper->_scanService |= (1 << DiscoveryRecord::Service::WLED); break;
 		case (DiscoveryRecord::Service::PhilipsHue): _helper->_scanService |= (1 << DiscoveryRecord::Service::PhilipsHue); break;
 		default: break;
@@ -102,8 +102,8 @@ void BonjourServiceRegister::messageFromFriendHandler(bool isExists, QString mdn
 		type = DiscoveryRecord::Service::WLED;
 	else if (mdnsString.indexOf(DiscoveryRecord::getmDnsHeader(DiscoveryRecord::Service::PhilipsHue)) >= 0)
 		type = DiscoveryRecord::Service::PhilipsHue;
-	else if (mdnsString.indexOf(DiscoveryRecord::getmDnsHeader(DiscoveryRecord::Service::HyperHDR)) >= 0)
-		type = DiscoveryRecord::Service::HyperHDR;
+	else if (mdnsString.indexOf(DiscoveryRecord::getmDnsHeader(DiscoveryRecord::Service::AmbilightAPP)) >= 0)
+		type = DiscoveryRecord::Service::AmbilightAPP;
 
 	if (type != DiscoveryRecord::Service::Unknown)
 	{

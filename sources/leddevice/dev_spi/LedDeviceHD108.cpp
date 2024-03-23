@@ -27,7 +27,7 @@
 
 #include "LedDeviceHD108.h"
 
-// Local HyperHDR includes
+// Local Ambilight App includes
 #include <utils/Logger.h>
 #include <cmath>
 #include <algorithm>

@@ -37,9 +37,9 @@
 #include <QMutexLocker>
 
 #include <base/Smoothing.h>
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 
-using namespace hyperhdr;
+using namespace ambilightapp;
 
 namespace {
 	const int64_t  DEFAUL_SETTLINGTIME = 200;   // settlingtime in ms
@@ -47,10 +47,10 @@ namespace {
 	const double   MINIMAL_UPDATEFREQUENCY = 20;
 }
 
-Smoothing::Smoothing(const QJsonDocument& config, HyperHdrInstance* hyperhdr)
-	: QObject(hyperhdr),
-	_log(Logger::getInstance(QString("SMOOTHING%1").arg(hyperhdr->getInstanceIndex()))),
-	_hyperhdr(hyperhdr),
+Smoothing::Smoothing(const QJsonDocument& config, AmbilightAppInstance* ambilightapp)
+	: QObject(ambilightapp),
+	_log(Logger::getInstance(QString("SMOOTHING%1").arg(ambilightapp->getInstanceIndex()))),
+	_ambilightapp(ambilightapp),
 	_updateInterval(static_cast<int64_t>(1000 / DEFAUL_UPDATEFREQUENCY)),
 	_settlingTime(DEFAUL_SETTLINGTIME),
 	_continuousOutput(false),
@@ -81,7 +81,7 @@ Smoothing::Smoothing(const QJsonDocument& config, HyperHdrInstance* hyperhdr)
     _configurations.push_back(std::unique_ptr<SmoothingConfig>(new SmoothingConfig(true, 0, 0, false)));
 
 	// listen for comp changes
-	connect(_hyperhdr, &HyperHdrInstance::SignalRequestComponent, this, &Smoothing::componentStateChange);
+	connect(_ambilightapp, &AmbilightAppInstance::SignalRequestComponent, this, &Smoothing::componentStateChange);
 }
 
 inline uint8_t Smoothing::clamp(int x)
@@ -123,7 +123,7 @@ void Smoothing::clearQueuedColors(bool deviceEnabled, bool restarting)
 			connect(this, &Smoothing::SignalMasterClockTick, this, &Smoothing::updateLeds, Qt::DirectConnection);
 		}
 
-		emit _hyperhdr->SignalSmoothingRestarted(this->GetSuggestedInterval());
+		emit _ambilightapp->SignalSmoothingRestarted(this->GetSuggestedInterval());
 
 		Info(_log, "Smoothing queue is cleared");
 	}
@@ -175,7 +175,7 @@ void Smoothing::handleSettingsUpdate(settings::type type, const QJsonDocument& c
 		if (_currentConfigId == 0)
 		{
 			if (_currentColors.size() > 0 && isEnabled())
-				QUEUE_CALL_0(_hyperhdr, update);
+				QUEUE_CALL_0(_ambilightapp, update);
 			SelectConfig(0, true);			
 		}
 	}
@@ -372,20 +372,20 @@ void Smoothing::queueColors(const std::vector<ColorRgb>& ledColors)
 {
 	if (!_pause)
 	{
-		emit _hyperhdr->SignalUpdateLeds(ledColors);
+		emit _ambilightapp->SignalUpdateLeds(ledColors);
 	}
 }
 
-void Smoothing::componentStateChange(hyperhdr::Components component, bool state)
+void Smoothing::componentStateChange(ambilightapp::Components component, bool state)
 {
 	_flushFrame = state;
 
-	if (component == hyperhdr::COMP_LEDDEVICE)
+	if (component == ambilightapp::COMP_LEDDEVICE)
 	{
 		clearQueuedColors(state);
 	}
 
-	if (component == hyperhdr::COMP_SMOOTHING)
+	if (component == ambilightapp::COMP_SMOOTHING)
 	{
 		SetEnable(state);
 	}
@@ -398,7 +398,7 @@ void Smoothing::SetEnable(bool enable)
 	clearQueuedColors(_enabled);
 
 	// update comp register
-	_hyperhdr->setNewComponentState(hyperhdr::COMP_SMOOTHING, enable);
+	_ambilightapp->setNewComponentState(ambilightapp::COMP_SMOOTHING, enable);
 }
 
 unsigned Smoothing::addConfig(int settlingTime_ms, double ledUpdateFrequency_hz, bool directMode)

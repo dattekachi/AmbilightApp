@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.5.0)
 
 message( STATUS "CMake Version: ${CMAKE_VERSION}" )
 
-PROJECT(HyperHdr)
+PROJECT(AmbilightApp)
 
 # Parse semantic version of version file
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.cmake)
-file (STRINGS "version" HYPERHDR_VERSION)
-SetVersionNumber(HYPERHDR ${HYPERHDR_VERSION})
+file (STRINGS "version" AMBILIGHTAPP_VERSION)
+SetVersionNumber(AMBILIGHTAPP ${AMBILIGHTAPP_VERSION})
 
 
 # Instruct CMake to run moc automatically when needed.
@@ -446,7 +446,7 @@ endif()
 
 # configure a header file to pass some of the CMake settings
 # to the source code
-configure_file("${PROJECT_SOURCE_DIR}/HyperhdrConfig.h.in" "${PROJECT_BINARY_DIR}/HyperhdrConfig.h")
+configure_file("${PROJECT_SOURCE_DIR}/AmbilightappConfig.h.in" "${PROJECT_BINARY_DIR}/AmbilightappConfig.h")
 include_directories("${PROJECT_BINARY_DIR}")
 
 # Define the global output path of binaries
@@ -544,7 +544,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 		SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${SUBDIRQT}/msvc2019_64/lib/cmake/Qt${Qt_VERSION}")
 	endif()
 
-	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT hyperhdr)
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ambilightapp)
 	add_definitions(/MP)
 endif()
 
@@ -558,7 +558,7 @@ if(WIN32)
 
 	if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libs4windows.zip OR
 		NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libjpeg-turbo_x64-windows)
-		message( STATUS "Downloading libraries for HyperHDR (Windows)")		
+		message( STATUS "Downloading libraries for Ambilight App (Windows)")		
 		file(DOWNLOAD https://github.com/awawa-dev/HyperHDR.libs.provider/releases/download/2023.08.07/libs4windows.zip
 					${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libs4windows.zip
 					STATUS WIN_LIBS_DOWNLOAD_STATUS
@@ -566,7 +566,7 @@ if(WIN32)
 		list(GET WIN_LIBS_DOWNLOAD_STATUS 0 WIN_LIBS_DOWNLOAD_STATUS_CODE)
 		if(WIN_LIBS_DOWNLOAD_STATUS_CODE AND NOT WIN_LIBS_DOWNLOAD_STATUS_CODE EQUAL 0)
 			file( REMOVE ${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libs4windows.zip )
-			message( FATAL_ERROR "Could not download libraries needed by HyperHDR (Windows)")
+			message( FATAL_ERROR "Could not download libraries needed by Ambilight App (Windows)")
 		endif()
 	endif()
 
@@ -577,9 +577,9 @@ if(WIN32)
 	)
 
 	if(STATUS_EXTRACT AND NOT STATUS_EXTRACT EQUAL 0)
-		message( FATAL_ERROR "Could not extract libraries for HyperHDR (Windows)")
+		message( FATAL_ERROR "Could not extract libraries for Ambilight App (Windows)")
 	else()
-		message( STATUS "Package of libraries for HyperHDR extracted (Windows)")
+		message( STATUS "Package of libraries for Ambilight App extracted (Windows)")
 	endif()
 
 	set (TURBOJPEG_FOUND 1)
@@ -624,7 +624,7 @@ add_subdirectory(resources)
 # remove generated files on make cleaan too
 LIST( APPEND GENERATED_QRC
 	${CMAKE_BINARY_DIR}/WebConfig.qrc
-	${CMAKE_BINARY_DIR}/HyperhdrConfig.h
+	${CMAKE_BINARY_DIR}/AmbilightappConfig.h
 )
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${GENERATED_QRC}" )
 
@@ -643,5 +643,5 @@ else()
 endif()
 
 if (NOT ENABLE_BONJOUR)	
-	message( FATAL_ERROR "The network discovery service (ENABLE_BONJOUR) is an important feature of HyperHDR. If you know what you are doing, remove this safe-break.")
+	message( FATAL_ERROR "The network discovery service (ENABLE_BONJOUR) is an important feature of Ambilight App. If you know what you are doing, remove this safe-break.")
 endif()

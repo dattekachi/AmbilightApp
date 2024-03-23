@@ -114,14 +114,14 @@ public:
 	quint16 getWebServerPort() const;
 
 	///
-	/// @brief set new hyperhdr name
+	/// @brief set new ambilightapp name
 	///
-	void setHyperhdrName(const QString& name);
+	void setAmbilightappName(const QString& name);
 
 	///
-	/// @brief get hyperhdr name
+	/// @brief get ambilightapp name
 	///
-	QString getHyperhdrName() const;
+	QString getAmbilightappName() const;
 
 signals:
 	///

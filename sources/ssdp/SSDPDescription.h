@@ -3,7 +3,7 @@
 ///
 /// The xml to fill with data
 /// %1 base url                   http://192.168.1.36:8090/
-/// %2 friendly name              HyperHDR (192.168.1.36)
+/// %2 friendly name              Ambilight App (192.168.1.36)
 /// %3 modelNumber                17.0.0
 /// %4 serialNumber / UDN (H ID)  Fjsa723dD0....
 ///
@@ -19,10 +19,10 @@ static const QString SSDP_DESCRIPTION =	"<?xml version=\"1.0\"?>"
 											"<device>"
 												"<deviceType>urn:schemas-upnp-org:device:Basic:1</deviceType>"
 												"<friendlyName>%2</friendlyName>"
-												"<manufacturer>HyperHDR Open Source Ambient Lighting</manufacturer>"
+												"<manufacturer>Ambilight App Open Source Ambient Lighting</manufacturer>"
 												"<manufacturerURL>http://www.hyperhdr.eu/</manufacturerURL>"
-												"<modelDescription>HyperHDR Open Source Ambient Light</modelDescription>"
-												"<modelName>HyperHDR</modelName>"
+												"<modelDescription>Ambilight App Open Source Ambient Light</modelDescription>"
+												"<modelName>Ambilight App</modelName>"
 												"<modelNumber>%3</modelNumber>"
 												"<modelURL>https://github.com/awawa-dev/HyperHDR</modelURL>"
 												"<serialNumber>%4</serialNumber>"
@@ -40,7 +40,7 @@ static const QString SSDP_DESCRIPTION =	"<?xml version=\"1.0\"?>"
 														"<height>100</height>"
 														"<width>100</width>"
 														"<depth>32</depth>"
-														"<url>img/hyperhdr/ssdp_icon.png</url>"
+														"<url>img/ambilightapp/ssdp_icon.png</url>"
 													"</icon>"
 												"</iconList>"
 											"</device>"

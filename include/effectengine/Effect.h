@@ -16,7 +16,7 @@
 #include <effectengine/AnimationBase.h>
 
 
-class HyperHdrInstance;
+class AmbilightAppInstance;
 class Logger;
 
 class Effect : public QObject
@@ -31,7 +31,7 @@ public slots:
 	void visiblePriorityChanged(quint8 priority);
 
 public:
-	Effect(HyperHdrInstance* hyperhdr,
+	Effect(AmbilightAppInstance* ambilightapp,
 			int visiblePriority,
 			int priority,
 			int timeout,

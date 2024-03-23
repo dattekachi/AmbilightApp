@@ -33,7 +33,7 @@ cecHandler::cecHandler() :
 	_cecCallbacks.commandReceived = handleCecCommandMessage;
 
 	_cecConfig.Clear();
-	snprintf(_cecConfig.strDeviceName, LIBCEC_OSD_NAME_SIZE, "HyperHDR");
+	snprintf(_cecConfig.strDeviceName, LIBCEC_OSD_NAME_SIZE, "AmbilightAPP");
 	_cecConfig.deviceTypes.Add(CEC::CEC_DEVICE_TYPE_RECORDING_DEVICE);
 	_cecConfig.clientVersion = CEC::LIBCEC_VERSION_CURRENT;
 	_cecConfig.bActivateSource = 0;

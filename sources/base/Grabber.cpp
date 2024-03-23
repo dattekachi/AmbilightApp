@@ -288,7 +288,7 @@ void Grabber::unblockAndRestart(bool running)
 		uninit();
 		start();
 
-		emit GlobalSignals::getInstance()->SignalPerformanceStateChanged(true, hyperhdr::PerformanceReportType::VIDEO_GRABBER, -1);
+		emit GlobalSignals::getInstance()->SignalPerformanceStateChanged(true, ambilightapp::PerformanceReportType::VIDEO_GRABBER, -1);
 	}
 
 	_blocked = false;
@@ -442,7 +442,7 @@ void Grabber::loadLutFile(PixelFormat color, const QList<QString>& files)
 			_lutBufferInit = true;
 		}
 
-		Error(_log, "You have forgotten to put lut_lin_tables.3d file in the HyperHDR configuration folder. Internal LUT table for YUV conversion has been created instead.");
+		Error(_log, "You have forgotten to put lut_lin_tables.3d file in the Ambilight App configuration folder. Internal LUT table for YUV conversion has been created instead.");
 		return;
 	}
 

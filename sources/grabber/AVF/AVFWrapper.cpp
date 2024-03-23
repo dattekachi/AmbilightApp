@@ -27,7 +27,7 @@
 
 #include <QMetaType>
 #include <grabber/AVF/AVFWrapper.h>
-#include <base/HyperHdrManager.h>
+#include <base/AmbilightAppManager.h>
 
 
 AVFWrapper::AVFWrapper(const QString& device,

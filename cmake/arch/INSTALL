@@ -1,33 +1,33 @@
 pre_install() {
-	echo "Preparing to install HyperHDR..."
+	echo "Preparing to install AmbilightAPP..."
 
 	# search for users in system, returns first entry
 	FOUND_USR=`who | grep -o -m1 '^\w*\b'` || "root"
 
 	# stop running daemon before we install
-	if pgrep hyperhdr > /dev/null 2>&1
+	if pgrep ambilightapp > /dev/null 2>&1
 	then
 		if grep -m1 systemd /proc/1/comm > /dev/null
 		then
-			echo "Stopping HyperHDR daemon: systemd"
+			echo "Stopping AmbilightAPP daemon: systemd"
 			# systemd
-			systemctl stop hyperhdr"@${FOUND_USR}" 2> /dev/null
+			systemctl stop ambilightapp"@${FOUND_USR}" 2> /dev/null
 
 		elif [ -e /usr/bin/initctl ]
 		then
-			echo "Stopping HyperHDR daemon: upstart"
+			echo "Stopping AmbilightAPP daemon: upstart"
 			# upstart
-			initctl stop hyperhdr
+			initctl stop ambilightapp
 
 		else
-			echo "Stopping HyperHDR daemon: sysV"
+			echo "Stopping AmbilightAPP daemon: sysV"
 			# sysV
-			service hyperhdr stop 2>/dev/null
+			service ambilightapp stop 2>/dev/null
 		fi
 	fi
 
 	# In case we don't use a service kill all instances
-	killall hyperhdr 2> /dev/null
+	killall ambilightapp 2> /dev/null
 
 	# overwrite last return code
 	exit 0
@@ -73,34 +73,34 @@ post_install() {
 
 	if [ $CPU_RPI -eq 1 ]; then
 		ENABLE_SERVICE=1
-		STARTUP_MSG="HyperHDR is installed as a service and starts automatically"
+		STARTUP_MSG="AmbilightAPP is installed as a service and starts automatically"
 	fi
 
 	start_msg=""
 	restart_msg=""
 
 	echo "Extracting LUT table..."
-	tar -xf /usr/share/hyperhdr/lut/lut_lin_tables.tar.xz -C /usr/share/hyperhdr/lut/
-	rm -f -v /usr/share/hyperhdr/lut/lut_lin_tables.tar.xz
+	tar -xf /usr/share/ambilightapp/lut/lut_lin_tables.tar.xz -C /usr/share/ambilightapp/lut/
+	rm -f -v /usr/share/ambilightapp/lut/lut_lin_tables.tar.xz
 
 	if grep -m1 systemd /proc/1/comm > /dev/null
 	then	
 		# systemd
 		if [ -z "${DISPLAY}" ]; then
-			echo "HyperHDR is installed as a service and starts automatically"
+			echo "AmbilightAPP is installed as a service and starts automatically"
 			ENABLE_SERVICE=1
 		else
-			echo "Init daemon: GUI detected (service is NOT enabled by default, you can run HyperHDR as an application or service with 'systemctl enable (and next: start) hyperhdr@${FOUND_USR}.service')"
+			echo "Init daemon: GUI detected (service is NOT enabled by default, you can run AmbilightAPP as an application or service with 'systemctl enable (and next: start) ambilightapp@${FOUND_USR}.service')"
 			ENABLE_SERVICE=0
 			ENABLE_XSYS=1
 		fi
 
-		install_file /usr/share/hyperhdr/service/hyperhdr.systemd /etc/systemd/system/hyperhdr@.service	
+		install_file /usr/share/ambilightapp/service/ambilightapp.systemd /etc/systemd/system/ambilightapp@.service	
 
 		if [ $ENABLE_SERVICE -eq 1 ]; then
-			systemctl enable hyperhdr"@${FOUND_USR}".service
-			start_msg="systemctl start hyperhdr for user ${FOUND_USR}"
-			systemctl start hyperhdr"@${FOUND_USR}"
+			systemctl enable ambilightapp"@${FOUND_USR}".service
+			start_msg="systemctl start ambilightapp for user ${FOUND_USR}"
+			systemctl start ambilightapp"@${FOUND_USR}"
 		fi
 
 	elif [ -e /usr/bin/initctl ]
@@ -108,9 +108,9 @@ post_install() {
 		# upstart
 		if [ $ENABLE_SERVICE -eq 1 ]; then
 			echo "Init daemon: upstart (service is enabled by default)"
-			install_file /usr/share/hyperhdr/service/hyperhdr.initctl /etc/init/hyperhdr.conf && initctl reload-configuration
-			start_msg="initctl start hyperhdr"
-			initctl start hyperhdr
+			install_file /usr/share/ambilightapp/service/ambilightapp.initctl /etc/init/ambilightapp.conf && initctl reload-configuration
+			start_msg="initctl start ambilightapp"
+			initctl start ambilightapp
 		else
 			echo "Init daemon: upstart (service is NOT enabled by default)"
 		fi
@@ -119,32 +119,32 @@ post_install() {
 		# sysV
 		if [ $ENABLE_SERVICE -eq 1 ]; then
 			echo "Init daemon: sysV (enabled by default)"
-			install_file /usr/share/hyperhdr/service/hyperhdr.init /etc/init.d/hyperhdr && chmod +x /etc/init.d/hyperhdr && update-rc.d hyperhdr defaults 98 02
-			start_msg="service hyperhdr start"
-			service hyperhdr start
+			install_file /usr/share/ambilightapp/service/ambilightapp.init /etc/init.d/ambilightapp && chmod +x /etc/init.d/ambilightapp && update-rc.d ambilightapp defaults 98 02
+			start_msg="service ambilightapp start"
+			service ambilightapp start
 		else
 			echo "Init daemon: sysV (service is NOT enabled by default)"
 		fi
 	fi
 
 	#cleanup
-	rm -r /usr/share/hyperhdr/service
+	rm -r /usr/share/ambilightapp/service
 
 	#link binarys and set exec bit
-	BINSP=/usr/share/hyperhdr/bin
+	BINSP=/usr/share/ambilightapp/bin
 	BINTP=/usr/bin
 	chmod +x -R $BINSP
-	ln -fs $BINSP/hyperhdr $BINTP/hyperhdr
-	ln -fs $BINSP/hyperhdr-remote $BINTP/hyperhdr-remote
+	ln -fs $BINSP/ambilightapp $BINTP/ambilightapp
+	ln -fs $BINSP/ambilightapp-remote $BINTP/ambilightapp-remote
 
 	# install desktop icons
-	echo "Install HyperHDR desktop icons"
-	mkdir /usr/share/pixmaps/hyperhdr 2>/dev/null
-	cp /usr/share/hyperhdr/desktop/*.png /usr/share/pixmaps/hyperhdr 2>/dev/null
-	desktop-file-install /usr/share/hyperhdr/desktop/hyperhdr.desktop 2>/dev/null
+	echo "Install AmbilightAPP desktop icons"
+	mkdir /usr/share/pixmaps/ambilightapp 2>/dev/null
+	cp /usr/share/ambilightapp/desktop/*.png /usr/share/pixmaps/ambilightapp 2>/dev/null
+	desktop-file-install /usr/share/ambilightapp/desktop/ambilightapp.desktop 2>/dev/null
 
 	# cleanup desktop icons
-	rm -r /usr/share/hyperhdr/desktop 2>/dev/null
+	rm -r /usr/share/ambilightapp/desktop 2>/dev/null
 
 	#Check, if dtparam=spi=on is in place
 	if [ $CPU_RPI -eq 1 ]; then
@@ -168,23 +168,23 @@ post_install() {
 	echo ${start_msg}
 
 echo " +-----------------------------------------------------------------------+"
-echo " |                 \033[32;1mHyperHDR has been installed/updated!\033[0m                  |"
+echo " |                 \033[32;1mAmbilightAPP has been installed/updated!\033[0m                  |"
 echo " +-----------------------------------------------------------------------+"
 printf " |  For configuration, visit with your browser: \033[37;1m%13s:%s\033[0m       |\n" "$NET_IP" "8090"
 printf " |  If already used by another service try: \033[37;1m%13s:%s\033[0m           |\n" "$NET_IP" "8091"
-printf " |  Start the service: \033[37;1msudo systemctl start hyperhdr@%-12s\033[0m        |\n" "$FOUND_USR"
-printf " |  Stop the service: \033[37;1msudo systemctl stop hyperhdr@%-12s\033[0m          |\n" "$FOUND_USR"
-echo   " |  Troubleshooting? Run HyperHDR manually: \033[37;1m/usr/bin/hyperhdr\033[0m            |"
+printf " |  Start the service: \033[37;1msudo systemctl start ambilightapp@%-12s\033[0m        |\n" "$FOUND_USR"
+printf " |  Stop the service: \033[37;1msudo systemctl stop ambilightapp@%-12s\033[0m          |\n" "$FOUND_USR"
+echo   " |  Troubleshooting? Run AmbilightAPP manually: \033[37;1m/usr/bin/ambilightapp\033[0m            |"
 echo   " +-----------------------------------------------------------------------+"
 case "$STARTUP_MSG" in 
-  *"HyperHDR is installed as a service"*)
+  *"AmbilightAPP is installed as a service"*)
 	printf " |  \033[32;1m%-67s\033[0m  |\n" "$STARTUP_MSG";;
   *) printf " |  \033[31;1m%-67s\033[0m  |\n" "$STARTUP_MSG"
 esac
 [ -z "$REBOOTMESSAGE" ] || printf " |  \033[31;1m%-67s\033[0m  |\n" "$REBOOTMESSAGE"
 echo " +-----------------------------------------------------------------------+"
 echo " |  Webpage: \033[36;1mhttps://hyperhdr.eu\033[0m                                         |"
-echo " |  GitHub: \033[36;1mhttps://github.com/awawa-dev/HyperHDR\033[0m                        |"
+echo " |  GitHub: \033[36;1mhttps://github.com/awawa-dev/AmbilightAPP\033[0m                        |"
 echo " +-----------------------------------------------------------------------+"
 
 	update-desktop-database -q
@@ -199,56 +199,56 @@ post_upgrade() {
 }
 
 pre_remove() {
-	echo "Preparing to uninstall HyperHDR"
+	echo "Preparing to uninstall AmbilightAPP"
 
 	# search for users in system, returns first entry
 	FOUND_USR=`who | grep -o -m1 '^\w*\b'` || "root"
 
 	# stop running daemon before we delete it
-	HYPERHDR_RUNNING=false
-	pgrep hyperhdr > /dev/null 2>&1 && HYPERHDR_RUNNING=true
+	AMBILIGHTAPP_RUNNING=false
+	pgrep ambilightapp > /dev/null 2>&1 && AMBILIGHTAPP_RUNNING=true
 
 	if grep -m1 systemd /proc/1/comm > /dev/null
 	then
-		echo "Stopping HyperHDR daemon: systemd"
+		echo "Stopping AmbilightAPP daemon: systemd"
 		# systemd
-		$HYPERHDR_RUNNING && systemctl stop hyperhdr"@${FOUND_USR}" 2> /dev/null
+		$AMBILIGHTAPP_RUNNING && systemctl stop ambilightapp"@${FOUND_USR}" 2> /dev/null
 		# disable user specific symlink
 		echo "Disabling service and removing entry"
-		systemctl -q disable hyperhdr"@${FOUND_USR}"
+		systemctl -q disable ambilightapp"@${FOUND_USR}"
 
-		rm -v /etc/systemd/system/hyperhdr@.service 2>/dev/null	
+		rm -v /etc/systemd/system/ambilightapp@.service 2>/dev/null	
 
 	elif [ -e /usr/bin/initctl ]
 	then
-		echo "Stopping HyperHDR daemon: upstart"
+		echo "Stopping AmbilightAPP daemon: upstart"
 		# upstart
-		$HYPERHDR_RUNNING && initctl stop hyperhdr
+		$AMBILIGHTAPP_RUNNING && initctl stop ambilightapp
 		echo "Remove upstart service"
-		rm -v /etc/init/hyperhdr* 2>/dev/null
+		rm -v /etc/init/ambilightapp* 2>/dev/null
 		initctl reload-configuration
 
 	else
-		echo "Stopping HyperHDR daemon: sysV"
+		echo "Stopping AmbilightAPP daemon: sysV"
 		# sysV
-		$HYPERHDR_RUNNING && service hyperhdr stop 2>/dev/null
+		$AMBILIGHTAPP_RUNNING && service ambilightapp stop 2>/dev/null
 		echo "Remove sysV service"
-		update-rc.d -f hyperhdr remove
-		rm /etc/init.d/hyperhdr* 2>/dev/null
+		update-rc.d -f ambilightapp remove
+		rm /etc/init.d/ambilightapp* 2>/dev/null
 	fi
 
 	# In case we don't use a service kill all instances
-	killall hyperhdr 2> /dev/null
+	killall ambilightapp 2> /dev/null
 
 	# delete desktop icons; desktop-file-edit is a workaround to hide the entry and delete it afterwards manual.
 	# TODO Better way for deletion and keep the desktop in sync without logout/login or desktop dependend cmds?
-	echo "Deleting HyperHDR desktop icons"
-	desktop-file-edit --set-key=NoDisplay --set-value=true /usr/share/applications/hyperhdr.desktop 2>/dev/null
-	rm -v /usr/share/applications/hyperhdr* 2>/dev/null
-	rm -rv /usr/share/pixmaps/hyperhdr 2>/dev/null
+	echo "Deleting AmbilightAPP desktop icons"
+	desktop-file-edit --set-key=NoDisplay --set-value=true /usr/share/applications/ambilightapp.desktop 2>/dev/null
+	rm -v /usr/share/applications/ambilightapp* 2>/dev/null
+	rm -rv /usr/share/pixmaps/ambilightapp 2>/dev/null
 
 	echo "Removing LUT table"
-	rm -f -v /usr/share/hyperhdr/lut/lut_lin_tables.3d
+	rm -f -v /usr/share/ambilightapp/lut/lut_lin_tables.3d
 	exit 0
 }
 

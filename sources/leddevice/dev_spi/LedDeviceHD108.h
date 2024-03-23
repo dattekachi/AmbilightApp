@@ -27,7 +27,7 @@
 *  SOFTWARE.
  */
 
-// HyperHDR includes
+// Ambilight App includes
 #include "ProviderSpi.h"
 
 class LedDeviceHD108 : public ProviderSpi

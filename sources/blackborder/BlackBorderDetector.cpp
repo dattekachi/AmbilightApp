@@ -5,7 +5,7 @@
 #include <blackborder/BlackBorderDetector.h>
 #include <cmath>
 
-using namespace hyperhdr;
+using namespace ambilightapp;
 
 BlackBorderDetector::BlackBorderDetector(double threshold)
 	: _blackborderThreshold(calculateThreshold(threshold))

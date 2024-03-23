@@ -37,9 +37,9 @@
 #include <utils/NetOrigin.h>
 #include <utils/GlobalSignals.h>
 #include <base/RawUdpServer.h>
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 
-RawUdpServer::RawUdpServer(HyperHdrInstance* ownerInstance, const QJsonDocument& config)
+RawUdpServer::RawUdpServer(AmbilightAppInstance* ownerInstance, const QJsonDocument& config)
 	: QObject(ownerInstance)
 	, _server(new QUdpSocket(this))
 	, _log(Logger::getInstance("RAW_UDP_SERVER"))
@@ -125,8 +125,8 @@ void RawUdpServer::readPendingDatagrams()
 		if (dataLen % 3 > 0 || dataLen > 1500 || dataLen == 0)
 			continue;
 
-		if (_ownerInstance->getComponentForPriority(_priority) != hyperhdr::COMP_RAWUDPSERVER)
-			_ownerInstance->registerInput(_priority, hyperhdr::COMP_RAWUDPSERVER, QString("%1").arg(datagram.senderAddress().toString()));
+		if (_ownerInstance->getComponentForPriority(_priority) != ambilightapp::COMP_RAWUDPSERVER)
+			_ownerInstance->registerInput(_priority, ambilightapp::COMP_RAWUDPSERVER, QString("%1").arg(datagram.senderAddress().toString()));
 
 		std::vector<ColorRgb> _ledColors;
 

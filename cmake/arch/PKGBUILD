@@ -1,7 +1,7 @@
-pkgname=HyperHDR
+pkgname=Ambilight App
 pkgver={VERSION}
 pkgrel=1
-pkgdesc="HyperHDR is an open source ambient light implementation."
+pkgdesc="Ambilight App is an open source ambient light implementation."
 url="https://github.com/awawa-dev/HyperHDR"
 license=('MIT')
 arch=('x86_64')

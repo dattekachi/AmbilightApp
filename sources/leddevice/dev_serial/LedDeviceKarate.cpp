@@ -1,4 +1,4 @@
-// HyperHDR local includes
+// Ambilight App local includes
 #include "LedDeviceKarate.h"
 
 LedDeviceKarate::LedDeviceKarate(const QJsonObject& deviceConfig)

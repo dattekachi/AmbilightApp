@@ -9,7 +9,7 @@
 	#include <QJsonArray>
 #endif
 
-#include <base/HyperHdrInstance.h>
+#include <base/AmbilightAppInstance.h>
 #include <effectengine/EffectDefinition.h>
 #include <effectengine/ActiveEffectDefinition.h>
 #include <utils/Logger.h>
@@ -22,7 +22,7 @@ class EffectEngine : public QObject
 	Q_OBJECT
 
 public:
-	EffectEngine(HyperHdrInstance* hyperhdr);
+	EffectEngine(AmbilightAppInstance* ambilightapp);
 	~EffectEngine() override;
 
 public slots:
@@ -42,7 +42,7 @@ private:
 	int runEffectScript(const QString& name, int priority, int timeout, const QString& origin);
 	void createSmoothingConfigs();
 
-	HyperHdrInstance* _hyperInstance;
+	AmbilightAppInstance* _hyperInstance;
 	std::list<EffectDefinition> _availableEffects;
 	std::list<std::unique_ptr<Effect, void(*)(Effect*)>> _activeEffects;
 

@@ -29,7 +29,7 @@
 	#include <QResource>
 #endif
 
-#include <HyperhdrConfig.h>
+#include <AmbilightappConfig.h>
 
 #include <base/Muxer.h>
 #include <utils/jsonschema/QJsonSchemaChecker.h>
@@ -39,12 +39,12 @@
 #include <effectengine/EffectEngine.h>
 #include <effectengine/Effect.h>
 
-EffectEngine::EffectEngine(HyperHdrInstance* hyperhdr)
-	: _hyperInstance(hyperhdr)
+EffectEngine::EffectEngine(AmbilightAppInstance* ambilightapp)
+	: _hyperInstance(ambilightapp)
 	, _availableEffects(Effect::getAvailableEffects())
-	, _log(Logger::getInstance(QString("EFFECTENGINE%1").arg(hyperhdr->getInstanceIndex())))
+	, _log(Logger::getInstance(QString("EFFECTENGINE%1").arg(ambilightapp->getInstanceIndex())))
 {
-	qRegisterMetaType<hyperhdr::Components>("hyperhdr::Components");
+	qRegisterMetaType<ambilightapp::Components>("ambilightapp::Components");
 
 	// register smooth cfgs and fill available effects
 	createSmoothingConfigs();
@@ -81,16 +81,16 @@ int EffectEngine::runEffectScript(const QString& name, int priority, int timeout
 		new Effect(_hyperInstance, _hyperInstance->getCurrentPriority(), priority, timeout, *it),
 		[](Effect* oldEffect) {
 			oldEffect->requestInterruption();
-			hyperhdr::THREAD_REMOVER(oldEffect->getDescription(), oldEffect->thread(), oldEffect);
+			ambilightapp::THREAD_REMOVER(oldEffect->getDescription(), oldEffect->thread(), oldEffect);
 		}
 	);
 	connect(effect.get(), &Effect::SignalSetLeds, this, &EffectEngine::handlerSetLeds);
-	connect(effect.get(), &Effect::SignalSetImage, _hyperInstance, &HyperHdrInstance::setInputImage);
+	connect(effect.get(), &Effect::SignalSetImage, _hyperInstance, &AmbilightAppInstance::setInputImage);
 	connect(effect.get(), &Effect::SignalEffectFinished, this, &EffectEngine::handlerEffectFinished);
 
 	// start the effect
 	Debug(_log, "Start the effect: name [%s]", QSTRING_CSTR(name));
-	_hyperInstance->registerInput(priority, hyperhdr::COMP_EFFECT, origin, name, (*it).smoothingConfig);
+	_hyperInstance->registerInput(priority, ambilightapp::COMP_EFFECT, origin, name, (*it).smoothingConfig);
 
 	// start the effect
 	QThread* newThread = new QThread();
@@ -171,7 +171,7 @@ void EffectEngine::createSmoothingConfigs()
 
 	for (EffectDefinition& def : _availableEffects)
 	{
-		// add smoothing configs to HyperHdr
+		// add smoothing configs to AmbilightApp
 		if (def.smoothingCustomSettings)
 		{
 			def.smoothingConfig = _hyperInstance->updateSmoothingConfig(

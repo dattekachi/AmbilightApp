@@ -41,7 +41,7 @@
 - Add support for HD108 led strip, 16/48bits colors #527 (v20 beta 🆕)  
 - Use optional system libs for compiling #541 (v20 beta 🆕)  
 - Update mbedtls to 3.4.0 #589 (v20 beta 🆕)  
-- Add Ubuntu support to HyperHDR and Github Pages APT repository #522 (v20 beta 🆕)
+- Add Ubuntu support to Ambilight App and Github Pages APT repository #522 (v20 beta 🆕)
 - New JsonAPI method to calculate average color of selected instance #611 (v20 beta 🆕)
 - Workaround for critical Rpi udev bug affecting serial ports #583 (v20 beta 🆕)  
 - Add Arch Linux support #520 (v20 beta 🆕)  
@@ -74,7 +74,7 @@
 - Direct support for USB grabbers under Windows 10, Linux and macOS (really fast & of course multi-threaded)
 - Support for software screen grabbers: DirectX11, CoreGraphics, X11
 - New software grabber for Linux: Wayland (pipewire/portal) which also means support for **Ubuntu 22.04 LTS**
-- Registering HyperHDR services with the MQTT broker
+- Registering Ambilight App services with the MQTT broker
 - Frame Buffer software screen grabber (Linux)
 - Reworked network discovery service and added Windows support
 - Improved Philips Hue wizard
@@ -103,7 +103,7 @@
 - Flatbuffers/Protobuf: HDR tone mapping can use an alternative filename: *flat_lut_lin_tables.3d*
 - FlatBuffers: add support for high performance local sockets ([link](https://github.com/awawa-dev/HyperHDR/commit/1100093068196a53eff5f856f0eaaf8e43ca229f))
 - The new build scheme allows grabber-less configuration and the use of external toolchains
-- Add popular 'UDP raw' (WLED compatible) receiver for HyperHDR ([link1](https://i.postimg.cc/RV4PqPct/udpraw.jpg) [link2](https://github.com/awawa-dev/HyperHDR/commit/5fb1be1c4bdbc84becfd964a08cb106482b6c4e5))
+- Add popular 'UDP raw' (WLED compatible) receiver for Ambilight App ([link1](https://i.postimg.cc/RV4PqPct/udpraw.jpg) [link2](https://github.com/awawa-dev/HyperHDR/commit/5fb1be1c4bdbc84becfd964a08cb106482b6c4e5))
 - User interface upgraded to modern standards (Bootstrap 5)
 - Improved LUT table for SDR(yuv) and HDR video streams
 - Support for CEC (turn ON/OFF grabbers, remote keys to command HDR tone mapping)
@@ -116,7 +116,7 @@
 - New video stream crop method in JSON API and GET multi-command support
 - Auto-resume option for the USB grabber
 - JSON API documentation in a form of live playground in 'Advanced' tab
-- List of available COM ports for the adalight driver
+- List of available COM ports for the ambilightusb driver
 - Fix: in specific cases some devices could not react to the 'no video signal' event when it's triggered
 - New installer for Raspberry Pi 3 & 4 64bit OS (AARCH64), faster up to 30% over 32bit OS armv7l version
 - Fix for WLED new network protocol
@@ -139,8 +139,8 @@
 - Improved backlight algorithm to minimize leds flickering on the dark scenes (configurable in the _Smoothing_)
 - Add old style color calibration (HSL) using luminance, saturation et.
 - Build for newer Raspbian Buster. It's a complete migration from older Raspbian Stretch
-- Option for _hyperhdr-remote_, JSON API and web GUI remote to turn on/off HDR tone mapping
-- Option for luminescence & saturation for hyperhdr-remote
-- Ready to write SD images of HyperHDR
+- Option for _ambilightapp-remote_, JSON API and web GUI remote to turn on/off HDR tone mapping
+- Option for luminescence & saturation for ambilightapp-remote
+- Ready to write SD images of Ambilight App
 - Fix for SK9822 leds on SPI (aka fake APA102)
 - Windows, macOS DMG and Linux DEB & RPM installers contain default LUT table
