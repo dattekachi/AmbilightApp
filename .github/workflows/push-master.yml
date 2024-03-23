@@ -13,123 +13,6 @@ env:
 jobs:
 
 ######################
-###### Linux #########
-######################
-
-  # Linux:
-  #   name: ${{ matrix.dockerName }}
-  #   runs-on: ubuntu-22.04
-
-  #   strategy:
-  #     matrix:
-  #       linuxVersion: [ bullseye ]
-  #       dockerImage: [ x86_64, arm-32bit-armv6l, arm-64bit-aarch64 ]
-  #       include:        
-  #         - dockerImage: x86_64
-  #           linuxVersion: bullseye
-  #           dockerName: Debian Bullseye (x86_64)
-  #           platform: linux
-  #         - dockerImage: x86_64
-  #           linuxVersion: bookworm
-  #           dockerName: Debian Bookworm (x86_64)
-  #           platform: linux
-  #         - dockerImage: x86_64
-  #           linuxVersion: jammy
-  #           dockerName: Ubuntu 22.04 LTS (x86_64)
-  #           platform: linux
-  #         - dockerImage: x86_64
-  #           linuxVersion: mantic
-  #           dockerName: Ubuntu 23.10 (x86_64)
-  #           platform: linux
-  #         - dockerImage: x86_64
-  #           linuxVersion: noble
-  #           dockerName: Ubuntu 24.04 LTS (x86_64)
-  #           platform: linux            
-  #         - dockerImage: arm-32bit-armv6l
-  #           linuxVersion: bullseye
-  #           dockerName: Debian Bullseye (ARM 32-bit Raspberry Pi OS)
-  #           platform: rpi
-  #         - dockerImage: arm-64bit-aarch64
-  #           linuxVersion: bullseye
-  #           dockerName: Debian Bullseye (ARM 64-bit Raspberry Pi OS)
-  #           platform: rpi
-  #         - dockerImage: arm-32bit-armv6l
-  #           linuxVersion: bookworm
-  #           dockerName: Debian Bookworm (ARM 32-bit Raspberry Pi OS)
-  #           platform: rpi
-  #         - dockerImage: arm-64bit-aarch64
-  #           linuxVersion: bookworm
-  #           dockerName: Debian Bookworm (ARM 64-bit Raspberry Pi OS)
-  #           platform: rpi              
-  #         - dockerImage: x86_64
-  #           linuxVersion: ArchLinux
-  #           dockerName: Arch Linux (x86_64)
-  #           platform: linux
-  #         - dockerImage: x86_64
-  #           linuxVersion: Fedora_39
-  #           dockerName: Fedora 39 (x86_64)
-  #           platform: linux
-  #   steps:
-  #     # checkout
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         submodules: true
-
-  #     # generate cache id
-  #     - name: Prepare ccache timestamp
-  #       if: env.USE_CACHE == '1'
-  #       id: ccache_cache_timestamp
-  #       shell: cmake -P {0}
-  #       run: |
-  #         string(TIMESTAMP current_date "%Y-%m-%d-%H-%M-%S" UTC)
-  #         file(APPEND "$ENV{GITHUB_OUTPUT}" "timestamp=${current_date}")
-
-  #      # download cache
-  #     - name: ccache cache files
-  #       if: ( env.USE_CACHE == '1' )
-  #       uses: actions/cache@v4
-  #       with:
-  #          path: .ccache
-  #          key: ${{ matrix.linuxVersion }}-${{ matrix.dockerImage }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
-  #          restore-keys: ${{ matrix.linuxVersion }}-${{ matrix.dockerImage }}-ccache-
-
-  #     - name: Check default version
-  #       if: matrix.linuxVersion != 'bullseye'
-  #       run: |
-  #         echo "USE_STANDARD_INSTALLER_NAME=ON" >> $GITHUB_ENV
-
-  #     - name: Build packages
-  #       env:
-  #         DOCKER_IMAGE: ${{ matrix.dockerImage }}
-  #         DOCKER_TAG: ${{ matrix.linuxVersion }}
-  #         DOCKER_NAME: ${{ matrix.dockerName }}
-  #         PLATFORM: ${{ matrix.platform }}
-  #         USE_CCACHE: ${{ env.USE_CACHE }}
-  #         RESET_CACHE: ${{ env.RESET_CACHE }}
-  #       shell: bash
-  #       run: |
-  #         ./.ci/ci_build.sh
-
-  #     # Upload artifacts (only on tagged commit)
-  #     - name: Upload artifacts
-  #       if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: release-artifact-${{ matrix.linuxVersion }}-${{ matrix.dockerImage }}
-  #         path: deploy/Hyper*
-
-  #     # Upload artifacts from commit
-  #     - name: Upload artifacts from commit
-  #       if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: Linux-${{ matrix.linuxVersion }}-${{ matrix.dockerImage }}-installer
-  #         path: |
-  #           deploy/Hyper*.deb
-  #           deploy/Hyper*.zst
-  #           deploy/Hyper*.rpm
-
-######################
 ######## macOS #######
 ######################
 
@@ -304,7 +187,7 @@ jobs:
   publish:
     name: Publish Releases
     if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
-    needs: [windows, macOS]
+    needs: [Linux, windows, macOS]
     runs-on: ubuntu-22.04
     permissions:
       contents: write

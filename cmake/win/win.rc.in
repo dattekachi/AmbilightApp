@@ -18,12 +18,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "HyperHDR-project"
             VALUE "Comments", "https://github.com/awawa-dev/HyperHDR"
-            VALUE "FileDescription", "Ambilight App Lighting"
+            VALUE "FileDescription", "HyperHDR Ambient Lighting"
             VALUE "FileVersion", "${HYPERHDR_VERSION}"
             VALUE "InternalName", "HyperHdr"
             VALUE "LegalCopyright", "MIT"
             VALUE "OriginalFilename", "${BINARY_NAME}"
-            VALUE "ProductName", "Ambilight App Lighting"
+            VALUE "ProductName", "HyperHDR Ambient Lighting"
             VALUE "ProductVersion", "${HYPERHDR_VERSION}"
         END
     END
