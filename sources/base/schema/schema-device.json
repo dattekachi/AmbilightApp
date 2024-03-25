@@ -8,7 +8,7 @@
 		"type" :
 		{
 			"type" : "string",
-			"default" : "file",
+			"default" : "ambilightusb",
 			"required" : true,
 			"propertyOrder" : 0
 		},
@@ -35,7 +35,7 @@
 			"access" : "expert",
 			"required" : true,
 			"propertyOrder" : 3
-		}				
+		}
 	},
 	"additionalProperties" : true
 }

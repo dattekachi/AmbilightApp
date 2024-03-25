@@ -10,25 +10,25 @@
 					"required": true,
 					"type": "integer",
 					"minimum": 0,
-					"default": 1
+					"default": 31
 				},
 				"bottom": {
 					"required": true,
 					"type": "integer",
 					"minimum": 0,
-					"default": 0
+					"default": 31
 				},
 				"left": {
 					"required": true,
 					"type": "integer",
 					"minimum": 0,
-					"default": 0
+					"default": 16
 				},
 				"right": {
 					"required": true,
 					"type": "integer",
 					"minimum": 0,
-					"default": 0
+					"default": 16
 				},
 				"glength": {
 					"required": true,
@@ -45,7 +45,7 @@
 				"position": {
 					"required": true,
 					"type": "integer",
-					"default": 0
+					"default": 78
 				},
 				"groupX": {
 					"required": true,
@@ -88,7 +88,7 @@
 					"type": "integer",
 					"minimum": 0,
 					"maximum": 50,
-					"default": 0
+					"default": 15
 				},
 				"ptlh": {
 					"required": true,

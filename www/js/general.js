@@ -175,7 +175,7 @@ $(document).ready(function()
 				{
 					content = JSON.parse(content);
 					if (typeof content.instances === 'undefined' || typeof content.settings === 'undefined' ||
-						content.version == null || content.version.indexOf("Ambilight_App_export_format_v") != 0)
+						content.version == null || content.version.indexOf("AmbilightApp_export_format_v") != 0)
 					{
 						showInfoDialog('error', "", $.i18n('infoDialog_import_hyperror_text', f.name));
 						dis_imp_btn(true);
@@ -224,7 +224,7 @@ $(document).ready(function()
 			
 		var backup = await requestGetDB();
 		if (backup.success === true)
-			download(JSON.stringify(backup.info, null, "\t"), 'Ambilight_App-' + window.currentVersion + '-Backup-' + timestamp + '.json', "application/json");		
+			download(JSON.stringify(backup.info, null, "\t"), 'AmbilightApp-' + window.currentVersion + '-Backup-' + timestamp + '.json', "application/json");		
 	});
 
 	//create introduction

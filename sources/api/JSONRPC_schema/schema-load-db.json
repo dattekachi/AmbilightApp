@@ -40,7 +40,7 @@
 				"version": {
 					"type" : "string",
 					"required" : true,
-					"enum" : ["Ambilight_App_export_format_v1", "Ambilight_App_export_format_v2"]
+					"enum" : ["AmbilightApp_export_format_v1", "AmbilightApp_export_format_v2"]
 				}
 			}
 		}

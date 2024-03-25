@@ -8,7 +8,7 @@
 			"type" : "boolean",
 			"format": "checkbox",
 			"title" : "edt_conf_general_enable_title",
-			"default" : true,
+			"default" : false,
 			"required" : true,
 			"propertyOrder" : 1
 		},

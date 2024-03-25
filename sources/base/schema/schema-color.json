@@ -70,7 +70,7 @@
 						"title" : "edt_conf_color_white_title",
 						"format" : "colorpicker",
 						"required" : true,
-						"default": [255,255,255],
+						"default": [255,200,160],
 						"items" : {
 							"type" : "integer",
 							"minimum" : 0,
@@ -205,7 +205,7 @@
 						"required" : true,
 						"minimum" : 0,
 						"maximum": 100,
-						"default" : 1,
+						"default" : 0,
 						"append" : "edt_append_percent",
 						"propertyOrder" : 11
 					},
@@ -268,7 +268,7 @@
 						"required" : true,
 						"minimum" : 0.1,
 						"maximum": 100.0,
-						"default" : 1.5,						
+						"default" : 3,						
 						"propertyOrder" : 15
 					},
 					"gammaGreen" :
@@ -280,7 +280,7 @@
 						"required" : true,
 						"minimum" : 0.1,
 						"maximum": 100.0,
-						"default" : 1.5,
+						"default" : 3,
 						"propertyOrder" : 16
 					},
 					"gammaBlue" :
@@ -292,7 +292,7 @@
 						"required" : true,
 						"minimum" : 0.1,
 						"maximum": 100.0,
-						"default" : 1.5,
+						"default" : 3,
 						"propertyOrder" : 17
 					},
 					"temperatureRed" :

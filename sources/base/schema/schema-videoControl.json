@@ -10,7 +10,7 @@
 			"format": "checkbox",
 			"required" : true,
 			"title" : "edt_conf_instC_v4lEnable_title",
-			"default" : true,
+			"default" : false,
 			"propertyOrder" : 1
 		},
 		"videoInstancePriority" :

@@ -20,7 +20,7 @@ class QSqlQuery;
 typedef QPair<QString, QVariant> CPair;
 typedef QVector<CPair> VectorPair;
 
-#define CURRENT_AMBILIGHTAPP_DB_EXPORT_VERSION "Ambilight_App_export_format_v1"
+#define CURRENT_AMBILIGHTAPP_DB_EXPORT_VERSION "AmbilightApp_export_format_v2"
 
 class DBManager
 {
