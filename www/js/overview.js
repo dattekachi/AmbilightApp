@@ -304,8 +304,8 @@ $(document).ready(function ()
 	{
 		var components = window.comps;
 		var components_html = '<div class="row border-bottom ambilightapp-vcenter text-primary" style="height:3em;">'+
-								'<div class="col-9 col-md-8 fw-bold ps-3" data-i18n="dashboard_componentbox_label_comp">Component</div>'+
-								'<div class="col-3 col-md-4 fw-bold text-center" data-i18n="dashboard_componentbox_label_status">Status</div>'+
+								'<div class="col-9 col-md-8 fw-bold ps-3" data-i18n="dashboard_componentbox_label_comp">Thành phần</div>'+
+								'<div class="col-3 col-md-4 fw-bold text-center" data-i18n="dashboard_componentbox_label_status">Trạng thái</div>'+
 							  '</div>';
 		for (var idx = 0; idx < components.length; idx++)
 		{
@@ -342,9 +342,9 @@ $(document).ready(function ()
 
 		var networkSessions_html =
 					'<div class="row border-bottom text-primary ambilightapp-vcenter" style="min-height:3em;">'+
-						'<div class="col-4 col-md-3 fw-bold ps-1 ps-md-4 pe-2 pe-md-1" data-i18n="edt_conf_stream_device_title">Device</div>'+
-						'<div class="col-4 col-md-4 fw-bold ps-0 pe-1 pe-md-2" data-i18n="device_address">Address</div>'+
-						'<div class="col-4 col-md-5 fw-bold ps-0 pe-0 pe-md-1" data-i18n="edt_dev_spec_lights_name">Name</div>'+
+						'<div class="col-4 col-md-3 fw-bold ps-1 ps-md-4 pe-2 pe-md-1" data-i18n="edt_conf_stream_device_title">Thiết bị</div>'+
+						'<div class="col-4 col-md-4 fw-bold ps-0 pe-1 pe-md-2" data-i18n="device_address">Cổng kết nối</div>'+
+						'<div class="col-4 col-md-5 fw-bold ps-0 pe-0 pe-md-1" data-i18n="edt_dev_spec_lights_name">Giao thức</div>'+
 					'</div>';
 
 		for(var i = 0; i< networkSessions.length; i++)
