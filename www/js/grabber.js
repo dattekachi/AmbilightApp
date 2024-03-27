@@ -592,28 +592,7 @@ $(document).ready( function(){
 
 	
 	 		
-	if(VIDEO_AVAILABLE) 
-	{
-		$('#conf_cont').append(createOptPanel('<svg data-src="svg/capturing_video.svg" fill="currentColor" class="svg4ambilightapp"></svg>', $.i18n("edt_conf_stream_heading_title"), 'editor_container_video_device', 'btn_submit_videoGrabber'));
-		$('#conf_cont').append(createHelpTable(window.schema.videoGrabber.properties, $.i18n("edt_conf_stream_heading_title")));
-	
-		$('#conf_cont').append(createOptPanel('<svg data-src="svg/capturing_video.svg" fill="currentColor" class="svg4ambilightapp"></svg>', $.i18n("edt_conf_instCapture_heading_title"), 'editor_container_videoControl', 'btn_submit_videoControl'));
-		$('#conf_cont').append(createHelpTable(window.schema.videoControl.properties, $.i18n("edt_conf_instCapture_heading_title")));			
-
-		// Instance Capture
-		conf_editor_videoControl = createJsonEditor('editor_container_videoControl', { videoControl: window.schema.videoControl}, true, true, undefined, true);
-
-		conf_editor_videoControl.on('change',function() {
-			(conf_editor_videoControl.validate().length || window.readOnlyMode) ? $('#btn_submit_videoControl').attr('disabled', true) : $('#btn_submit_videoControl').attr('disabled', false);
-		});
-
-		$('#btn_submit_videoControl').off().on('click',function() {
-			requestWriteConfig(conf_editor_videoControl.getValue());
-		});
-	}
-
-	if(VIDEO_AVAILABLE)
-		BuildVideoEditor();	
+	//	
 		
 	if(SYSTEM_AVAILABLE) 
 	{
@@ -667,6 +646,29 @@ $(document).ready( function(){
 		else
 			createHint("intro", $.i18n('conf_grabber_dx11_intro'), "editor_container_system_device");
 	}
+
+	if(VIDEO_AVAILABLE) 
+	{
+		$('#conf_cont').append(createOptPanel('<svg data-src="svg/capturing_video.svg" fill="currentColor" class="svg4ambilightapp"></svg>', $.i18n("edt_conf_stream_heading_title"), 'editor_container_video_device', 'btn_submit_videoGrabber'));
+		$('#conf_cont').append(createHelpTable(window.schema.videoGrabber.properties, $.i18n("edt_conf_stream_heading_title")));
+	
+		$('#conf_cont').append(createOptPanel('<svg data-src="svg/capturing_video.svg" fill="currentColor" class="svg4ambilightapp"></svg>', $.i18n("edt_conf_instCapture_heading_title"), 'editor_container_videoControl', 'btn_submit_videoControl'));
+		$('#conf_cont').append(createHelpTable(window.schema.videoControl.properties, $.i18n("edt_conf_instCapture_heading_title")));			
+
+		// Instance Capture
+		conf_editor_videoControl = createJsonEditor('editor_container_videoControl', { videoControl: window.schema.videoControl}, true, true, undefined, true);
+
+		conf_editor_videoControl.on('change',function() {
+			(conf_editor_videoControl.validate().length || window.readOnlyMode) ? $('#btn_submit_videoControl').attr('disabled', true) : $('#btn_submit_videoControl').attr('disabled', false);
+		});
+
+		$('#btn_submit_videoControl').off().on('click',function() {
+			requestWriteConfig(conf_editor_videoControl.getValue());
+		});
+	}
+
+	if(VIDEO_AVAILABLE)
+		BuildVideoEditor();
 	
 	if (window.serverInfo.hasCEC != 1)
 	{	
