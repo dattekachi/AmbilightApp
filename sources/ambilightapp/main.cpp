@@ -144,8 +144,8 @@ int main(int argc, char** argv)
 {
 
 	#ifdef _WIN32
-		if (isRunning("LedFx.exe")) {
-			QString szAppName = "LedFx.exe";
+		if (isRunning("MusicLedStudio.exe")) {
+			QString szAppName = "MusicLedStudio.exe";
 			QProcess process;
 			process.setProgram("taskkill");
 			QStringList arguments;
@@ -155,7 +155,7 @@ int main(int argc, char** argv)
 			process.waitForFinished();
 		}
 	#else
-		const char* command = "killall MusicLedStudio_v2";
+		const char* command = "killall MusicLedStudio";
 		system(command);
 	#endif
 
