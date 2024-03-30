@@ -5,7 +5,7 @@
 		<key>CFBundleIdentifier</key>
 		<string>com.awawa-dev.hyperhdr</string>
 		<key>CFBundleName</key>
-		<string>Ambilight App</string>
+		<string>AmbilightApp</string>
 		<key>CFBundleExecutable</key>
 		<string>ambilightapp</string>
 		<key>CFBundleIconFile</key>
