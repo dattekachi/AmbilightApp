@@ -16,7 +16,3 @@
 [submodule "external/mdns"]
 	path = external/mdns
 	url = https://github.com/mjansson/mdns.git
-[submodule "external/xz"]
-	path = external/xz
-	url = https://git.tukaani.org/xz.git
-	branch = v5.2
