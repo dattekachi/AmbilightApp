@@ -39,7 +39,7 @@ SysTray::SysTray(AmbilightAppDaemon* ambilightappDaemon, quint16 webPort)
 	_settingsAction(nullptr),
 	_clearAction(nullptr),
 	_runmusicledAction(nullptr),
-	//_restartappAction(nullptr),
+	_restartappAction(nullptr),
 	_autorunAction(nullptr),
 	_trayIcon(nullptr),
 	_trayIconMenu(nullptr),
@@ -78,7 +78,7 @@ SysTray::~SysTray()
 	delete _settingsAction;
 	delete _clearAction;
 	delete _runmusicledAction;
-	//delete _restartappAction;
+	delete _restartappAction;
 	delete _autorunAction;
 
 	delete _trayIcon;
@@ -140,9 +140,9 @@ void SysTray::createTrayIcon()
 	_runmusicledAction->setIcon(QPixmap(":/music.svg"));
 	connect(_runmusicledAction, &QAction::triggered, this, &SysTray::runMusicLed);
 
-	//_restartappAction = new QAction(tr("&Khởi động lại"));
-	//_restartappAction->setIcon(QPixmap(":/quit.svg"));
-	//connect(_restartappAction, &QAction::triggered, this, &SysTray::restartApp);
+	_restartappAction = new QAction(tr("&Khởi động lại"));
+	_restartappAction->setIcon(QPixmap(":/quit.svg"));
+	connect(_restartappAction, &QAction::triggered, this, &SysTray::restartApp);
 
 	std::list<EffectDefinition> efxs;
 
@@ -177,7 +177,7 @@ void SysTray::createTrayIcon()
 	_trayIconMenu->addMenu(_trayIconEfxMenu);
 	_trayIconMenu->addAction(_clearAction);
 	_trayIconMenu->addAction(_runmusicledAction);
-	//_trayIconMenu->addAction(_restartappAction);
+	_trayIconMenu->addAction(_restartappAction);
 	_trayIconMenu->addSeparator();
 	_trayIconMenu->addAction(_quitAction);
 }
@@ -296,19 +296,15 @@ void SysTray::runMusicLed()
 #endif
 }
 
-//void SysTray::restartApp()
-//{
-//	// Khởi động lại ứng dụng hiện tại sau 1 giây
-//	QTimer::singleShot(1000, []() {
-//		QCoreApplication::quit();
-//
-//		// Lấy đường dẫn đến tệp thực thi của ứng dụng hiện tại
-//		QString appPath = QCoreApplication::applicationFilePath();
-//
-//		// Khởi động lại ứng dụng hiện tại
-//		QDesktopServices::openUrl(QUrl::fromLocalFile(appPath));
-//	});
-//}
+void SysTray::restartApp()
+{
+	auto arguments = QCoreApplication::arguments();
+	if (!arguments.contains("--wait-ambilightapp"))
+		arguments << "--wait-ambilightapp";
+
+	QProcess::startDetached(QCoreApplication::applicationFilePath(), arguments);
+	QCoreApplication::exit(12);
+}
 
 void SysTray::signalInstanceStateChangedHandler(InstanceState state, quint8 instance, const QString& name)
 {
