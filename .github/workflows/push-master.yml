@@ -141,8 +141,8 @@ jobs:
         if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: release-artifact-windows
-          path: build/Ambilight*
+          name: Windows_Artifact_x64
+          path: build/Ambilight*.zip
           
       # Upload artifacts from commit
       # - name: Upload artifacts from commit
