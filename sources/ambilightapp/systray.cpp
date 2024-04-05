@@ -141,7 +141,7 @@ void SysTray::createTrayIcon()
 	connect(_runmusicledAction, &QAction::triggered, this, &SysTray::runMusicLed);
 
 	_restartappAction = new QAction(tr("&Khởi động lại"));
-	_restartappAction->setIcon(QPixmap(":/quit.svg"));
+	_restartappAction->setIcon(QPixmap(":/restart.svg"));
 	connect(_restartappAction, &QAction::triggered, this, &SysTray::restartApp);
 
 	std::list<EffectDefinition> efxs;
@@ -177,8 +177,8 @@ void SysTray::createTrayIcon()
 	_trayIconMenu->addMenu(_trayIconEfxMenu);
 	_trayIconMenu->addAction(_clearAction);
 	_trayIconMenu->addAction(_runmusicledAction);
-	_trayIconMenu->addAction(_restartappAction);
 	_trayIconMenu->addSeparator();
+	_trayIconMenu->addAction(_restartappAction);
 	_trayIconMenu->addAction(_quitAction);
 }
 
