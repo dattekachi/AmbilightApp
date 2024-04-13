@@ -152,7 +152,7 @@ void InstanceTable::createInstance()
 	else
 	{
 		QVariantMap data;
-		data["friendly_name"] = "Led Ambilight";
+		data["friendly_name"] = "Led ambilight";
 		VectorPair cond;
 		cond.append(CPair("instance", 0));
 		if (createRecord(cond, data))
