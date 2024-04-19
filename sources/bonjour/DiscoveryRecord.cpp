@@ -50,10 +50,10 @@ const QString DiscoveryRecord::getName(Service _type)
 	{
 		case(Service::PhilipsHue): return "Hue bridge"; break;
 		case(Service::WLED): return "WLED"; break;
-		case(Service::AmbilightAPP): return "AmbilightAPP"; break;
+		case(Service::AmbilightAPP): return "Ambilight App"; break;
 		case(Service::Pico): return "Pico/RP2040"; break;
 		case(Service::ESP32_S2): return "ESP32-S2"; break;
-		case(Service::ESP): return "ESP board"; break;
+		case(Service::ESP): return "Ambilight USB"; break;
 		default: return "SERVICE_UNKNOWN";
 	}
 }
