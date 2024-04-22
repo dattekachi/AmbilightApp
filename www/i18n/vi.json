@@ -753,7 +753,7 @@
   "infoDialog_general_success_title": "Sự thành công",
   "infoDialog_general_warning_title": "Cảnh báo",
   "infoDialog_import_comperror_text": "Buồn! Trình duyệt của bạn không hỗ trợ nhập. Vui lòng thử lại với trình duyệt khác.",
-  "infoDialog_import_confirm_text": "Bạn có chắc chắn nhập \"$1\"? <p class='mt-2' style='color: red;'>Không thể hoàn tác quá trình này! Ambilight App sẽ đóng sau khi nhập thành công và bạn phải khởi động lại theo cách thủ công nếu Ambilight App không được định cấu hình dưới dạng dịch vụ Linux.</p>",
+  "infoDialog_import_confirm_text": "Bạn có chắc chắn nhập \"$1\"? <p class='mt-2' style='color: red;'>Không thể hoàn tác quá trình này! Ambilight App sẽ khởi động lại sau khi nhập cấu hình thành công.</p>",
   "infoDialog_import_confirm_title": "Xác nhận nhập khẩu",
   "infoDialog_import_hyperror_text": "Không thể nhập tệp cấu hình đã chọn \"$1\". Nó không tương thích với Ambilight App v17 trở lên!",
   "infoDialog_import_jsonerror_text": "Tệp cấu hình đã chọn \"$1\" không phải là tệp .json hoặc nó bị hỏng. Thông báo lỗi: ($2)",

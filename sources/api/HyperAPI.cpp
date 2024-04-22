@@ -41,6 +41,7 @@
 #ifdef ENABLE_BONJOUR
 	#include <bonjour/DiscoveryWrapper.h>
 #endif
+#include <qprocess.h>
 
 using namespace ambilightapp;
 
@@ -706,7 +707,16 @@ void HyperAPI::handleLoadDB(const QJsonObject& message, const QString& command, 
 			QTimer::singleShot(0, _instanceManager.get(), []() {QCoreApplication::exit(1); });
 #else
 			AmbilightAppInstance::signalTerminateTriggered();
-			QTimer::singleShot(0, _instanceManager.get(), []() {QCoreApplication::quit(); });
+			// QTimer::singleShot(0, _instanceManager.get(), []() {QCoreApplication::quit(); });
+			QTimer::singleShot(0, _instanceManager.get(), []()
+			{
+				auto arguments = QCoreApplication::arguments();
+				if (!arguments.contains("--wait-ambilightapp"))
+					arguments << "--wait-ambilightapp";
+
+				QProcess::startDetached(QCoreApplication::applicationFilePath(), arguments);
+				QCoreApplication::exit(12);
+			});
 #endif
 		}
 		else
