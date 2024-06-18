@@ -37,6 +37,7 @@ SysTray::SysTray(AmbilightAppDaemon* ambilightappDaemon, quint16 webPort)
 	_stopAction(nullptr),
 	_colorAction(nullptr),
 	_settingsAction(nullptr),
+	_openscreencapAction(nullptr),
 	_clearAction(nullptr),
 	_runmusicledAction(nullptr),
 	_restartappAction(nullptr),
@@ -76,6 +77,7 @@ SysTray::~SysTray()
 	delete _stopAction;
 	delete _colorAction;
 	delete _settingsAction;
+	delete _openscreencapAction;
 	delete _clearAction;
 	delete _runmusicledAction;
 	delete _restartappAction;
@@ -132,6 +134,10 @@ void SysTray::createTrayIcon()
 	_settingsAction->setIcon(QPixmap(":/settings.svg"));
 	connect(_settingsAction, &QAction::triggered, this, &SysTray::settings);
 
+	_openscreencapAction = new QAction(tr("&Trình quét màu"));
+	_openscreencapAction->setIcon(QPixmap(":/settings.svg"));
+	connect(_openscreencapAction, &QAction::triggered, this, &SysTray::openScreenCap);
+
 	_clearAction = new QAction(tr("&Theo màu màn hình"));
 	_clearAction->setIcon(QPixmap(":/clear.svg"));
 	connect(_clearAction, &QAction::triggered, this, &SysTray::clearEfxColor);
@@ -177,6 +183,8 @@ void SysTray::createTrayIcon()
 	_trayIconMenu->addMenu(_trayIconEfxMenu);
 	_trayIconMenu->addAction(_clearAction);
 	_trayIconMenu->addAction(_runmusicledAction);
+	_trayIconMenu->addSeparator();
+	_trayIconMenu->addAction(_openscreencapAction);
 	_trayIconMenu->addSeparator();
 	_trayIconMenu->addAction(_restartappAction);
 	_trayIconMenu->addAction(_quitAction);
@@ -267,6 +275,23 @@ void SysTray::settings()
 	// restoring stderr
 	::dup2(saved_stderr, STDERR_FILENO);
 #endif
+}
+
+void SysTray::openScreenCap()
+{
+	QString szHyperionScreenCapPath = "C:\\Program Files\\Hyperion Screen Capture\\HyperionScreenCap.exe";
+	QString szAppName = "HyperionScreenCap.exe";
+
+	// Kiểm tra xem ứng dụng có đang chạy hay không
+	if (QProcess::startDetached(szHyperionScreenCapPath)) {
+		// Nếu đang chạy, đóng ứng dụng
+		QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << szAppName);
+		// Chờ một chút để ứng dụng đóng hoàn toàn (nếu cần)
+		QThread::sleep(1);
+	}
+
+	// Khởi động lại ứng dụng với tham số "-show"
+	QProcess::startDetached(szHyperionScreenCapPath, QStringList() << "-show");
 }
 
 void SysTray::setEffect()

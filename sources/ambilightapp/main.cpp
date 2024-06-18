@@ -127,16 +127,24 @@ QCoreApplication* createApplication(int& argc, char* argv[])
 }
 
 #ifdef _WIN32
-	bool isRunning(const QString& process) {
-		QProcess tasklist;
-		tasklist.start(
-			"tasklist",
-			QStringList() << "/NH"
-			<< "/FO" << "CSV"
-			<< "/FI" << QString("IMAGENAME eq %1").arg(process));
-		tasklist.waitForFinished();
-		QString output = tasklist.readAllStandardOutput();
-		return output.startsWith(QString("\"%1").arg(process));
+	//bool isRunning(const QString& process) {
+	//	QProcess tasklist;
+	//	tasklist.start(
+	//		"tasklist",
+	//		QStringList() << "/NH"
+	//		<< "/FO" << "CSV"
+	//		<< "/FI" << QString("IMAGENAME eq %1").arg(process));
+	//	tasklist.waitForFinished();
+	//	QString output = tasklist.readAllStandardOutput();
+	//	return output.startsWith(QString("\"%1").arg(process));
+	//}
+
+	bool isRunning(const QString& processName) {
+		QProcess process;
+		process.start("tasklist", QStringList() << "/FI" << QString("IMAGENAME eq %1").arg(processName));
+		process.waitForFinished();
+		QString output = process.readAllStandardOutput();
+		return output.contains(processName, Qt::CaseInsensitive);
 	}
 #endif
 
@@ -144,15 +152,20 @@ int main(int argc, char** argv)
 {
 
 	#ifdef _WIN32
-		if (isRunning("MusicLedStudio.exe")) {
-			QString szAppName = "MusicLedStudio.exe";
-			QProcess process;
-			process.setProgram("taskkill");
-			QStringList arguments;
-			arguments << "/F" << "/IM" << szAppName;
-			process.setArguments(arguments);
-			process.start();
-			process.waitForFinished();
+		//if (isRunning("MusicLedStudio.exe")) {
+		//	QString szAppName = "MusicLedStudio.exe";
+		//	QProcess process;
+		//	process.setProgram("taskkill");
+		//	QStringList arguments;
+		//	arguments << "/F" << "/IM" << szAppName;
+		//	process.setArguments(arguments);
+		//	process.start();
+		//	process.waitForFinished();
+		//}
+
+		if (isRunning("MusicLedStudio.exe"))
+		{
+			QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << "MusicLedStudio.exe");
 		}
 	#else
 		const char* command = "killall MusicLedStudio";
@@ -177,7 +190,8 @@ int main(int argc, char** argv)
 	DefaultSignalHandler::install();
 
 #ifdef _WIN32
-	if (!isRunning("HyperionScreenCap.exe")) {
+	if (!isRunning("HyperionScreenCap.exe"))
+	{
 		QString szHyperionScreenCapPath = "C:\\Program Files\\Hyperion Screen Capture\\HyperionScreenCap.exe";
 		QDesktopServices::openUrl(QUrl::fromLocalFile(szHyperionScreenCapPath));
 	}

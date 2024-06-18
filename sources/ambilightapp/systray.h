@@ -28,6 +28,7 @@ public slots:
 	void showColorDialog();
 	void setColor(const QColor& color);
 	void settings();
+	void openScreenCap();
 	void setEffect();
 	void clearEfxColor();
 	void runMusicLed();
@@ -59,6 +60,7 @@ private:
 	QAction* _stopAction;
 	QAction* _colorAction;
 	QAction* _settingsAction;
+	QAction* _openscreencapAction;
 	QAction* _clearAction;
 	QAction* _runmusicledAction;
 	QAction* _restartappAction;
