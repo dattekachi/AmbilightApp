@@ -16,18 +16,6 @@ macro(DeployApple TARGET)
 		install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION "ambilightapp.app/Contents/Resources" COMPONENT "AmbilightAPP")
 		install(FILES "${PROJECT_SOURCE_DIR}/3RD_PARTY_LICENSES" DESTINATION "ambilightapp.app/Contents/Resources" COMPONENT "AmbilightAPP")
 
-		if ( Qt5Core_FOUND )			
-			get_target_property(MYQT_QMAKE_EXECUTABLE ${Qt5Core_QMAKE_EXECUTABLE} IMPORTED_LOCATION)		
-		else()
-			SET (MYQT_QMAKE_EXECUTABLE "${_qt_import_prefix}/../../../bin/qmake")
-		endif()
-
-		execute_process(
-			COMMAND ${MYQT_QMAKE_EXECUTABLE} -query QT_INSTALL_PLUGINS
-			OUTPUT_VARIABLE MYQT_PLUGINS_DIR
-			OUTPUT_STRIP_TRAILING_WHITESPACE
-		)
-		install(CODE "set(MYQT_PLUGINS_DIR \"${MYQT_PLUGINS_DIR}\")"     COMPONENT "AmbilightAPP")
 		install(CODE "set(MY_DEPENDENCY_PATHS \"${TARGET_FILE}\")"       COMPONENT "AmbilightAPP")
 		install(CODE "set(MY_SYSTEM_LIBS_SKIP \"${SYSTEM_LIBS_SKIP}\")"  COMPONENT "AmbilightAPP")
 		install(CODE "set(SCOPE_Qt_VERSION ${Qt_VERSION})"               COMPONENT "AmbilightAPP")
@@ -128,40 +116,10 @@ macro(DeployApple TARGET)
 				list(LENGTH _u_deps _u_length)
 				if("${_u_length}" GREATER 0)
 					message(WARNING "Unresolved dependencies detected!")
-				endif()
-				  
-				foreach(PLUGIN "platforms" "sqldrivers" "imageformats")
-				if(EXISTS ${MYQT_PLUGINS_DIR}/${PLUGIN})
-					file(GLOB files "${MYQT_PLUGINS_DIR}/${PLUGIN}/*")
-					foreach(file ${files})							
-							file(GET_RUNTIME_DEPENDENCIES
-							EXECUTABLES ${file}
-							RESOLVED_DEPENDENCIES_VAR PLUGINS
-							UNRESOLVED_DEPENDENCIES_VAR _u_deps				
-							)
-
-						foreach(DEPENDENCY ${PLUGINS})
-								file(INSTALL
-									DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
-									TYPE SHARED_LIBRARY
-									FILES ${DEPENDENCY}
-								)									
-						endforeach()
-							
-						get_filename_component(singleQtLib ${file} NAME)
-						list(APPEND MYQT_PLUGINS "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/plugins/${PLUGIN}/${singleQtLib}")
-						file(INSTALL
-							DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/plugins/${PLUGIN}"
-							TYPE SHARED_LIBRARY
-							FILES ${file}
-						)
-							
-					endforeach()
-				endif()
-			endforeach()
+				endif()				
 			
 			include(BundleUtilities)							
-			fixup_bundle("${CMAKE_INSTALL_PREFIX}/ambilightapp.app" "${MYQT_PLUGINS}" "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib")
+			fixup_bundle("${CMAKE_INSTALL_PREFIX}/ambilightapp.app" "" "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib")
 				
 			file(REMOVE_RECURSE "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib")			
 			file(REMOVE_RECURSE "${CMAKE_INSTALL_PREFIX}/share")
@@ -172,8 +130,6 @@ macro(DeployApple TARGET)
 					cmake_policy(SET CMP0009 NEW)
 					message( "Re-signing bundle's components...")
 					file(GLOB_RECURSE libSignFramework LIST_DIRECTORIES false "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/Frameworks/*")
-					file(GLOB_RECURSE libSignPlugins LIST_DIRECTORIES false "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/plugins/*")
-					list(APPEND libSignFramework ${libSignPlugins})
 					list(APPEND libSignFramework "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/MacOS/ambilightapp")
 					foreach(_fileToSign ${libSignFramework})
 						string(FIND ${_fileToSign} ".framework/Resources" isResources)
@@ -206,156 +162,46 @@ endmacro()
 
 macro(DeployUnix TARGET)
 	if (EXISTS ${TARGET_FILE})
-		message(STATUS "Collecting Dependencies for target file: ${TARGET_FILE}")
 		include(GetPrerequisites)
-		#"libsystemd0"
-		set(SYSTEM_LIBS_SKIP
-			"libc"
-			"libglib-2"
-			"libsystemd0"
-			"libdl"
-			"libexpat"
-			"libfontconfig"
-			"libgcc_s"			
-			"libgpg-error"
-			"libm"
-			"libpthread"
-			"librt"
-			"libstdc++"
-			"libudev"
-			"libutil"			
-			"libz"
-			"libxrender1"
-			"libxi6"
-			"libxext6"
-			"libx11-xcb1"
-			"libsm"
-			"libqt5gui5"
-			"libice6"
-			"libdrm2"
-			"libxkbcommon0"
-			"libwacom2"
-			"libmtdev1"
-			"libinput10"
-			"libgudev-1.0-0"
-			"libffi6"
-			"libevdev2"
-			"libqt5dbus5"
-			"libuuid1"
-			"libselinux1"
-			"libmount1"
-			"libblkid1"
-			"libxcb-icccm4"
-			"libxcb-image0"
-			"libxcb-keysyms1"
-			"libxcb-randr0"
-			"libxcb-render-util0"
-			"libxcb-render0"
-			"libxcb-shape0"
-			"libxcb-shm0"
-			"libxcb-sync1"
-			"libxcb-util0"
-			"libxcb-xfixes0"
-			"libxcb-xkb1"
-			"libxkbcommon-x11-0"			
-			"libssl1.1"
-		)
 
-		# Extract dependencies ignoring the system ones
-		if (NOT CMAKE_CROSSCOMPILING)
-			get_prerequisites(${TARGET_FILE} DEPENDENCIES 0 1 "" "")
-		endif()
+		# Install LUT		
+		install(FILES "${PROJECT_SOURCE_DIR}/resources/lut/lut_lin_tables.tar.xz" DESTINATION "share/ambilightapp/lut" COMPONENT "AmbilightAPP")
+		install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION "share/ambilightapp" COMPONENT "AmbilightAPP")
+		install(FILES "${PROJECT_SOURCE_DIR}/3RD_PARTY_LICENSES" DESTINATION "share/ambilightapp" COMPONENT "AmbilightAPP")
 
-		# Append symlink and non-symlink dependencies to the list
+		# Our and custom libs
 		set(PREREQUISITE_LIBS "")
-		foreach(DEPENDENCY ${DEPENDENCIES})
-			get_filename_component(resolved ${DEPENDENCY} NAME_WE)
-			
-			foreach(myitem ${SYSTEM_LIBS_SKIP})
-				string(FIND ${myitem} ${resolved} _index)
-				if (${_index} GREATER -1)
-					break()									
-				endif()
-			endforeach()
-					
-			if (${_index} GREATER -1)
-				continue() # Skip system libraries
-			else()
-				gp_resolve_item("${TARGET_FILE}" "${DEPENDENCY}" "" "" resolved_file)
-				get_filename_component(resolved_file ${resolved_file} ABSOLUTE)
-				gp_append_unique(PREREQUISITE_LIBS ${resolved_file})
-				get_filename_component(file_canonical ${resolved_file} REALPATH)
-				gp_append_unique(PREREQUISITE_LIBS ${file_canonical})
-				#message(STATUS "Basic check added: ${resolved_file}")
-			endif()
-		endforeach()
-		
+
 		# Copy SMARTX11 lib
-		find_library(LIBSMARTX11
-			NAMES "smartX11" "smartX11.so"
-			PATHS "${CMAKE_BINARY_DIR}/lib"
-			NO_DEFAULT_PATH
-		)
-		if (LIBSMARTX11)
-			SET(resolved_file ${LIBSMARTX11})		
-			get_filename_component(resolved_file ${resolved_file} ABSOLUTE)
-			gp_append_unique(PREREQUISITE_LIBS ${resolved_file})
-			message(STATUS "Adding smartX11: ${resolved_file}")		
-			get_filename_component(file_canonical ${resolved_file} REALPATH)
-			gp_append_unique(PREREQUISITE_LIBS ${file_canonical})
-			message(STATUS "Added smartX11(2): ${file_canonical}")
-		endif()
+		install(CODE [[ file(INSTALL FILES $<TARGET_FILE:smartX11> DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ambilightapp/lib" TYPE SHARED_LIBRARY) ]] COMPONENT "AmbilightAPP")
 
 		# Copy SMARTPIPEWIRE lib
-		find_library(LIBSMARTPIPEWIRE
-			NAMES "smartPipewire" "smartPipewire.so"
-			PATHS "${CMAKE_BINARY_DIR}/lib"
-			NO_DEFAULT_PATH
-		)
-		if (LIBSMARTPIPEWIRE)
-			SET(resolved_file ${LIBSMARTPIPEWIRE})
-			get_filename_component(resolved_file ${resolved_file} ABSOLUTE)
-			gp_append_unique(PREREQUISITE_LIBS ${resolved_file})
-			message(STATUS "Adding smartPipewire: ${resolved_file}")		
-			get_filename_component(file_canonical ${resolved_file} REALPATH)
-			gp_append_unique(PREREQUISITE_LIBS ${file_canonical})
-			message(STATUS "Added smartPipewire(2): ${file_canonical}")
-		endif()		
-		
+		install(CODE [[ file(INSTALL FILES $<TARGET_FILE:smartPipewire> DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ambilightapp/lib" TYPE SHARED_LIBRARY) ]] COMPONENT "AmbilightAPP")
+
 		#OpenSSL
 		find_package(OpenSSL)
 		if(OPENSSL_FOUND)
 			foreach(openssl_lib ${OPENSSL_LIBRARIES})
+				message(STATUS "Adding OpenSSL(1): ${openssl_lib}")
 				gp_append_unique(PREREQUISITE_LIBS ${openssl_lib})
 				get_filename_component(file_canonical ${openssl_lib} REALPATH)
+				message(STATUS "Adding OpenSSL(2): ${file_canonical}")
 				gp_append_unique(PREREQUISITE_LIBS ${file_canonical})
+
+				get_filename_component(rootLib ${openssl_lib} NAME)
+				get_filename_component(rootPath ${openssl_lib} DIRECTORY)
+				file(GLOB resultSSL "${rootPath}/${rootLib}*")
+				foreach(targetlib ${resultSSL})
+					message("=>${targetlib}")
+					gp_append_unique(PREREQUISITE_LIBS ${targetlib})
+				endforeach()
 			endforeach()
 		else()
 			message( WARNING "OpenSSL NOT found (https instance will not work)")
 		endif()
 
-		# Detect the Qt5 plugin directory, source: https://github.com/lxde/lxqt-qtplugin/blob/master/src/CMakeLists.txt
-		if ( Qt5Core_FOUND )			
-			get_target_property(QT_QMAKE_EXECUTABLE ${Qt5Core_QMAKE_EXECUTABLE} IMPORTED_LOCATION)
-			execute_process(
-				COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_PLUGINS
-				OUTPUT_VARIABLE QT_PLUGINS_DIR
-				OUTPUT_STRIP_TRAILING_WHITESPACE
-			)		
-		elseif ( TARGET Qt${QT_VERSION_MAJOR}::qmake )
-			get_target_property(QT_QMAKE_EXECUTABLE Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
-			execute_process(
-				COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_PLUGINS
-				OUTPUT_VARIABLE QT_PLUGINS_DIR
-				OUTPUT_STRIP_TRAILING_WHITESPACE
-			)
-		endif()
-
-		message(STATUS "QT plugin path: ${QT_PLUGINS_DIR}")
-		
 		# Copy CEC lib
 		if (CEC_FOUND)
-
 			find_library(XRANDR_LIBRARY NAMES Xrandr libXrandr libXrandr.so.2)
 
 			if (XRANDR_LIBRARY)
@@ -391,144 +237,126 @@ macro(DeployUnix TARGET)
 				endif()
 			endforeach()
 		endif()
-		
-		if ( GLD )
-			SET(resolved_file ${GLD})
-			message(STATUS "Adding GLD: ${resolved_file}")
-			get_filename_component(resolved_file ${resolved_file} ABSOLUTE)
-			gp_append_unique(PREREQUISITE_LIBS ${resolved_file})
-			message(STATUS "Added GLD: ${resolved_file}")
-			set(resolved_file0 "${resolved_file}.0")
-			if(EXISTS ${resolved_file0})
-				message(STATUS "Adding GLD0: ${resolved_file0}")
-				get_filename_component(resolved_file0 ${resolved_file0} ABSOLUTE)
-				gp_append_unique(PREREQUISITE_LIBS ${resolved_file0})
-				message(STATUS "Added GLD0: ${resolved_file0}")
-			endif()
-			get_filename_component(file_canonical ${resolved_file} REALPATH)
-			gp_append_unique(PREREQUISITE_LIBS ${file_canonical})
-			message(STATUS "Added GLD: ${file_canonical}")
-		endif()
-
-		
-		find_library(LIB_XCB
-			NAMES libxcb libxcb.so
-		)
-
-		if(LIB_XCB)
-			message(STATUS "libXCB found ${LIB_XCB}")
-			SET(resolved_file ${LIB_XCB})
-			message(STATUS "Adding libXCB: ${resolved_file}")
-			get_filename_component(resolved_file ${resolved_file} ABSOLUTE)
-			gp_append_unique(PREREQUISITE_LIBS ${resolved_file})
-			message(STATUS "Added libXCB: ${resolved_file}")
-			set(resolved_file1 "${resolved_file}.1")
-			if(EXISTS ${resolved_file1})
-				message(STATUS "Adding libXCB1: ${resolved_file1}")
-				get_filename_component(resolved_file1 ${resolved_file1} ABSOLUTE)
-				gp_append_unique(PREREQUISITE_LIBS ${resolved_file1})
-				message(STATUS "Added libXCB1: ${resolved_file1}")
-			endif()
-			get_filename_component(file_canonical ${resolved_file} REALPATH)
-			gp_append_unique(PREREQUISITE_LIBS ${file_canonical})
-			message(STATUS "Added: ${file_canonical}")
-		else()
-			message(STATUS "libXCB not found")
-		endif()
-		
-		find_library(LIB_GLX
-			NAMES libGLX libGLX.so		
-		)
 				
-		if(LIB_GLX)
-			message(STATUS "libGLX found ${LIB_GLX}")
-			SET(resolved_file ${LIB_GLX})
-			message(STATUS "Adding LIB_GLX: ${resolved_file}")
-			get_filename_component(resolved_file ${resolved_file} ABSOLUTE)
-			gp_append_unique(PREREQUISITE_LIBS ${resolved_file})
-			message(STATUS "Added LIB_GLX: ${resolved_file}")
-			set(resolved_file0 "${resolved_file}.0")
-			if(EXISTS ${resolved_file0})
-				message(STATUS "Adding LIB_GLX0: ${resolved_file0}")
-				get_filename_component(resolved_file0 ${resolved_file0} ABSOLUTE)
-				gp_append_unique(PREREQUISITE_LIBS ${resolved_file0})
-				message(STATUS "Added LIB_GLX0: ${resolved_file0}")
-			endif()
-			get_filename_component(file_canonical ${resolved_file} REALPATH)
-			gp_append_unique(PREREQUISITE_LIBS ${file_canonical})
-			message(STATUS "Added: ${file_canonical}")
-		else()
-			message(STATUS "libGLX not found")
+		# install CODE 	
+		install(CODE "set(TARGET_FILE \"${TARGET_FILE}\")"					COMPONENT "AmbilightAPP")
+		install(CODE "set(PREREQUISITE_LIBS \"${PREREQUISITE_LIBS}\")"		COMPONENT "AmbilightAPP")
+
+		install(CODE [[
+
+		set(SYSTEM_LIBS_SKIP
+			"libc"
+			"libglib-2"
+			"libsystemd0"
+			"libdl"
+			"libexpat"
+			"libfontconfig"
+			"libgcc_s"			
+			"libgpg-error"
+			"libm"
+			"libpthread"
+			"librt"
+			"libstdc++"
+			"libudev"
+			"libutil"			
+			"libz"
+			"libxrender1"
+			"libxi6"
+			"libxext6"
+			"libx11-xcb1"
+			"libsm"
+			"libice6"
+			"libdrm2"
+			"libxkbcommon0"
+			"libwacom2"
+			"libmtdev1"
+			"libinput10"
+			"libgudev-1.0-0"
+			"libffi6"
+			"libevdev2"
+			"libuuid1"
+			"libselinux1"
+			"libmount1"
+			"libblkid1"
+			"libwayland"
+			"libxcb-icccm4"
+			"libxcb-image0"
+			"libxcb-keysyms1"
+			"libxcb-randr0"
+			"libxcb-render-util0"
+			"libxcb-render0"
+			"libxcb-shape0"
+			"libxcb-shm0"
+			"libxcb-sync1"
+			"libxcb-util0"
+			"libxcb-xfixes0"
+			"libxcb-xkb1"
+			"libxkbcommon-x11-0"
+			"ld-linux-x86-64"
+		)
+
+		#message(STATUS "Collecting Dependencies for target file: ${TARGET_FILE}")
+		include(GetPrerequisites)		
+		# Extract dependencies ignoring the system ones
+		if (NOT CMAKE_CROSSCOMPILING)
+			# get AmbilightAPP deps
+			file(GET_RUNTIME_DEPENDENCIES
+				RESOLVED_DEPENDENCIES_VAR DEPENDENCIES
+				EXECUTABLES ${TARGET_FILE}
+			)
+
+			# get Systray deps (always present even if it's a dummy implementation)
+			file(INSTALL FILES $<TARGET_FILE:systray-widget> DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ambilightapp/lib" TYPE SHARED_LIBRARY)
+			file(GET_RUNTIME_DEPENDENCIES
+				RESOLVED_DEPENDENCIES_VAR SYS_DEPENDENCIES
+				EXECUTABLES $<TARGET_FILE:systray-widget>)
+			foreach(systrayLib ${SYS_DEPENDENCIES})
+				string(FIND ${systrayLib} "libayatana" _sysindex)
+				if (${_sysindex} GREATER -1)
+					list(APPEND DEPENDENCIES ${systrayLib})
+				endif()
+				string(FIND ${systrayLib} "libdbusmenu" _sysDBusindex)
+				if (${_sysDBusindex} GREATER -1)
+					list(APPEND DEPENDENCIES ${systrayLib})
+				endif()
+			endforeach()						
 		endif()
 
-		# Copy Qt plugins to 'share/ambilightapp/lib'
-		if(QT_PLUGINS_DIR)
-			foreach(PLUGIN "platforms" "sqldrivers" "imageformats")
-				if(EXISTS ${QT_PLUGINS_DIR}/${PLUGIN})
-					file(GLOB files "${QT_PLUGINS_DIR}/${PLUGIN}/*")
-					foreach(file ${files})
-						if (NOT CMAKE_CROSSCOMPILING)
-							get_prerequisites(${file} PLUGINS 0 1 "" "")
-						endif()
 
-						foreach(DEPENDENCY ${PLUGINS})
-							get_filename_component(resolved ${DEPENDENCY} NAME_WE)
-							
-							foreach(myitem ${SYSTEM_LIBS_SKIP})
-									#message(STATUS "Checking ${myitem}")
-									string(FIND ${myitem} ${resolved} _index)
-									if (${_index} GREATER -1)
-										#message(STATUS "${myitem} = ${resolved}")									
-										break()									
-									endif()
-							endforeach()
-								
-							if (${_index} GREATER -1)
-								#message(STATUS "QT skipped: ${resolved}")
-								continue() # Skip system libraries
-							else()						
-								#message(STATUS "QT included: ${resolved}")
-								gp_resolve_item("${file}" "${DEPENDENCY}" "" "" resolved_file)
-								get_filename_component(resolved_file ${resolved_file} ABSOLUTE)
-								gp_append_unique(PREREQUISITE_LIBS ${resolved_file})
-								get_filename_component(file_canonical ${resolved_file} REALPATH)
-								gp_append_unique(PREREQUISITE_LIBS ${file_canonical})
-								#message(STATUS "QT added: ${resolved_file}")
-							endif()
-						endforeach()
-
-						install(
-							FILES ${file}
-							DESTINATION "share/ambilightapp/lib/${PLUGIN}"
-							COMPONENT "AmbilightAPP"
-						)
-					endforeach()
+		# Append symlink and non-symlink dependencies to the list		
+		foreach(DEPENDENCY ${DEPENDENCIES})
+			get_filename_component(resolved ${DEPENDENCY} NAME_WE)
+			
+			foreach(myitem ${SYSTEM_LIBS_SKIP})
+				string(FIND ${resolved} ${myitem} _index)
+				if (${_index} GREATER -1)
+					break()									
 				endif()
 			endforeach()
-		endif(QT_PLUGINS_DIR)
-
-		# Create a qt.conf file in 'share/ambilightapp/bin' to override hard-coded search paths in Qt plugins
-		file(WRITE "${CMAKE_BINARY_DIR}/qt.conf" "[Paths]\nPlugins=../lib/\n")
-		install(
-			FILES "${CMAKE_BINARY_DIR}/qt.conf"
-			DESTINATION "share/ambilightapp/bin"
-			COMPONENT "AmbilightAPP"
-		)
+					
+			if (${_index} GREATER -1)
+				continue() # Skip system libraries
+			else()
+				gp_resolve_item("${TARGET_FILE}" "${DEPENDENCY}" "" "" resolved_file)
+				get_filename_component(resolved_file ${resolved_file} ABSOLUTE)
+				gp_append_unique(PREREQUISITE_LIBS ${resolved_file})
+				get_filename_component(file_canonical ${resolved_file} REALPATH)
+				gp_append_unique(PREREQUISITE_LIBS ${file_canonical})
+				#message(STATUS "Basic check added: ${resolved_file}")
+			endif()
+		endforeach()		
 
 		# Copy dependencies to 'share/ambilightapp/lib'
 		foreach(PREREQUISITE_LIB ${PREREQUISITE_LIBS})
 			message("Installing: " ${PREREQUISITE_LIB})
-			install(
+			file(
+				INSTALL
 				FILES ${PREREQUISITE_LIB}
-				DESTINATION "share/ambilightapp/lib"
-				COMPONENT "AmbilightAPP"
+				DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ambilightapp/lib"
+				TYPE SHARED_LIBRARY
 			)
-		endforeach()
-		
-		# install LUT		
-		install(FILES "${PROJECT_SOURCE_DIR}/resources/lut/lut_lin_tables.tar.xz" DESTINATION "share/ambilightapp/lut" COMPONENT "AmbilightAPP")
-		install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION "share/ambilightapp" COMPONENT "AmbilightAPP")
-		install(FILES "${PROJECT_SOURCE_DIR}/3RD_PARTY_LICENSES" DESTINATION "share/ambilightapp" COMPONENT "AmbilightAPP")
+		endforeach()		
+	]] COMPONENT "AmbilightAPP")
 	else()
 		# Run CMake after target was built to run get_prerequisites on ${TARGET_FILE}
 		add_custom_command(
@@ -559,6 +387,7 @@ macro(DeployWindows TARGET)
 			--dry-run
 			${WINDEPLOYQT_PARAMS}
 			--list mapping
+			--no-plugins
 			"${TARGET_FILE}"
 			OUTPUT_VARIABLE DEPS
 			OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -592,57 +421,10 @@ macro(DeployWindows TARGET)
 		endwhile()
 
 		# Copy TurboJPEG Libs
-		if (ENABLE_MF)
-			find_file(TurboJPEG_DLL
-				NAMES "turbojpeg.dll" "jpeg62.dll"
-				PATHS "${TURBOJPEG_LIBRARY_DIRS}"
-				NO_DEFAULT_PATH
-				REQUIRED
-			)
-					
-			if(NOT CMAKE_GITHUB_ACTION)
-				get_filename_component(JPEG_RUNTIME_TARGET ${TARGET_FILE} DIRECTORY)
-				execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TurboJPEG_DLL} ${JPEG_RUNTIME_TARGET})
-			endif()
+		install(FILES ${TurboJPEG_INSTALL_LIB} DESTINATION "bin" COMPONENT "AmbilightAPP" )
 
-			install(
-				FILES ${TurboJPEG_DLL}
-				DESTINATION "bin"
-				COMPONENT "AmbilightAPP"
-			)
-		endif()
-
-		# Copy MQTT Libs
-		if (ENABLE_MQTT)
-			set (MQTT_TARGET_LIB_FOLDER ${LIBRARY_OUTPUT_PATH}/${CMAKE_BUILD_TYPE})
-			message(${MQTT_TARGET_LIB_FOLDER})
-			find_file(MQTT_DLL
-				NAMES "qmqtt.dll"
-				PATHS "${MQTT_TARGET_LIB_FOLDER}"
-				NO_DEFAULT_PATH
-				REQUIRED
-			)
-			message(${MQTT_DLL})
-			if(NOT CMAKE_GITHUB_ACTION)
-				get_filename_component(MQTT_RUNTIME_TARGET ${TARGET_FILE} DIRECTORY)
-				execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MQTT_DLL} ${MQTT_RUNTIME_TARGET})
-			endif()
-
-			install(
-				FILES ${MQTT_DLL}
-				DESTINATION "bin"
-				COMPONENT "AmbilightAPP"
-			)
-		endif()
-
-
-		# Create a qt.conf file in 'bin' to override hard-coded search paths in Qt plugins
-		file(WRITE "${CMAKE_BINARY_DIR}/qt.conf" "[Paths]\nPlugins=../lib/\n")
-		install(
-			FILES "${CMAKE_BINARY_DIR}/qt.conf"
-			DESTINATION "bin"
-			COMPONENT "AmbilightAPP"
-		)
+		# Copy MQTT
+		install(CODE [[ file(INSTALL FILES $<TARGET_FILE:qmqtt> DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE SHARED_LIBRARY) ]] COMPONENT "AmbilightAPP")
 
 		execute_process(
 			COMMAND ${SEVENZIP_BIN} e ${PROJECT_SOURCE_DIR}/resources/lut/lut_lin_tables.tar.xz -o${CMAKE_CURRENT_BINARY_DIR} -aoa -y
@@ -671,32 +453,6 @@ macro(DeployWindows TARGET)
 			DESTINATION "bin"
 			COMPONENT "AmbilightAPP"
 		)
-
-
-		find_package(OpenSSL QUIET)
-		
-		find_file(OPENSSL_SSL
-			NAMES libssl-1_1-x64.dll libssl-1_1.dll libssl ssleay32.dll ssl.dll
-			PATHS "C:/Program Files/OpenSSL" "C:/Program Files/OpenSSL-Win64" ${_OPENSSL_ROOT_PATHS}
-			PATH_SUFFIXES bin
-		)
-
-		find_file(OPENSSL_CRYPTO
-			NAMES libcrypto-1_1-x64.dll libcrypto-1_1.dll libcrypto libeay32.dll crypto.dll
-			PATHS "C:/Program Files/OpenSSL" "C:/Program Files/OpenSSL-Win64" ${_OPENSSL_ROOT_PATHS}
-			PATH_SUFFIXES bin
-		)
-		
-		if(OPENSSL_SSL AND OPENSSL_CRYPTO)
-			message( STATUS "OpenSSL found: ${OPENSSL_SSL} ${OPENSSL_CRYPTO}")
-			install(
-				FILES ${OPENSSL_SSL} ${OPENSSL_CRYPTO}
-				DESTINATION "bin"
-				COMPONENT "AmbilightAPP"
-			)
-		else()
-			message( WARNING "OpenSSL NOT found (AmbilightAPP's https instance will not work)")
-		endif()
 
 		INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION bin COMPONENT "AmbilightAPP")
 		

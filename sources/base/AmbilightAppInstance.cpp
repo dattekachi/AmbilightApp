@@ -4,7 +4,7 @@
 *
 *  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,6 @@
 #include <base/SystemControl.h>
 #include <base/GrabberWrapper.h>
 #include <base/RawUdpServer.h>
-#include <utils/ColorSys.h>
 #include <base/ComponentController.h>
 #include <base/Muxer.h>
 #include <base/SoundCapture.h>
@@ -67,7 +66,7 @@
 std::atomic<bool> AmbilightAppInstance::_signalTerminate(false);
 std::atomic<int>  AmbilightAppInstance::_totalRunningCount(0);
 
-AmbilightAppInstance::AmbilightAppInstance(quint8 instance, bool readonlyMode, bool disableOnStartup, QString name)
+AmbilightAppInstance::AmbilightAppInstance(quint8 instance, bool disableOnStartup, QString name)
 	: QObject()
 	, _instIndex(instance)
 	, _bootEffect(QTime::currentTime().addSecs(5))
@@ -89,7 +88,6 @@ AmbilightAppInstance::AmbilightAppInstance(quint8 instance, bool readonlyMode, b
 	, _ledGridSize()
 	, _currentLedColors()
 	, _name((name.isEmpty()) ? QString("INSTANCE%1").arg(instance) : name)
-	, _readOnlyMode(readonlyMode)
 	, _disableOnStartup(disableOnStartup)
 {
 	_totalRunningCount++;
@@ -142,7 +140,7 @@ void AmbilightAppInstance::start()
 
 	Info(_log, "Starting the instance");	
 
-	_instanceConfig = std::unique_ptr<InstanceConfig>(new InstanceConfig(false, _instIndex, this, _readOnlyMode));
+	_instanceConfig = std::unique_ptr<InstanceConfig>(new InstanceConfig(false, _instIndex, this));
 	_componentController = std::unique_ptr<ComponentController>(new ComponentController(this, _disableOnStartup));
 	connect(_componentController.get(), &ComponentController::SignalComponentStateChanged, this, &AmbilightAppInstance::SignalComponentStateChanged);
 	_ledString = LedString::createLedString(getSetting(settings::type::LEDS).array(), LedString::createColorOrder(getSetting(settings::type::DEVICE).object()));
@@ -426,6 +424,11 @@ int AmbilightAppInstance::getLedCount() const
 	return static_cast<int>(_ledString.leds().size());
 }
 
+bool AmbilightAppInstance::getReadOnlyMode() const
+{
+	return _instanceConfig->isReadOnlyMode();
+}
+
 void AmbilightAppInstance::setSourceAutoSelect(bool state)
 {
 	_muxer->setSourceAutoSelectEnabled(state);
@@ -650,15 +653,6 @@ int AmbilightAppInstance::setEffect(const QString& effectName, int priority, int
 		return 0;
 }
 
-int AmbilightAppInstance::setEffect(const QString& effectName, const QJsonObject& args, int priority, int timeout, const QString& origin, const QString& imageData)
-{
-	if (_effectEngine != nullptr)
-		return _effectEngine->runEffect(effectName, priority, timeout, origin);
-	else
-		return 0;
-
-}
-
 void AmbilightAppInstance::setLedMappingType(int mappingType)
 {
 	if (mappingType != _imageProcessor->getLedMappingType())
@@ -880,7 +874,7 @@ void AmbilightAppInstance::putJsonInfo(QJsonObject& info, bool full)
 
 				// add HSL Value to Array
 				QJsonArray HSLValue;
-				ColorSys::rgb2hsl(priorityInfo.staticColor.red,
+				ColorRgb::rgb2hsl(priorityInfo.staticColor.red,
 					priorityInfo.staticColor.green,
 					priorityInfo.staticColor.blue,
 					Hue, Saturation, Luminace);
@@ -977,7 +971,7 @@ void AmbilightAppInstance::putJsonInfo(QJsonObject& info, bool full)
 
 			// add HSL Value to Array
 			QJsonArray HSLValue;
-			ColorSys::rgb2hsl(priorityInfo.staticColor.red,
+			ColorRgb::rgb2hsl(priorityInfo.staticColor.red,
 				priorityInfo.staticColor.green,
 				priorityInfo.staticColor.blue,
 				Hue, Saturation, Luminace);

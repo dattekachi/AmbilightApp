@@ -12,13 +12,10 @@ target_link_libraries(database
 	ambilightapp-base
 	ambilightapp-utils
 	Qt${Qt_VERSION}::Core
-	Qt${Qt_VERSION}::Sql
 )
-
-if (USE_STATIC_QT_PLUGINS)
-	target_link_libraries(database ${STATIC_QT_PLUGINS_LIBS})
-endif()
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
     target_precompile_headers(database REUSE_FROM precompiled_ambilightapp_headers)
 endif()
+
+target_link_libraries(database sqlite3)

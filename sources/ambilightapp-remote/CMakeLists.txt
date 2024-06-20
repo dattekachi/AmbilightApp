@@ -30,16 +30,11 @@ if(NOT WIN32)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELEASE -s)
 endif()
 
-if (USE_STATIC_QT_PLUGINS)
-	target_link_libraries(${PROJECT_NAME} ${STATIC_QT_PLUGINS_LIBS})
-endif()
-
 target_link_libraries(${PROJECT_NAME}
 	effectengine
 	commandline
 	ambilightapp-utils
 	ssdp
-	Qt${Qt_VERSION}::Gui
 	Qt${Qt_VERSION}::Core
 	Qt${Qt_VERSION}::Network
 	${TURBOJPEG_LINK_LIBRARIES}

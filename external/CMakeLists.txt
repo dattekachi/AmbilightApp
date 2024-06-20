@@ -1,3 +1,30 @@
+#=============================================================================
+# SQLite
+#=============================================================================
+
+add_library(sqlite3 "${CMAKE_CURRENT_SOURCE_DIR}/sqlite/sqlite3.c")
+target_include_directories(sqlite3 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/sqlite")
+target_link_libraries(sqlite3 PRIVATE ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
+
+
+set_target_properties(sqlite3 PROPERTIES
+    OUTPUT_NAME   sqlite3
+    PUBLIC_HEADER sqlite3.h
+)
+
+target_compile_definitions(sqlite3 PUBLIC
+	SQLITE_THREADSAFE=1
+	SQLITE_DEFAULT_MEMSTATUS=0
+	SQLITE_DEFAULT_SYNCHRONOUS=3	
+	SQLITE_OMIT_AUTHORIZATION
+	SQLITE_OMIT_DEPRECATED
+)
+
+#=============================================================================
+# RPi ws281x
+#=============================================================================
+
+
 if(ENABLE_WS281XPWM)
 	add_library(ws281x
 		${CMAKE_CURRENT_SOURCE_DIR}/rpi_ws281x/mailbox.c ${CMAKE_CURRENT_SOURCE_DIR}/rpi_ws281x/ws2811.c
@@ -5,6 +32,16 @@ if(ENABLE_WS281XPWM)
 		${CMAKE_CURRENT_SOURCE_DIR}/rpi_ws281x/pcm.c
 		${CMAKE_CURRENT_SOURCE_DIR}/rpi_ws281x/rpihw.c)
 endif()
+
+#=============================================================================
+# LUNASVG
+#=============================================================================
+
+
+set(no_dev_warnings_backup "$CACHE{CMAKE_WARN_DEPRECATED}")
+set(CMAKE_WARN_DEPRECATED OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lunasvg)
+set(CMAKE_WARN_DEPRECATED ${no_dev_warnings_backup} CACHE INTERNAL "" FORCE)
 
 #=============================================================================
 # FLATBUFFER
@@ -159,7 +196,7 @@ if ( ENABLE_MQTT )
 	endif()
 
 	if (NOT USE_SYSTEM_MQTT_LIBS)
-		# HyperHDR workaround for fixed Qt5 version
+		# AmbilightApp workaround for fixed Qt5 version
 		file(READ "${CMAKE_CURRENT_SOURCE_DIR}/qmqtt/CMakeLists.txt" FILE_CONTENTS)
 		string(REPLACE "Qt5" "Qt${Qt_VERSION}" FILE_CONTENTS "${FILE_CONTENTS}")
 		string(REPLACE "find_package" "#find_package" FILE_CONTENTS "${FILE_CONTENTS}")		
@@ -173,6 +210,10 @@ if ( ENABLE_MQTT )
 		add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/qmqtt)
 	endif()
 endif()
+
+#=============================================================================
+# XZ
+#=============================================================================
 
 if ( ENABLE_XZ )
 	option(BUILD_TESTING "" OFF)
@@ -190,3 +231,13 @@ if ( ENABLE_XZ )
 		endif()		
 	endif()
 ENDIF()
+
+#=============================================================================
+# sdbus-cpp
+#=============================================================================
+
+if (UNIX AND NOT APPLE AND (ENABLE_POWER_MANAGEMENT OR ENABLE_PIPEWIRE))
+	set(SDBUSCPP_BUILD_DOCS OFF CACHE BOOL "No doc")
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/sdbus-cpp)
+	set_target_properties(sdbus-c++-objlib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endif()

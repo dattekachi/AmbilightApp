@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2023 awawa-dev
+*  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal

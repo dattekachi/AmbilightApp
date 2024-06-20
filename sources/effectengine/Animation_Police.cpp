@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2023 awawa-dev
+*  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -42,14 +42,14 @@ Animation_Police::Animation_Police(QString name) :
 
 
 void Animation_Police::Init(
-	QImage& hyperImage,
+	AmbilightImage& hyperImage,
 	int hyperLatchTime
 )
 {
 
 }
 
-bool Animation_Police::Play(QPainter* painter)
+bool Animation_Police::Play(AmbilightImage& painter)
 {
 	return true;
 }
@@ -67,16 +67,16 @@ bool Animation_Police::hasLedData(QVector<ColorRgb>& buffer)
 		Point3d    hsv1, hsv2;
 		uint16_t   hsv1x, hsv2x;
 
-		ColorSys::rgb2hsv(colorOne.x, colorOne.y, colorOne.z, hsv1x, hsv1.y, hsv1.z);
-		ColorSys::rgb2hsv(colorTwo.x, colorTwo.y, colorTwo.z, hsv2x, hsv2.y, hsv2.z);
+		ColorRgb::rgb2hsv(colorOne.x, colorOne.y, colorOne.z, hsv1x, hsv1.y, hsv1.z);
+		ColorRgb::rgb2hsv(colorTwo.x, colorTwo.y, colorTwo.z, hsv2x, hsv2.y, hsv2.z);
 
 		for (int i = 0; i < hledCount; i++)
 		{
 			ColorRgb newColor{ 0,0,0 };
 			if (i <= colorsCount)
-				ColorSys::hsv2rgb(hsv1x, hsv1.y, hsv1.z, newColor.red, newColor.green, newColor.blue);
+				ColorRgb::hsv2rgb(hsv1x, hsv1.y, hsv1.z, newColor.red, newColor.green, newColor.blue);
 			else if ((i >= hledCount / 2 - 1) && (i < (hledCount / 2) + colorsCount))
-				ColorSys::hsv2rgb(hsv2x, hsv2.y, hsv2.z, newColor.red, newColor.green, newColor.blue);
+				ColorRgb::hsv2rgb(hsv2x, hsv2.y, hsv2.z, newColor.red, newColor.green, newColor.blue);
 			ledData.append(newColor);
 		}
 

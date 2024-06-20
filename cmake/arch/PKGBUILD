@@ -1,18 +1,19 @@
-pkgname=Ambilight App
+pkgname=AmbilightApp
 pkgver={VERSION}
 pkgrel=1
-pkgdesc="Ambilight App is an open source ambient light implementation."
-url="https://github.com/awawa-dev/HyperHDR"
+pkgdesc="AmbilightApp is an open source ambient light implementation."
+url="https://ambilightled.com"
 license=('MIT')
 arch=('x86_64')
 install=INSTALL
 depends=('xz')
-optdepends=('libx11' 'shared-mime-info')
+optdepends=('shared-mime-info' 'gtk3')
 # not needed fot Github Action
-# source=("git+https://github.com/awawa-dev/HyperHDR.git")
+# source=("git+https://ambilightled.com.git")
 # md5sums=('SKIP')
 
 build() {
+    export LDFLAGS=${LDFLAGS/-Wl,-z,pack-relative-relocs/}
     cmake -B build -S .. \
         -DCMAKE_BUILD_TYPE='None' \
         -DCMAKE_INSTALL_PREFIX='/usr' \

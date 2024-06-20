@@ -8,7 +8,7 @@
 #include <QUrl>
 #include <QHostInfo>
 
-#include <api/HyperAPI.h>
+#include <api/AmbilightAPI.h>
 
 // default param %1 is 'Ambilight App', do not edit templates here
 const static QString TEMPLATE_AMBILIGHTAPPAPI = QStringLiteral("%1/JsonAPI");
@@ -234,17 +234,17 @@ void mqtt::begin()
 
 void mqtt::executeJson(QString origin, const QJsonDocument& input, QJsonDocument& result)
 {	
-	HyperAPI* _hyperAPI = new HyperAPI(origin, _log, true, this);
+	AmbilightAPI* _ambilightAPI = new AmbilightAPI(origin, _log, true, this);
 
 	_resultArray = QJsonArray();
 
-	_hyperAPI->initialize();
-	connect(_hyperAPI, &HyperAPI::SignalCallbackJsonMessage, this, [this](QJsonObject ret) {
+	_ambilightAPI->initialize();
+	connect(_ambilightAPI, &AmbilightAPI::SignalCallbackJsonMessage, this, [this](QJsonObject ret) {
 		_resultArray.append(ret);
 	});
 
 	if (input.isObject())
-		_hyperAPI->handleMessage(input.toJson());
+		_ambilightAPI->handleMessage(input.toJson());
 	else if (input.isArray())
 	{
 		const QJsonArray& array = input.array();
@@ -252,14 +252,14 @@ void mqtt::executeJson(QString origin, const QJsonDocument& input, QJsonDocument
 			if (elem.isObject())
 			{
 				QJsonDocument doc(elem.toObject());
-				_hyperAPI->handleMessage(doc.toJson());
+				_ambilightAPI->handleMessage(doc.toJson());
 			}
 	}
 
 	result.setArray(_resultArray);
 
-	disconnect(_hyperAPI, &HyperAPI::SignalCallbackJsonMessage, nullptr, nullptr);
-	_hyperAPI->deleteLater();
+	disconnect(_ambilightAPI, &AmbilightAPI::SignalCallbackJsonMessage, nullptr, nullptr);
+	_ambilightAPI->deleteLater();
 }
 
 ///////////////////////////////////////////////////////////

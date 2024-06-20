@@ -10,7 +10,7 @@
 #include "QtHttpServer.h"
 #include "QtHttpClientWrapper.h"
 
-#include <api/HyperAPI.h>
+#include <api/AmbilightAPI.h>
 
 #define MULTI_REQ "&request="
 
@@ -21,10 +21,10 @@ WebJsonRpc::WebJsonRpc(QtHttpRequest* request, QtHttpServer* server, bool localC
 	, _log(Logger::getInstance("HTTPJSONRPC"))
 {
 	const QString client = request->getClientInfo().clientAddress.toString();
-	_hyperAPI = new HyperAPI(client, _log, localConnection, this, true);
-	connect(_hyperAPI, &HyperAPI::SignalCallbackJsonMessage, this, &WebJsonRpc::handleCallback);
-	connect(_hyperAPI, &HyperAPI::SignalPerformClientDisconnection, [&]() { _wrapper->closeConnection(); _stopHandle = true; });
-	_hyperAPI->initialize();
+	_hmbilightAPI = new AmbilightAPI(client, _log, localConnection, this, true);
+	connect(_hmbilightAPI, &AmbilightAPI::SignalCallbackJsonMessage, this, &WebJsonRpc::handleCallback);
+	connect(_hmbilightAPI, &AmbilightAPI::SignalPerformClientDisconnection, [&]() { _wrapper->closeConnection(); _stopHandle = true; });
+	_hmbilightAPI->initialize();
 }
 
 
@@ -53,7 +53,7 @@ void WebJsonRpc::handleMessage(QtHttpRequest* request, QString query)
 			const QByteArray& header = request->getHeader("Authorization");
 			const QByteArray& data = (query.length() > 0) ? query.toUtf8() : request->getRawData();
 			_unlocked = true;
-			_hyperAPI->handleMessage(data, header);
+			_hmbilightAPI->handleMessage(data, header);
 		}
 		else
 		{
@@ -69,7 +69,7 @@ void WebJsonRpc::handleMessage(QtHttpRequest* request, QString query)
 				QString leftQuery = (nextQueryIndex >= 0) ? query.left(nextQueryIndex) : query;
 				query = query.right(query.length() - leftQuery.length());
 
-				_hyperAPI->handleMessage(leftQuery.toUtf8(), header);
+				_hmbilightAPI->handleMessage(leftQuery.toUtf8(), header);
 
 			} while (nextQueryIndex >= 0 && query.length() > QString(MULTI_REQ).length());
 		}

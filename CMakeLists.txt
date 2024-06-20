@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.5.0)
+if (WIN32)
+	cmake_minimum_required(VERSION 3.24.0)
+else()
+	cmake_minimum_required(VERSION 3.16.0)
+endif()
 
 message( STATUS "CMake Version: ${CMAKE_VERSION}" )
 
@@ -38,10 +42,10 @@ SET ( DEFAULT_SOUNDCAPMACOS               OFF )
 SET ( DEFAULT_CEC                         OFF )
 SET ( DEFAULT_BONJOUR                     ON  )
 SET ( DEFAULT_MQTT                        ON  )
-SET ( DEFAULT_STATIC_QT_PLUGINS           OFF )
 SET ( DEFAULT_PRECOMPILED_HEADERS         ON  )
 SET ( DEFAULT_XZ                          ON  )
 SET ( DEFAULT_POWER_MANAGEMENT            ON  )
+SET ( DEFAULT_SYSTRAY                     ON  )
 
 # Configure CCache if available
 find_program(CCACHE_FOUND ccache)
@@ -58,7 +62,7 @@ else()
 endif(CCACHE_FOUND)
 
 # find QT libs
-find_package(Qt6 COMPONENTS Core Gui Network Sql Widgets SerialPort QUIET)
+find_package(Qt6 COMPONENTS Core Network SerialPort QUIET)
 
 if (Qt6Core_FOUND AND NOT (DO_NOT_USE_QT_VERSION_6_LIBS STREQUAL "ON"))	
 	message( STATUS "Found Qt Version: ${Qt6Core_VERSION}" )
@@ -70,7 +74,7 @@ ELSE()
 		message( STATUS "QT version 6 not found. Searching for QT version 5 instead." )
 	endif()
 	SET(QT_MIN_VERSION "5.10.0")
-	find_package(Qt5 COMPONENTS Core Gui Network SerialPort Sql Widgets REQUIRED)
+	find_package(Qt5 COMPONENTS Core Network SerialPort REQUIRED)
 	message( STATUS "Found Qt Version: ${Qt5Core_VERSION}" )
 	IF ( "${Qt5Core_VERSION}" VERSION_LESS "${QT_MIN_VERSION}" )
 		message( FATAL_ERROR "Your Qt version is to old! Minimum required ${QT_MIN_VERSION}" )
@@ -156,8 +160,9 @@ if ( "${PLATFORM}" MATCHES "osx" )
 	SET ( DEFAULT_MAC_SYSTEM          ON  )
 	SET ( DEFAULT_PRECOMPILED_HEADERS OFF )
 elseif ( "${PLATFORM}" MATCHES "rpi" )	
-	SET ( DEFAULT_WS281XPWM  ON )
-	SET ( DEFAULT_CEC        ON )
+	SET ( DEFAULT_WS281XPWM  ON  )
+	SET ( DEFAULT_CEC        ON  )
+	SET ( DEFAULT_SYSTRAY    OFF )
 	
 	# GL dispatcher
 	find_library (GLD GLdispatch)
@@ -231,6 +236,17 @@ if (DEFAULT_X11)
 	endif()
 endif()
 
+if (DEFAULT_SYSTRAY)
+	if(UNIX AND NOT APPLE)
+		find_package(PkgConfig REQUIRED)
+		pkg_check_modules(AppIndicator ayatana-appindicator3-0.1)
+		if (NOT AppIndicator_FOUND OR NOT AppIndicator_INCLUDE_DIRS OR NOT AppIndicator_LIBRARIES)
+			message( WARNING "AppIndicator dev package (eg. libayatana-appindicator3-dev) not found. Disabling support for the systray.")
+			SET ( DEFAULT_SYSTRAY                          OFF )
+		endif()
+	endif()
+endif()
+
 if (DEFAULT_FRAMEBUFFER)
 	include(CheckIncludeFile)
 	check_include_file("linux/fb.h" HAVE_FB)
@@ -244,33 +260,36 @@ if (DEFAULT_FRAMEBUFFER)
 	endif()
 endif()
 
-find_package(Qt${Qt_VERSION} COMPONENTS DBus QUIET )
-
-if (UNIX AND NOT APPLE AND NOT Qt${Qt_VERSION}DBus_FOUND AND DEFAULT_POWER_MANAGEMENT)
-	message( WARNING "QT dbus library is required for Power Management support" )
-	SET ( DEFAULT_POWER_MANAGEMENT            OFF )
-endif()
-
-if (DEFAULT_PIPEWIRE OR ENABLE_PIPEWIRE)
-	if (NOT Qt${Qt_VERSION}DBus_FOUND)
-		message( WARNING "QT dbus library is required for PipeWire/Portal support" )
+# D-bus support
+set ( AMBILIGHTAPP_HAVE_DBUS                  OFF )
+if (UNIX AND NOT APPLE AND (DEFAULT_POWER_MANAGEMENT OR DEFAULT_PIPEWIRE))
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(Systemd IMPORTED_TARGET GLOBAL libsystemd>=238)
+    if(NOT TARGET PkgConfig::Systemd)
+		message( WARNING "libsystemd>=238 development library is required for the D-Bus support. It is also required for the Power Management and the Pipewire grabber support." )
+		SET ( DEFAULT_POWER_MANAGEMENT            OFF )
 		SET ( DEFAULT_PIPEWIRE                    OFF )
 	else()
-		FIND_PACKAGE(PkgConfig REQUIRED)
-		pkg_check_modules(PIPEWIRE libpipewire-0.3)
-		if(NOT PIPEWIRE_FOUND OR NOT PIPEWIRE_INCLUDE_DIRS OR NOT PIPEWIRE_LIBRARIES)
-			message( WARNING "Pipewire >= 3.0 not found (did you install libpipewire-0.3-dev?). Disabling support for PipeWire software grabber.")
-			SET ( DEFAULT_PIPEWIRE                    OFF )
+		set ( AMBILIGHTAPP_HAVE_DBUS                  ON )
+	endif()
+endif()
+
+# Pipewire support
+if (DEFAULT_PIPEWIRE)
+	FIND_PACKAGE(PkgConfig REQUIRED)
+	pkg_check_modules(PIPEWIRE libpipewire-0.3)
+	if(NOT PIPEWIRE_FOUND OR NOT PIPEWIRE_INCLUDE_DIRS OR NOT PIPEWIRE_LIBRARIES)
+		message( WARNING "Pipewire >= 3.0 not found (did you install libpipewire-0.3-dev?). Disabling support for the PipeWire software grabber.")
+		SET ( DEFAULT_PIPEWIRE                    OFF )
+	else()
+		if(POLICY CMP0072)
+			cmake_policy(SET CMP0072 NEW)
+		endif()
+		find_package(OpenGL)
+		if (NOT OpenGL_OpenGL_FOUND OR NOT OpenGL_EGL_FOUND)
+			message( WARNING "OpenGL/EGL not found. Disabling DMA buffers for the Pipewire software grabber.")
 		else()
-			if(POLICY CMP0072)
-			  cmake_policy(SET CMP0072 NEW)
-			endif()
-			find_package(OpenGL)
-			if (NOT OpenGL_OpenGL_FOUND OR NOT OpenGL_EGL_FOUND)
-				message( WARNING "OpenGL/EGL not found. Disabling DMA buffers for Pipewire.")
-			else()
-				SET ( DEFAULT_PIPEWIRE_EGL                ON )
-			endif()
+			SET ( DEFAULT_PIPEWIRE_EGL                ON )
 		endif()
 	endif()
 endif()
@@ -404,13 +423,13 @@ colorMe("ENABLE_POWER_MANAGEMENT = " ${ENABLE_POWER_MANAGEMENT})
 option(ENABLE_PROTOBUF "Enable PROTOBUF" ${DEFAULT_PROTOBUF})
 colorMe("ENABLE_PROTOBUF = " ${ENABLE_PROTOBUF})
 
+option(ENABLE_SYSTRAY "Enable SYSTRAY" ${DEFAULT_SYSTRAY})
+colorMe("ENABLE_SYSTRAY = " ${ENABLE_SYSTRAY})
+
 option(ENABLE_XZ "Enable XZ support" ${DEFAULT_XZ})
 colorMe("ENABLE_XZ = " ${ENABLE_XZ})
 
 message( STATUS "\n${CyanColor}BUILD FEATURES${ColorReset}")
-
-option(USE_STATIC_QT_PLUGINS "Enable static QT plugins" ${DEFAULT_STATIC_QT_PLUGINS})
-colorMe("USE_STATIC_QT_PLUGINS = " ${USE_STATIC_QT_PLUGINS})
 
 option(USE_PRECOMPILED_HEADERS "Enable precompiled headers (PCH)" ${DEFAULT_PRECOMPILED_HEADERS})
 colorMe("USE_PRECOMPILED_HEADERS = " ${USE_PRECOMPILED_HEADERS})
@@ -427,6 +446,8 @@ colorMe("USE_SYSTEM_MBEDTLS_LIBS = " ${USE_SYSTEM_MBEDTLS_LIBS})
 if(UNIX AND NOT APPLE)
 	option(USE_STANDARD_INSTALLER_NAME "Use the standardized Linux installer name" OFF)
 	colorMe("USE_STANDARD_INSTALLER_NAME = " ${USE_STANDARD_INSTALLER_NAME})
+
+	colorMe("AMBILIGHTAPP_HAVE_DBUS = " ${AMBILIGHTAPP_HAVE_DBUS})
 else()
 	SET ( USE_STANDARD_INSTALLER_NAME      OFF )
 endif()
@@ -473,11 +494,10 @@ if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 	endif()
 	if(COMPILER_SUPPORTS_CXX17 AND Qt_VERSION EQUAL 6)
 			message(STATUS "Enabling support for C++17 for QT6")
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+			set(CMAKE_CXX_STANDARD 17)
 	elseif(COMPILER_SUPPORTS_CXX11)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-	elseif(COMPILER_SUPPORTS_CXX0X)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+			message(STATUS "Enabling support for C++11")
+			set(CMAKE_CXX_STANDARD 11)
 	else()
 			message(STATUS "No support for C++11 detected. Compilation will most likely fail on your compiler")
 	endif()
@@ -485,7 +505,7 @@ else()
 	include(CheckCXXCompilerFlag)
     CHECK_CXX_COMPILER_FLAG("/std:c++20" COMPILER_SUPPORTS_CXX20)
     if (COMPILER_SUPPORTS_CXX20)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
+		set(CMAKE_CXX_STANDARD 20)
 		message(STATUS "Enabling MSVC support for c++20")
     endif()
 endif()
@@ -551,67 +571,25 @@ endif()
 add_definitions(${QT_DEFINITIONS})
 
 # libjpegturbo
-if(WIN32)
-	if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/external/windows)
-		file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/windows)
+find_package(TurboJPEG REQUIRED)
+
+message( STATUS "TURBOJPEG_LIBRARY_DIRS=${TurboJPEG_LIBRARY}")
+message( STATUS "TURBOJPEG_INCLUDE_DIRS=${TurboJPEG_INCLUDE_DIRS}")
+
+if (WIN32)
+	if(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+		set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
+			${${PROJECT_NAME}_BINARY_DIR}/Bin
+			CACHE PATH
+			"Single Directory for all Libraries")
 	endif()
 
-	if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libs4windows.zip OR
-		NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libjpeg-turbo_x64-windows)
-		message( STATUS "Downloading libraries for Ambilight App (Windows)")		
-		file(DOWNLOAD https://github.com/awawa-dev/HyperHDR.libs.provider/releases/download/2023.08.07/libs4windows.zip
-					${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libs4windows.zip
-					STATUS WIN_LIBS_DOWNLOAD_STATUS
-					EXPECTED_HASH SHA256=2a0fc14eaad35d8cc36b262c8dcb501d1fac3a72d7bedcca51b71b60395c6c3f)
-		list(GET WIN_LIBS_DOWNLOAD_STATUS 0 WIN_LIBS_DOWNLOAD_STATUS_CODE)
-		if(WIN_LIBS_DOWNLOAD_STATUS_CODE AND NOT WIN_LIBS_DOWNLOAD_STATUS_CODE EQUAL 0)
-			file( REMOVE ${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libs4windows.zip )
-			message( FATAL_ERROR "Could not download libraries needed by Ambilight App (Windows)")
-		endif()
+	if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
+			${${PROJECT_NAME}_BINARY_DIR}/Bin
+			CACHE PATH
+			"Single Directory for all Executables")
 	endif()
-
-	execute_process(
-		COMMAND ${SEVENZIP_BIN} x ${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libs4windows.zip -o${CMAKE_CURRENT_SOURCE_DIR}/external/windows/ -aoa -y
-		RESULT_VARIABLE STATUS_EXTRACT
-		OUTPUT_VARIABLE OUTPUT1
-	)
-
-	if(STATUS_EXTRACT AND NOT STATUS_EXTRACT EQUAL 0)
-		message( FATAL_ERROR "Could not extract libraries for Ambilight App (Windows)")
-	else()
-		message( STATUS "Package of libraries for Ambilight App extracted (Windows)")
-	endif()
-
-	set (TURBOJPEG_FOUND 1)
-	set (TURBOJPEG_LIBRARY_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libjpeg-turbo_x64-windows/bin")
-	set (TURBOJPEG_LINK_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libjpeg-turbo_x64-windows/lib/turbojpeg.lib")
-	set (TURBOJPEG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/external/windows/libjpeg-turbo_x64-windows/include")
-else()
-	FIND_PACKAGE(PkgConfig REQUIRED)
-	pkg_check_modules(TURBOJPEG REQUIRED libturbojpeg>=2.0)
-endif ()
-	
-message( STATUS "TURBOJPEG_LIBRARY_DIRS=${TURBOJPEG_LIBRARY_DIRS}")
-message( STATUS "TURBOJPEG_LINK_LIBRARIES=${TURBOJPEG_LINK_LIBRARIES}")
-message( STATUS "TURBOJPEG_INCLUDE_DIRS=${TURBOJPEG_INCLUDE_DIRS}")
-
-# Embedded QT plugins
-if (USE_STATIC_QT_PLUGINS)
-	foreach(guiPlugin ${Qt${Qt_VERSION}Gui_PLUGINS} Qt${Qt_VERSION}::Gui)		
-		get_target_property(file ${guiPlugin} LOCATION)
-		if (NOT IS_SYMLINK ${file})
-			message("Using static QT plugin: " ${file})
-			set(STATIC_QT_PLUGINS_LIBS ${STATIC_QT_PLUGINS_LIBS} ${file})
-		endif()
-	endforeach()
-	foreach(sqlPlugin ${Qt${Qt_VERSION}Sql_PLUGINS} Qt${Qt_VERSION}::Sql)
-		message( STATUS "TURBOJPEG_INCLUDE_DIRS=${sqlPlugin}")
-		get_target_property(file ${sqlPlugin} LOCATION)
-		if (NOT IS_SYMLINK ${file})
-			message("Using static QT plugin: " ${file})
-			set(STATIC_QT_PLUGINS_LIBS ${STATIC_QT_PLUGINS_LIBS} ${file})
-		endif()
-	endforeach()	
 endif()
 
 # Add the source/lib directories
@@ -636,12 +614,13 @@ add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_D
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/packages.cmake)
 
 # external targets
-if (WIN32 AND TARGET apidoc AND TARGET flatbuffers AND TARGET flatc AND TARGET mbedcrypto AND TARGET qmqtt AND TARGET liblzma)
-	set_target_properties(qmqtt apidoc flatbuffers flatc lib mbedcrypto mbedtls mbedx509 resources uninstall liblzma PROPERTIES FOLDER ExternalLibsTargets)	
+if (WIN32 AND TARGET apidoc AND TARGET flatbuffers AND TARGET flatc AND TARGET mbedcrypto AND TARGET qmqtt AND TARGET liblzma AND TARGET sqlite3)
+	set_target_properties(qmqtt apidoc flatbuffers flatc lib mbedcrypto mbedtls mbedx509 resources uninstall liblzma sqlite3 PROPERTIES FOLDER ExternalLibsTargets)	
 else()
 	set_target_properties(resources uninstall PROPERTIES FOLDER ExternalLibsTargets)
 endif()
 
 if (NOT ENABLE_BONJOUR)	
-	message( FATAL_ERROR "The network discovery service (ENABLE_BONJOUR) is an important feature of Ambilight App. If you know what you are doing, remove this safe-break.")
+	message( FATAL_ERROR "The network discovery service (ENABLE_BONJOUR) is an important feature of AmbilightApp. If you know what you are doing, remove this safe-break.")
 endif()
+

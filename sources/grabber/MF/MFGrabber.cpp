@@ -4,7 +4,7 @@
 *
 *  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,6 @@
 #include <QFileInfo>
 #include <QCoreApplication>
 
-#include <utils/ColorSys.h>
 #include <grabber/MF/MFGrabber.h>
 #include <grabber/MF/MFCallback.h>
 #include <utils/GlobalSignals.h>

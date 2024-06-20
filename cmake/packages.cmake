@@ -51,13 +51,13 @@ endif()
 # Apply to all packages, some of these can be overwritten with generator specific content
 # https://cmake.org/cmake/help/v3.5/module/CPack.html
 
-SET ( CPACK_PACKAGE_NAME "Ambilight App" )
-SET ( CPACK_PACKAGE_DESCRIPTION_SUMMARY "Ambilight App is an open source ambient light implementation" )
+SET ( CPACK_PACKAGE_NAME "AmbilightAPP" )
+SET ( CPACK_PACKAGE_DESCRIPTION_SUMMARY "AmbilightAPP is an open source ambient light implementation" )
 SET ( CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README.md" )
 SET ( CPACK_PACKAGE_FILE_NAME "AmbilightAPP-${AMBILIGHTAPP_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
 
-SET ( CPACK_PACKAGE_CONTACT "see_me_at@ambilightapp.eu")
-SET ( CPACK_PACKAGE_VENDOR "Ambilight App")
+SET ( CPACK_PACKAGE_CONTACT "see_me_at@ambilightled.com")
+SET ( CPACK_PACKAGE_VENDOR "AmbilightAPP")
 SET ( CPACK_PACKAGE_EXECUTABLES "ambilightapp;AmbilightAPP" )
 SET ( CPACK_PACKAGE_INSTALL_DIRECTORY "AmbilightAPP" )
 SET ( CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/resources/icons/ambilightapp-icon-32px.png")
@@ -72,7 +72,7 @@ if(USE_STANDARD_INSTALLER_NAME AND UNIX AND NOT APPLE)
 	if (AMBILIGHTAPP_VERSION_LIST_LEN EQUAL 4)
 		list(GET AMBILIGHTAPP_VERSION_LIST 2 H_ELEM_2)
 		list(GET AMBILIGHTAPP_VERSION_LIST 3 H_ELEM_3)
-		string(REPLACE "alfa" "~${DEBIAN_NAME_TAG}~alfa" H_ELEM_3a "${H_ELEM_3}")
+		string(REPLACE "alpha" "~${DEBIAN_NAME_TAG}~alpha" H_ELEM_3a "${H_ELEM_3}")
 		string(REPLACE "beta" "~${DEBIAN_NAME_TAG}~beta" H_ELEM_3b "${H_ELEM_3a}")
 		string(CONCAT CPACK_PACKAGE_VERSION_PATCH "${H_ELEM_2}" "." "${H_ELEM_3b}")
 		string(FIND "${CPACK_PACKAGE_VERSION_PATCH}" "${DEBIAN_NAME_TAG}" foundTag)
@@ -117,7 +117,12 @@ endif()
 if ( ENABLE_CEC )
 	string(CONCAT CPACK_DEBIAN_PACKAGE_RECOMMENDS "${CPACK_DEBIAN_PACKAGE_RECOMMENDS}" ", libp8-platform-dev" )	
 endif()
+
 SET ( CPACK_DEBIAN_PACKAGE_SUGGESTS "libx11-6" )
+if ( ENABLE_SYSTRAY )
+	string(CONCAT CPACK_DEBIAN_PACKAGE_SUGGESTS "${CPACK_DEBIAN_PACKAGE_SUGGESTS}" ", libgtk-3-0" )	
+endif()
+
 SET ( CPACK_DEBIAN_PACKAGE_SECTION "Miscellaneous" )
 
 # .rpm for rpm
@@ -129,11 +134,14 @@ SET ( CPACK_RPM_PACKAGE_REQUIRES "xz" )
 SET ( CPACK_RPM_PRE_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/rpm/preinst" )
 SET ( CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/rpm/postinst" )
 SET ( CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/rpm/prerm" )
+if ( ENABLE_SYSTRAY )
+	SET( CPACK_RPM_PACKAGE_SUGGESTS "gtk3")
+endif()
 
-if(NOT DO_NOT_BUILD_ARCHIVES)
+#if(NOT DO_NOT_BUILD_ARCHIVES)
 	SET ( CPACK_DEBIAN_COMPRESSION_TYPE "xz" )
 	SET ( CPACK_RPM_COMPRESSION_TYPE "xz" )
-endif()
+#endif()
 
 # OSX dmg generator
 if ( APPLE )
@@ -177,8 +185,8 @@ SET ( CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP ${NSIS_HYP_LOGO_VERT})
 SET ( CPACK_NSIS_DISPLAY_NAME "AmbilightAPP Ambient Light")
 SET ( CPACK_NSIS_PACKAGE_NAME "AmbilightAPP" )
 SET ( CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\ambilightapp.exe")
-SET ( CPACK_NSIS_HELP_LINK "http://www.hyperhdr.eu/")
-SET ( CPACK_NSIS_URL_INFO_ABOUT "https://github.com/awawa-dev/HyperHDR")
+SET ( CPACK_NSIS_HELP_LINK "http://ambilightled.com/")
+SET ( CPACK_NSIS_URL_INFO_ABOUT "http://ambilightled.com")
 SET ( CPACK_NSIS_MUI_FINISHPAGE_RUN "ambilightapp.exe")
 SET ( CPACK_NSIS_BRANDING_TEXT "AmbilightAPP-${AMBILIGHTAPP_VERSION}")
 # custom nsis plugin directory
@@ -223,7 +231,7 @@ cpack_add_component(AmbilightAPP
 	REQUIRED
 )
 
-if (NOT APPLE)
+if (NOT APPLE AND DISABLED_REMOTE)
 	cpack_add_component(AmbilightAPP_remote
 		DISPLAY_NAME "AmbilightApp Remote"
 		DESCRIPTION "AmbilightApp remote cli tool"

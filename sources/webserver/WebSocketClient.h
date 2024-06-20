@@ -8,7 +8,7 @@
 
 class QTcpSocket;
 class QtHttpRequest;
-class HyperAPI;
+class AmbilightAPI;
 
 class WebSocketClient : public QObject
 {
@@ -29,7 +29,7 @@ public:
 private:
 	QTcpSocket*	_socket;
 	Logger*		_log;
-	HyperAPI*	_hyperAPI;
+	AmbilightAPI*	_hmbilightAPI;
 
 	void getWsFrameHeader(WebSocketHeader* header);
 	void sendClose(int status, QString reason = "");

@@ -9,7 +9,7 @@
 class QtHttpServer;
 class QtHttpRequest;
 class QtHttpClientWrapper;
-class HyperAPI;
+class AmbilightAPI;
 class AmbilightAppManager;
 
 class WebJsonRpc : public QObject {
@@ -24,7 +24,7 @@ private:
 	QtHttpServer* _server;
 	QtHttpClientWrapper* _wrapper;
 	Logger*		_log;
-	HyperAPI*	_hyperAPI;
+	AmbilightAPI*	_hmbilightAPI;
 
 	bool _stopHandle = false;
 	bool _unlocked = false;

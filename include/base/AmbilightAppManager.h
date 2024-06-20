@@ -2,11 +2,15 @@
 
 #ifndef PCH_ENABLED
 	#include <QMap>
+	#include <QStringList>
 
+	#include <utils/ColorRgb.h>
 	#include <utils/Logger.h>
 	#include <utils/settings.h>
 	#include <utils/Components.h>
 #endif
+
+#include <effectengine/EffectDefinition.h>
 
 class AmbilightAppInstance;
 class InstanceTable;
@@ -76,6 +80,13 @@ public slots:
 
 	void handleInstanceStateChange(InstanceState state, quint8 instance, const QString& name);
 
+	std::vector<QString> getInstances();
+
+	void setInstanceColor(int instance, int priority,ColorRgb ledColors, int timeout_ms);
+	void setInstanceEffect(int instance, QString effectName, int priority);
+	void clearInstancePriority(int instance, int priority);
+	std::list<EffectDefinition> getEffects();
+
 signals:
 	void SignalInstanceStateChanged(InstanceState state, quint8 instance, const QString& name = QString());
 
@@ -97,7 +108,7 @@ private slots:
 private:
 	friend class AmbilightAppDaemon;
 
-	AmbilightAppManager(const QString& rootPath, bool readonlyMode);
+	AmbilightAppManager(const QString& rootPath);
 
 	void startAll(bool disableOnStartup);
 
@@ -113,7 +124,6 @@ private:
 	QMap<quint8, std::shared_ptr<AmbilightAppInstance>> _runningInstances;
 	QMap<quint8, std::shared_ptr<AmbilightAppInstance>>	_startingInstances;
 
-	bool	_readonlyMode;
 	int		_fireStarter;
 
 	QMap<quint8, PendingRequests> _pendingRequests;

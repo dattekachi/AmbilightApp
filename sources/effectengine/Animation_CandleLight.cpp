@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2023 awawa-dev
+*  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -40,15 +40,15 @@ Animation_CandleLight::Animation_CandleLight(QString name) :
 };
 
 void Animation_CandleLight::Init(
-	QImage& hyperImage,
+	AmbilightImage& hyperImage,
 	int hyperLatchTime
 )
 {
-	ColorSys::rgb2hsv(color.x, color.y, color.z, hsv.x, hsv.y, hsv.z);
+	ColorRgb::rgb2hsv(color.x, color.y, color.z, hsv.x, hsv.y, hsv.z);
 	SetSleepTime((int)(0.20 * 1000.0));
 }
 
-bool Animation_CandleLight::Play(QPainter* painter)
+bool Animation_CandleLight::Play(AmbilightImage& painter)
 {
 	return true;
 }
@@ -67,7 +67,7 @@ Point3d Animation_CandleLight::CandleRgb()
 
 	int val = std::min(RAND * 17, 255);
 
-	ColorSys::hsv2rgb(hue, hsv.y, val, frgb.x, frgb.y, frgb.z);
+	ColorRgb::hsv2rgb(hue, hsv.y, val, frgb.x, frgb.y, frgb.z);
 
 	return frgb;
 }

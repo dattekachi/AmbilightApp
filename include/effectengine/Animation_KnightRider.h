@@ -13,10 +13,10 @@ public:
 	Animation_KnightRider();
 
 	void Init(
-		QImage& hyperImage,
+		AmbilightImage& hyperImage,
 		int hyperLatchTime) override;
 
-	bool Play(QPainter* painter) override;
+	bool Play(AmbilightImage& painter) override;
 
 	static EffectDefinition getDefinition();
 

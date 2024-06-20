@@ -32,7 +32,7 @@ public:
 	~WrapperCEC() override;
 
 public slots:
-	void sourceRequestHandler(ambilightapp::Components component, int hyperHdrInd, bool listen);	
+	void sourceRequestHandler(ambilightapp::Components component, int ambilightAppInd, bool listen);	
 
 signals:
 	void SignalStateChange(bool enabled, QString info);

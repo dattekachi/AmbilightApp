@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2023 awawa-dev
+*  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -52,10 +52,10 @@ EffectDefinition Animation_KnightRider::getDefinition()
 }
 
 void Animation_KnightRider::Init(
-	QImage& hyperImage,
+	AmbilightImage& hyperImage,
 	int hyperLatchTime)
 {
-	hyperImage = hyperImage.scaled(KNIGHT_WIDTH, KNIGHT_HEIGHT);
+	hyperImage.resize(KNIGHT_WIDTH, KNIGHT_HEIGHT);
 
 	speed = 1.0;
 	fadeFactor = 0.7;
@@ -79,7 +79,7 @@ void Animation_KnightRider::Init(
 	direction = 1;
 }
 
-bool Animation_KnightRider::Play(QPainter* painter)
+bool Animation_KnightRider::Play(AmbilightImage& painter)
 {
 	bool ret = true;
 
@@ -102,8 +102,9 @@ bool Animation_KnightRider::Play(QPainter* painter)
 			imageData[3 * j + 1] = uint8_t(clamp(int(fadeFactor * imageData[3 * j + 1]), 0, 255));
 			imageData[3 * j + 2] = uint8_t(clamp(int(fadeFactor * imageData[3 * j + 2]), 0, 255));
 
-			painter->setPen(qRgb(imageData[3 * j], imageData[3 * j + 1], imageData[3 * j + 2]));
-			painter->drawLine(j, 0, j, KNIGHT_HEIGHT - 1);
+			painter.setPen(ColorRgb(imageData[3 * j], imageData[3 * j + 1], imageData[3 * j + 2]));
+			painter.drawVerticalLine(j, 0, KNIGHT_HEIGHT - 1);
+
 
 		}
 
@@ -112,8 +113,8 @@ bool Animation_KnightRider::Play(QPainter* painter)
 		imageData[3 * position + 2] = color.z;
 
 		//QImage img(imageData, KNIGHT_WIDTH, KNIGHT_HEIGHT, KNIGHT_WIDTH, QImage::Format_RGB888);
-		painter->setPen(qRgb(color.x, color.y, color.z));
-		painter->drawLine(position, 0, position, KNIGHT_HEIGHT - 1);
+		painter.setPen(ColorRgb(color.x, color.y, color.z));
+		painter.drawVerticalLine(position, 0, KNIGHT_HEIGHT - 1);
 	}
 	return ret;
 }

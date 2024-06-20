@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2023 awawa-dev
+*  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -35,14 +35,14 @@ Animation_Sparks::Animation_Sparks() :
 };
 
 void Animation_Sparks::Init(
-	QImage& hyperImage,
+	AmbilightImage& hyperImage,
 	int hyperLatchTime
 )
 {
 	SetSleepTime((int)(sleep_time * 1000.0));
 }
 
-bool Animation_Sparks::Play(QPainter* painter)
+bool Animation_Sparks::Play(AmbilightImage& painter)
 {
 	return true;
 }

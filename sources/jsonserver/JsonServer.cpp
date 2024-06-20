@@ -7,7 +7,7 @@
 #include "JsonClientConnection.h"
 
 #include <utils/NetOrigin.h>
-#include <api/HyperAPI.h>
+#include <api/AmbilightAPI.h>
 
 // qt includes
 #include <QTcpServer>

@@ -1,9 +1,9 @@
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)
 	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/precompiled_ambilightapp_headers.cpp "void precompiledHeadersAmbilightAPP(){};")
 	add_library(precompiled_ambilightapp_headers ${CMAKE_CURRENT_BINARY_DIR}/precompiled_ambilightapp_headers.cpp)
-	target_link_libraries(precompiled_ambilightapp_headers Qt${Qt_VERSION}::Gui Qt${Qt_VERSION}::Network)
+	target_link_libraries(precompiled_ambilightapp_headers Qt${Qt_VERSION}::Network)
 
-    target_precompile_headers(precompiled_ambilightapp_headers PRIVATE ${CMAKE_SOURCE_DIR}/include/base/AllHeaders_pch.h ${CMAKE_SOURCE_DIR}/include/base/AllHdrHeaders_pch.h )
+    target_precompile_headers(precompiled_ambilightapp_headers PRIVATE ${CMAKE_SOURCE_DIR}/include/precompiled_ambilightapp_headers/AllHeaders_pch.h ${CMAKE_SOURCE_DIR}/include/precompiled_ambilightapp_headers/AllHdrHeaders_pch.h )
 endif()
 
 # Define the current source locations
@@ -18,10 +18,13 @@ add_subdirectory(db)
 add_subdirectory(effectengine)
 add_subdirectory(flatbufserver)
 add_subdirectory(grabber)
+add_subdirectory(ambilightimage)
 add_subdirectory(jsonserver)
 add_subdirectory(leddevice)
 add_subdirectory(sound-capture)
 add_subdirectory(ssdp)
+add_subdirectory(suspend-handler)
+add_subdirectory(systray)
 add_subdirectory(utils)
 add_subdirectory(webserver)
 
@@ -47,7 +50,7 @@ endif()
 
 # Executables
 add_subdirectory(ambilightapp)
-if (NOT APPLE)
+if (NOT APPLE AND DISABLED_REMOTE)
 	add_subdirectory(ambilightapp-remote)
 endif()
 

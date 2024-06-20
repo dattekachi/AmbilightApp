@@ -16,11 +16,11 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "Ambilight App-project"
-            VALUE "Comments", "https://github.com/awawa-dev/HyperHDR"
+            VALUE "CompanyName", "AmbilightApp-project"
+            VALUE "Comments", "https://ambilightled.com"
             VALUE "FileDescription", "Ambilight App Lighting"
             VALUE "FileVersion", "${AMBILIGHTAPP_VERSION}"
-            VALUE "InternalName", "Ambilight App"
+            VALUE "InternalName", "AmbilightApp"
             VALUE "LegalCopyright", "MIT"
             VALUE "OriginalFilename", "${BINARY_NAME}"
             VALUE "ProductName", "Ambilight App Lighting"

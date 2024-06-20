@@ -11,10 +11,10 @@ public:
 	Animation_RainbowWaves(QString name = ANIM_RAINBOW_WAVES);
 
 	void Init(
-		QImage& hyperImage,
+		AmbilightImage& hyperImage,
 		int hyperLatchTime) override;
 
-	bool Play(QPainter* painter) override;
+	bool Play(AmbilightImage& painter) override;
 	bool hasLedData(QVector<ColorRgb>& buffer) override;
 
 	static EffectDefinition getDefinition();

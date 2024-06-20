@@ -17,8 +17,7 @@
 	#include <stdlib.h>
 #endif
 
-#include <QApplication>
-
+#include <QCoreApplication>
 #include <utils/Components.h>
 #include <utils/JsonUtils.h>
 #include <utils/Image.h>
@@ -28,12 +27,6 @@
 #include <base/GrabberWrapper.h>
 #include <base/GrabberHelper.h>
 #include <base/NetworkForwarder.h>
-
-#ifdef USE_STATIC_QT_PLUGINS
-	#include <QtPlugin>
-	Q_IMPORT_PLUGIN(QJpegPlugin)
-	Q_IMPORT_PLUGIN(QGifPlugin)
-#endif
 
 #include <jsonserver/JsonServer.h>
 #include <webserver/WebServer.h>
@@ -63,7 +56,7 @@
 
 #include "AmbilightAppDaemon.h"
 
-AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QApplication* parent, bool logLvlOverwrite, bool readonlyMode, QStringList params, bool isGuiApp)
+AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QCoreApplication* parent, bool logLvlOverwrite, bool readonlyMode, QStringList params, bool isGuiApp)
 	: QObject(parent)
 	, _log(Logger::getInstance("DAEMON"))
 	, _instanceManager(nullptr)
@@ -86,6 +79,7 @@ AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QApplication* pa
 {
 
 	// Register metas for thread queued connection
+	qRegisterMetaType<ColorRgb>("ColorRgb");
 	qRegisterMetaType<Image<ColorRgb>>("Image<ColorRgb>");
 	qRegisterMetaType<ambilightapp::Components>("ambilightapp::Components");
 	qRegisterMetaType<settings::type>("settings::type");
@@ -93,10 +87,10 @@ AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QApplication* pa
 	qRegisterMetaType<std::vector<ColorRgb>>("std::vector<ColorRgb>");
 
 	// First load default configuration for other objects
-	_instanceZeroConfig = std::unique_ptr<InstanceConfig>(new InstanceConfig(true, 0, this, readonlyMode));
+	_instanceZeroConfig = std::unique_ptr<InstanceConfig>(new InstanceConfig(true, 0, this));
 
 	// Instance manager
-	_instanceManager = std::shared_ptr<AmbilightAppManager>(new AmbilightAppManager(rootPath, readonlyMode),
+	_instanceManager = std::shared_ptr<AmbilightAppManager>(new AmbilightAppManager(rootPath),
 		[](AmbilightAppManager* instanceManager) {
 			SMARTPOINTER_MESSAGE("AmbilightAppManager");
 			delete instanceManager;
@@ -104,7 +98,7 @@ AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QApplication* pa
 	connect(GlobalSignals::getInstance(), &GlobalSignals::SignalGetInstanceManager, this, &AmbilightAppDaemon::getInstanceManager, Qt::DirectConnection);
 
 	// Access Manager
-	_accessManager = std::shared_ptr<AccessManager>(new AccessManager(this, readonlyMode),
+	_accessManager = std::shared_ptr<AccessManager>(new AccessManager(this),
 		[](AccessManager* accessManager) {
 			SMARTPOINTER_MESSAGE("AccessManager");
 			delete accessManager;
@@ -178,18 +172,19 @@ AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QApplication* pa
 	connect(_instanceManager.get(), &AmbilightAppManager::SignalInstanceStateChanged, this, &AmbilightAppDaemon::instanceStateChangedHandler);
 	connect(_instanceManager.get(), &AmbilightAppManager::SignalSettingsChanged, this, &AmbilightAppDaemon::settingsChangedHandler);
 
-	// power management
-	#if defined(HAVE_POWER_MANAGEMENT)
-		bool lockedEnable = genConfig["disableOnLocked"].toBool(false);
+	//// power management
+	//#if defined(HAVE_POWER_MANAGEMENT)
+	//	bool lockedEnable = genConfig["disableOnLocked"].toBool(false);
 
-		_suspendHandler = std::unique_ptr<SuspendHandler>(new SuspendHandler(lockedEnable));
-		connect(_suspendHandler.get(), &SuspendHandler::SignalHibernate, _instanceManager.get(), &AmbilightAppManager::hibernate);
+	//	_suspendHandler = std::unique_ptr<SuspendHandler>(new SuspendHandler(lockedEnable));
+	//	connect(_suspendHandler.get(), &SuspendHandler::SignalHibernate, _instanceManager.get(), &AmbilightAppManager::hibernate);
 
-		#ifdef _WIN32
-			if (QAbstractEventDispatcher::instance() != nullptr)
-				QAbstractEventDispatcher::instance()->installNativeEventFilter(_suspendHandler.get());
-		#endif
-	#endif
+	//	#ifdef _WIN32
+	//		if (QAbstractEventDispatcher::instance() != nullptr)
+	//			QAbstractEventDispatcher::instance()->installNativeEventFilter(_suspendHandler.get());
+	//	#endif
+	//#endif
+
 
 	// ---- network services -----
 	startNetworkServices();
@@ -204,6 +199,23 @@ void AmbilightAppDaemon::instanceStateChangedHandler(InstanceState state, quint8
 	{
 		if (_instanceManager->areInstancesReady())
 		{
+			// power management
+			#if defined(HAVE_POWER_MANAGEMENT)
+				if (_suspendHandler == nullptr)
+				{
+					QJsonObject genConfig = getSetting(settings::type::GENERAL).object();
+					bool lockedEnable = genConfig["disableOnLocked"].toBool(false);
+
+					_suspendHandler = std::unique_ptr<SuspendHandler>(new SuspendHandler(lockedEnable));
+					connect(_suspendHandler.get(), &SuspendHandler::SignalHibernate, _instanceManager.get(), &AmbilightAppManager::hibernate);
+
+					#ifdef _WIN32
+						if (QAbstractEventDispatcher::instance() != nullptr)
+							QAbstractEventDispatcher::instance()->installNativeEventFilter(_suspendHandler.get());
+					#endif
+				}
+			#endif
+
 			if (_systemGrabber != nullptr)
 			{				
 				_systemGrabber->linker.acquire(1);

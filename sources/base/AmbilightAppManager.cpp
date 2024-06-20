@@ -4,7 +4,7 @@
 *
 *  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,8 @@
 	#include <QThread>
 #endif
 
+#include <QStringList>
+
 #include <base/AmbilightAppManager.h>
 #include <base/AmbilightAppInstance.h>
 #include <db/InstanceTable.h>
@@ -42,11 +44,10 @@ QString AmbilightAppManager::getRootPath()
 	return _rootPath;
 }
 
-AmbilightAppManager::AmbilightAppManager(const QString& rootPath, bool readonlyMode)
+AmbilightAppManager::AmbilightAppManager(const QString& rootPath)
 	: _log(Logger::getInstance("HYPER_MANAGER"))
-	, _instanceTable(new InstanceTable(readonlyMode))
+	, _instanceTable(new InstanceTable())
 	, _rootPath(rootPath)
-	, _readonlyMode(readonlyMode)
 	, _fireStarter(0)
 {
 	qRegisterMetaType<InstanceState>("InstanceState");
@@ -82,6 +83,62 @@ std::shared_ptr<AmbilightAppInstance> AmbilightAppManager::getAmbilightAppInstan
 
 	Warning(_log, "The requested instance index '%d' with name '%s' isn't running, return main instance", instance, QSTRING_CSTR(_instanceTable->getNamebyIndex(instance)));
 	return _runningInstances.value(0);
+}
+
+std::vector<QString> AmbilightAppManager::getInstances()
+{
+	std::vector<QString> ret;
+
+	for (const quint8& key : _runningInstances.keys())
+	{
+		ret.push_back(QString::number(key));
+		ret.push_back(_instanceTable->getNamebyIndex(key));
+	}
+
+	return ret;
+}
+
+void AmbilightAppManager::setInstanceColor(int instance, int priority, ColorRgb ledColors, int timeout_ms)
+{
+	std::vector<ColorRgb> rgbColor{ ledColors };
+
+	for (const auto& selInstance : _runningInstances)
+		if (instance == -1 || selInstance->getInstanceIndex() == instance)
+		{
+			QUEUE_CALL_3(selInstance.get(), setColor, int, 1, std::vector<ColorRgb>, rgbColor, int, 0);
+		}
+}
+
+void  AmbilightAppManager::setInstanceEffect(int instance, QString effectName, int priority)
+{
+	for (const auto& selInstance : _runningInstances)
+		if (instance == -1 || selInstance->getInstanceIndex() == instance)
+		{
+			QUEUE_CALL_2(selInstance.get(), setEffect, QString, effectName, int, 1);
+		}
+}
+
+void AmbilightAppManager::clearInstancePriority(int instance, int priority)
+{
+	for (const auto& selInstance : _runningInstances)
+		if (instance == -1 || selInstance->getInstanceIndex() == instance)
+		{
+			QUEUE_CALL_1(selInstance.get(), clear, int, 1);
+		}
+}
+
+std::list<EffectDefinition> AmbilightAppManager::getEffects()
+{
+	std::list<EffectDefinition> efxs;
+
+	if (IsInstanceRunning(0))
+	{
+		auto inst = getAmbilightAppInstance(0);
+
+		SAFE_CALL_0_RET(inst.get(), getEffects, std::list<EffectDefinition>, efxs);
+	}
+
+	return efxs;
 }
 
 QVector<QVariantMap> AmbilightAppManager::getInstanceData() const
@@ -228,7 +285,6 @@ bool AmbilightAppManager::startInstance(quint8 inst, QObject* caller, int tan, b
 
 			auto ambilightapp = std::shared_ptr<AmbilightAppInstance>(
 				new AmbilightAppInstance(inst,
-					_readonlyMode,
 					disableOnStartup,
 					_instanceTable->getNamebyIndex(inst)),
 				[](AmbilightAppInstance* oldInstance) {

@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2023 awawa-dev
+*  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -44,14 +44,14 @@ EffectDefinition Animation4Music_QuatroMulti::getDefinition()
 }
 
 void Animation4Music_QuatroMulti::Init(
-	QImage& hyperImage,
+	AmbilightImage& hyperImage,
 	int hyperLatchTime
 )
 {
 	SetSleepTime(15);
 }
 
-bool Animation4Music_QuatroMulti::Play(QPainter* painter)
+bool Animation4Music_QuatroMulti::Play(AmbilightImage& painter)
 {
 	return false;
 }
@@ -69,7 +69,7 @@ bool Animation4Music_QuatroMulti::getImage(Image<ColorRgb>& newImage)
 	if (r == nullptr || !newData)
 		return false;
 
-	QColor selected;
+	ColorRgb selected;
 	uint32_t maxSingle, average;
 
 	newImage.clear();
@@ -91,8 +91,8 @@ bool Animation4Music_QuatroMulti::getImage(Image<ColorRgb>& newImage)
 		{
 			int width = newImage.width() * 0.04;
 
-			newImage.gradientVBox(0, h1, width, h2, selected.red(), selected.green(), selected.blue());
-			newImage.gradientVBox(newImage.width() - 1 - width, h1, newImage.width() - 1, h2, selected.red(), selected.green(), selected.blue());
+			newImage.gradientVBox(0, h1, width, h2, selected.Red(), selected.Green(), selected.Blue());
+			newImage.gradientVBox(newImage.width() - 1 - width, h1, newImage.width() - 1, h2, selected.Red(), selected.Green(), selected.Blue());
 		}
 	}
 	{
@@ -105,8 +105,8 @@ bool Animation4Music_QuatroMulti::getImage(Image<ColorRgb>& newImage)
 		{
 			int height = newImage.height() * 0.067;
 
-			newImage.gradientHBox(w1, 0, w2, height, selected.red(), selected.green(), selected.blue());
-			newImage.gradientHBox(w1, newImage.height() - 1 - height, w2, newImage.height() - 1, selected.red(), selected.green(), selected.blue());
+			newImage.gradientHBox(w1, 0, w2, height, selected.Red(), selected.Green(), selected.Blue());
+			newImage.gradientHBox(w1, newImage.height() - 1 - height, w2, newImage.height() - 1, selected.Red(), selected.Green(), selected.Blue());
 		}
 	}
 

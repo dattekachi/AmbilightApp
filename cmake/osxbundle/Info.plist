@@ -3,7 +3,7 @@
 <plist version="1.0">
 	<dict>
 		<key>CFBundleIdentifier</key>
-		<string>com.awawa-dev.hyperhdr</string>
+		<string>com.thesetupstore.ambilightapp</string>
 		<key>CFBundleName</key>
 		<string>AmbilightApp</string>
 		<key>CFBundleExecutable</key>

@@ -1,8 +1,5 @@
 // Generated config file
 
-// support for static QT plugins
-#cmakedefine USE_STATIC_QT_PLUGINS
-
 // cec support
 #cmakedefine ENABLE_CEC
 
@@ -51,6 +48,9 @@
 // Define to enable the ws281x-pwm-via-dma-device using jgarff's library
 #cmakedefine ENABLE_WS281XPWM
 
+// Define to enable systray control
+#cmakedefine ENABLE_SYSTRAY
+
 // Define to enable network discovery
 #cmakedefine ENABLE_BONJOUR
 
@@ -73,6 +73,8 @@
 #cmakedefine USE_SYSTEM_MBEDTLS_LIBS
 
 #cmakedefine ENABLE_POWER_MANAGEMENT
+
+#cmakedefine AMBILIGHTAPP_HAVE_DBUS
 
 // the ambilightapp build id string
 #define AMBILIGHTAPP_BUILD_ID "${AMBILIGHTAPP_BUILD_ID}"

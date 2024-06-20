@@ -1,6 +1,6 @@
 // project includes
 #include "JsonClientConnection.h"
-#include <api/HyperAPI.h>
+#include <api/AmbilightAPI.h>
 
 // qt inc
 #include <QTcpSocket>
@@ -15,12 +15,12 @@ JsonClientConnection::JsonClientConnection(QTcpSocket* socket, bool localConnect
 	connect(_socket, &QTcpSocket::disconnected, this, &JsonClientConnection::disconnected);
 	connect(_socket, &QTcpSocket::readyRead, this, &JsonClientConnection::readRequest);
 	// create a new instance of JsonAPI
-	_hyperAPI = new HyperAPI(socket->peerAddress().toString(), _log, localConnection, this);
+	_hmbilightAPI = new AmbilightAPI(socket->peerAddress().toString(), _log, localConnection, this);
 	// get the callback messages from JsonAPI and send it to the client
-	connect(_hyperAPI, &HyperAPI::SignalCallbackJsonMessage, this, &JsonClientConnection::sendMessage);
-	connect(_hyperAPI, &HyperAPI::SignalPerformClientDisconnection, this, [&]() { _socket->close(); });
+	connect(_hmbilightAPI, &AmbilightAPI::SignalCallbackJsonMessage, this, &JsonClientConnection::sendMessage);
+	connect(_hmbilightAPI, &AmbilightAPI::SignalPerformClientDisconnection, this, [&]() { _socket->close(); });
 
-	_hyperAPI->initialize();
+	_hmbilightAPI->initialize();
 }
 
 void JsonClientConnection::readRequest()
@@ -37,7 +37,7 @@ void JsonClientConnection::readRequest()
 		_receiveBuffer = _receiveBuffer.mid(bytes);
 
 		// handle message
-		_hyperAPI->handleMessage(message);
+		_hmbilightAPI->handleMessage(message);
 
 		// try too look up '\n' again
 		bytes = _receiveBuffer.indexOf('\n') + 1;

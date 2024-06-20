@@ -51,7 +51,7 @@ class AmbilightAppInstance : public QObject
 	Q_OBJECT
 
 public:
-	AmbilightAppInstance(quint8 instance, bool readonlyMode, bool disableOnstartup, QString name);
+	AmbilightAppInstance(quint8 instance, bool disableOnstartup, QString name);
 	~AmbilightAppInstance();
 	
 	quint8 getInstanceIndex() const { return _instIndex; }
@@ -72,7 +72,7 @@ public slots:
 	int getCurrentPriority() const;
 	std::list<EffectDefinition> getEffects() const;
 	int getLedCount() const;
-	bool getReadOnlyMode() const { return _readOnlyMode; };
+	bool getReadOnlyMode() const;
 	QJsonDocument getSetting(settings::type type) const;
 	int hasLedClock();
 	void identifyLed(const QJsonObject& params);
@@ -103,13 +103,6 @@ public slots:
 	void updateResult(std::vector<ColorRgb> _ledBuffer);
 	
 	int setEffect(const QString& effectName, int priority, int timeout = -1, const QString& origin = "System");
-	int setEffect(const QString& effectName
-		, const QJsonObject& args
-		, int priority
-		, int timeout = -1
-		, const QString& origin = "System"
-		, const QString& imageData = ""
-	);
 
 signals:
 	void SignalComponentStateChanged(ambilightapp::Components comp, bool state);
@@ -159,7 +152,6 @@ private:
 	std::vector<ColorRgb>	_currentLedColors;
 	QString					_name;
 
-	bool					_readOnlyMode;
 	bool					_disableOnStartup;
 
 	static std::atomic<bool>	_signalTerminate;

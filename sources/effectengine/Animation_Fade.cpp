@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2023 awawa-dev
+*  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -72,7 +72,7 @@ void Animation_Fade::SetPoint(Point3d point) {
 	(uint8_t)(std::min(std::max(int(std::round(colorStart.i + color_step.i*step)),0), int((colorStart.i < colorEnd.i) ? colorEnd.i : colorStart.i)))
 
 void Animation_Fade::Init(
-	QImage& hyperImage,
+	AmbilightImage& hyperImage,
 	int hyperLatchTime
 )
 {
@@ -141,7 +141,7 @@ void Animation_Fade::Init(
 	repeatCounter = 1;
 }
 
-bool Animation_Fade::Play(QPainter* painter)
+bool Animation_Fade::Play(AmbilightImage& painter)
 {
 	return true;
 }

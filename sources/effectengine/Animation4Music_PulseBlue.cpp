@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2023 awawa-dev
+*  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -44,14 +44,14 @@ EffectDefinition Animation4Music_PulseBlue::getDefinition()
 }
 
 void Animation4Music_PulseBlue::Init(
-	QImage& hyperImage,
+	AmbilightImage& hyperImage,
 	int hyperLatchTime
 )
 {
 	SetSleepTime(15);
 }
 
-bool Animation4Music_PulseBlue::Play(QPainter* painter)
+bool Animation4Music_PulseBlue::Play(AmbilightImage& painter)
 {
 	return false;
 }
@@ -74,8 +74,8 @@ bool Animation4Music_PulseBlue::getImage(Image<ColorRgb>& newImage)
 	if (value < 0)
 		return false;
 
-	QColor selected(0, 0, value);
-	newImage.fastBox(0, 0, newImage.width() - 1, newImage.height() - 1, selected.red(), selected.green(), selected.blue());
+	ColorRgb selected(0, 0, value);
+	newImage.fastBox(0, 0, newImage.width() - 1, newImage.height() - 1, selected.Red(), selected.Green(), selected.Blue());
 
 	return true;
 };

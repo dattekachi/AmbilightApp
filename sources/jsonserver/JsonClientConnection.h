@@ -8,7 +8,7 @@
 
 #include <utils/Logger.h>
 
-class HyperAPI;
+class AmbilightAPI;
 class QTcpSocket;
 class AmbilightAppManager;
 
@@ -31,7 +31,7 @@ private slots:
 
 private:
 	QTcpSocket* _socket;
-	HyperAPI* _hyperAPI;
+	AmbilightAPI* _hmbilightAPI;
 	QByteArray _receiveBuffer;
 	Logger* _log;
 };

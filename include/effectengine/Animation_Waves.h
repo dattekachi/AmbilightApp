@@ -8,16 +8,16 @@ public:
 	Animation_Waves(QString name);
 
 	void Init(
-		QImage& hyperImage,
+		AmbilightImage& hyperImage,
 		int hyperLatchTime) override;
 
-	bool Play(QPainter* painter) override;
+	bool Play(AmbilightImage& painter) override;
 
 private:
 
-	Point2d getPoint(const QImage& hyperImage, bool random, double x, double y);
+	Point2d getPoint(const AmbilightImage& hyperImage, bool random, double x, double y);
 	int		getSTime(int hyperLatchTime, int _rt, double steps);
-	bool	imageRadialGradient(QPainter* painter, int centerX, int centerY, int angle, const QList<Animation_Swirl::SwirlGradient>& bytearray);
+	bool	imageRadialGradient(AmbilightImage& painter, int centerX, int centerY, int angle, const QList<Animation_Swirl::SwirlGradient>& bytearray);
 
 	Point2d			pointS1;
 	QList<Animation_Swirl::SwirlGradient> baS1;

@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2023 awawa-dev
+*  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://github.com/awawa-dev/HyperHDR
+*  Project homesite: https://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -104,15 +104,14 @@ Effect::Effect(AmbilightAppInstance* ambilightapp, int visiblePriority, int prio
 	, _effect(effect.factory())
 	, _endTime(-1)
 	, _interrupt(false)
-	, _image(ambilightapp->getLedGridSize(), QImage::Format_ARGB32_Premultiplied)	
+	, _image(ambilightapp->getLedGridSize())	
 	, _timer(this)
 	, _ledCount(ambilightapp->getLedCount())
 {
 	_log = Logger::getInstance(QString("EFFECT%1(%2)").arg(_instanceIndex).arg((_name.length() > 9) ? _name.left(6) + "..." : _name));
 
 	_colors.resize(_ledCount);
-	_colors.fill(ColorRgb::BLACK);
-	_image.fill(Qt::black);
+	_colors.fill(ColorRgb::BLACK);	
 
 	_timer.setTimerType(Qt::PreciseTimer);
 	connect(&_timer, &QTimer::timeout, this, &Effect::run);
@@ -161,9 +160,7 @@ void Effect::run()
 
 	if (!_effect->hasOwnImage())
 	{
-		_painter.begin(&_image);
-		_effect->Play(&_painter);
-		_painter.end();
+		_effect->Play(_image);
 
 		hasLedData = _effect->hasLedData(_ledBuffer);
 	}
@@ -216,22 +213,7 @@ void Effect::ledShow(int left)
 
 void Effect::imageShow(int left)
 {
-	int width = _image.width();
-	int height = _image.height();
-
-	Image<ColorRgb> image(width, height);
-	uint8_t* rawColors = image.rawMem();
-
-	for (int i = 0; i < height; i++)
-	{
-		const QRgb* scanline = reinterpret_cast<const QRgb*>(_image.scanLine(i));
-		for (int j = 0; j < width; j++)
-		{
-			*(rawColors++) = qRed(scanline[j]);
-			*(rawColors++) = qGreen(scanline[j]);
-			*(rawColors++) = qBlue(scanline[j]);
-		}
-	}
+	Image<ColorRgb> image = _image.renderImage();
 
 	emit SignalSetImage(_priority, image, left, false);
 }
@@ -283,61 +265,61 @@ std::list<EffectDefinition> Effect::getAvailableEffects()
 {
 	std::list<EffectDefinition> _availableEffects;
 
-	/*_availableEffects.push_back(Animation4Music_WavesPulse::getDefinition());
+	//_availableEffects.push_back(Animation4Music_WavesPulse::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_WavesPulseFast::getDefinition());
+	//_availableEffects.push_back(Animation4Music_WavesPulseFast::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_WavesPulseSlow::getDefinition());
+	//_availableEffects.push_back(Animation4Music_WavesPulseSlow::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_PulseMulti::getDefinition());
+	//_availableEffects.push_back(Animation4Music_PulseMulti::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_PulseMultiFast::getDefinition());
+	//_availableEffects.push_back(Animation4Music_PulseMultiFast::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_PulseMultiSlow::getDefinition());
+	//_availableEffects.push_back(Animation4Music_PulseMultiSlow::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_PulseYellow::getDefinition());
+	//_availableEffects.push_back(Animation4Music_PulseYellow::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_PulseWhite::getDefinition());
+	//_availableEffects.push_back(Animation4Music_PulseWhite::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_PulseRed::getDefinition());
+	//_availableEffects.push_back(Animation4Music_PulseRed::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_PulseGreen::getDefinition());
+	//_availableEffects.push_back(Animation4Music_PulseGreen::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_PulseBlue::getDefinition());
-
-
-	_availableEffects.push_back(Animation4Music_StereoMulti::getDefinition());
-
-	_availableEffects.push_back(Animation4Music_StereoMultiFast::getDefinition());
-
-	_availableEffects.push_back(Animation4Music_StereoMultiSlow::getDefinition());
-
-	_availableEffects.push_back(Animation4Music_StereoYellow::getDefinition());
-
-	_availableEffects.push_back(Animation4Music_StereoWhite::getDefinition());
-
-	_availableEffects.push_back(Animation4Music_StereoRed::getDefinition());
-
-	_availableEffects.push_back(Animation4Music_StereoGreen::getDefinition());
-
-	_availableEffects.push_back(Animation4Music_StereoBlue::getDefinition());
+	//_availableEffects.push_back(Animation4Music_PulseBlue::getDefinition());
 
 
-	_availableEffects.push_back(Animation4Music_QuatroMulti::getDefinition());
+	//_availableEffects.push_back(Animation4Music_StereoMulti::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_QuatroMultiFast::getDefinition());
+	//_availableEffects.push_back(Animation4Music_StereoMultiFast::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_QuatroMultiSlow::getDefinition());
+	//_availableEffects.push_back(Animation4Music_StereoMultiSlow::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_QuatroYellow::getDefinition());
+	//_availableEffects.push_back(Animation4Music_StereoYellow::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_QuatroWhite::getDefinition());
+	//_availableEffects.push_back(Animation4Music_StereoWhite::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_QuatroRed::getDefinition());
+	//_availableEffects.push_back(Animation4Music_StereoRed::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_QuatroGreen::getDefinition());
+	//_availableEffects.push_back(Animation4Music_StereoGreen::getDefinition());
 
-	_availableEffects.push_back(Animation4Music_QuatroBlue::getDefinition());*/
+	//_availableEffects.push_back(Animation4Music_StereoBlue::getDefinition());
+
+
+	//_availableEffects.push_back(Animation4Music_QuatroMulti::getDefinition());
+
+	//_availableEffects.push_back(Animation4Music_QuatroMultiFast::getDefinition());
+
+	//_availableEffects.push_back(Animation4Music_QuatroMultiSlow::getDefinition());
+
+	//_availableEffects.push_back(Animation4Music_QuatroYellow::getDefinition());
+
+	//_availableEffects.push_back(Animation4Music_QuatroWhite::getDefinition());
+
+	//_availableEffects.push_back(Animation4Music_QuatroRed::getDefinition());
+
+	//_availableEffects.push_back(Animation4Music_QuatroGreen::getDefinition());
+
+	//_availableEffects.push_back(Animation4Music_QuatroBlue::getDefinition());
 
 
 
