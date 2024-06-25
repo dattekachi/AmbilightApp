@@ -29,6 +29,7 @@
 
 #include <QAbstractNativeEventFilter>
 #include <QAbstractEventDispatcher>
+#include <QWidget>
 #define NOMINMAX
 #include <windows.h>
 
@@ -39,6 +40,7 @@
 class SuspendHandler : public QObject, public QAbstractNativeEventFilter {
 	Q_OBJECT
 
+	QWidget			_widget;
 	HPOWERNOTIFY	_notifyHandle, _notifyMonitorHandle;
 	bool			_sessionLocker;
 

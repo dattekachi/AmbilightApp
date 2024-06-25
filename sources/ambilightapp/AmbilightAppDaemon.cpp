@@ -32,7 +32,7 @@
 #include <webserver/WebServer.h>
 
 // Flatbuffer Server
-#include <flatbufserver/FlatBufferServer.h>
+#include <flatbuffers/server/FlatBuffersServer.h>
 
 // ProtoNanoBuffer Server
 #include <proto-nano-server/ProtoServer.h>
@@ -171,19 +171,6 @@ AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QCoreApplication
 	// pipe settings changes and component state changes from AmbilightAPPIManager to Daemon
 	connect(_instanceManager.get(), &AmbilightAppManager::SignalInstanceStateChanged, this, &AmbilightAppDaemon::instanceStateChangedHandler);
 	connect(_instanceManager.get(), &AmbilightAppManager::SignalSettingsChanged, this, &AmbilightAppDaemon::settingsChangedHandler);
-
-	//// power management
-	//#if defined(HAVE_POWER_MANAGEMENT)
-	//	bool lockedEnable = genConfig["disableOnLocked"].toBool(false);
-
-	//	_suspendHandler = std::unique_ptr<SuspendHandler>(new SuspendHandler(lockedEnable));
-	//	connect(_suspendHandler.get(), &SuspendHandler::SignalHibernate, _instanceManager.get(), &AmbilightAppManager::hibernate);
-
-	//	#ifdef _WIN32
-	//		if (QAbstractEventDispatcher::instance() != nullptr)
-	//			QAbstractEventDispatcher::instance()->installNativeEventFilter(_suspendHandler.get());
-	//	#endif
-	//#endif
 
 
 	// ---- network services -----
@@ -332,18 +319,18 @@ void AmbilightAppDaemon::startNetworkServices()
 
 	_flatProtoThread->setObjectName("FlatProtoThread");
 
-	FlatBufferServer* _flatBufferServer = new FlatBufferServer(_netOrigin, getSetting(settings::type::FLATBUFSERVER), _rootPath);
+	FlatBuffersServer* _flatBufferServer = new FlatBuffersServer(_netOrigin, getSetting(settings::type::FLATBUFSERVER), _rootPath);
 	_flatBufferServer->moveToThread(_flatProtoThread);
 	flatProtoThreadClients.push_back(_flatBufferServer);
 	if (_videoGrabber == nullptr)
 	{
 		Warning(_log, "The USB grabber was disabled during build. FlatbufferServer now controlls the HDR state.");		
-		connect(_flatBufferServer, &FlatBufferServer::SignalSetNewComponentStateToAllInstances, _instanceManager.get(), &AmbilightAppManager::SignalSetNewComponentStateToAllInstances);
+		connect(_flatBufferServer, &FlatBuffersServer::SignalSetNewComponentStateToAllInstances, _instanceManager.get(), &AmbilightAppManager::SignalSetNewComponentStateToAllInstances);
 	}
-	connect(GlobalSignals::getInstance(), &GlobalSignals::SignalRequestComponent, _flatBufferServer, &FlatBufferServer::signalRequestSourceHandler);
-	connect(_flatProtoThread, &QThread::started, _flatBufferServer, &FlatBufferServer::initServer);
-	connect(_flatProtoThread, &QThread::finished, _flatBufferServer, &FlatBufferServer::deleteLater);
-	connect(_instanceManager.get(), &AmbilightAppManager::SignalSettingsChanged, _flatBufferServer, &FlatBufferServer::handleSettingsUpdate);
+	connect(GlobalSignals::getInstance(), &GlobalSignals::SignalRequestComponent, _flatBufferServer, &FlatBuffersServer::signalRequestSourceHandler);
+	connect(_flatProtoThread, &QThread::started, _flatBufferServer, &FlatBuffersServer::initServer);
+	connect(_flatProtoThread, &QThread::finished, _flatBufferServer, &FlatBuffersServer::deleteLater);
+	connect(_instanceManager.get(), &AmbilightAppManager::SignalSettingsChanged, _flatBufferServer, &FlatBuffersServer::handleSettingsUpdate);
 
 	NetworkForwarder* _networkForwarder = new NetworkForwarder();
 	_networkForwarder->moveToThread(_flatProtoThread);
@@ -357,7 +344,7 @@ void AmbilightAppDaemon::startNetworkServices()
 	flatProtoThreadClients.push_back(_protoServer);
 	connect(_flatProtoThread, &QThread::started, _protoServer, &ProtoServer::initServer);
 	connect(_flatProtoThread, &QThread::finished, _protoServer, &ProtoServer::deleteLater);
-	connect(_protoServer, &ProtoServer::SignalImportFromProto, _flatBufferServer, &FlatBufferServer::SignalImportFromProto);
+	connect(_protoServer, &ProtoServer::SignalImportFromProto, _flatBufferServer, &FlatBuffersServer::SignalImportFromProto);
 	connect(_instanceManager.get(), &AmbilightAppManager::SignalSettingsChanged, _protoServer, &ProtoServer::handleSettingsUpdate);
 #endif
 

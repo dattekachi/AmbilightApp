@@ -42,17 +42,18 @@
 
 #pragma comment (lib, "WtsApi32.Lib")
 
-namespace
-{
-	HWND handle = nullptr;
-}
+// namespace
+// {
+// 	HWND handle = nullptr;
+// }
 
 SuspendHandler::SuspendHandler(bool sessionLocker):
 	_notifyHandle(NULL),
 	_notifyMonitorHandle(NULL),
 	_sessionLocker(sessionLocker)
 {
-	handle = SystrayGetWindow();
+	// handle = SystrayGetWindow();
+	auto handle = reinterpret_cast<HWND> (_widget.winId());
 	_notifyHandle = RegisterSuspendResumeNotification(handle, DEVICE_NOTIFY_WINDOW_HANDLE);
 
 	if (_notifyHandle == NULL)
@@ -94,6 +95,7 @@ SuspendHandler::~SuspendHandler()
 			std::cout << "Monitor state handler deregistered!" << std::endl;
 		}
 		_notifyMonitorHandle = NULL;
+		auto handle = reinterpret_cast<HWND> (_widget.winId());
 
 		WTSUnRegisterSessionNotification(handle);
 	}

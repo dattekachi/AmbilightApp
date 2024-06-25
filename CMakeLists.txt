@@ -26,7 +26,6 @@ SET ( DEFAULT_PROTOBUF                    ON  )
 SET ( DEFAULT_BOBLIGHT                    OFF )
 SET ( DEFAULT_WS281XPWM                   OFF )
 SET ( DEFAULT_USE_SYSTEM_FLATBUFFERS_LIBS OFF )
-SET ( DEFAULT_USE_SYSTEM_MBEDTLS_LIBS     OFF )
 SET ( DEFAULT_USE_SYSTEM_MQTT_LIBS        OFF )
 SET ( DEFAULT_MF                          OFF )
 SET ( DEFAULT_DX                          OFF )
@@ -42,10 +41,12 @@ SET ( DEFAULT_SOUNDCAPMACOS               OFF )
 SET ( DEFAULT_CEC                         OFF )
 SET ( DEFAULT_BONJOUR                     ON  )
 SET ( DEFAULT_MQTT                        ON  )
+SET ( DEFAULT_STATIC_QT_PLUGINS           OFF )
 SET ( DEFAULT_PRECOMPILED_HEADERS         ON  )
 SET ( DEFAULT_XZ                          ON  )
 SET ( DEFAULT_POWER_MANAGEMENT            ON  )
 SET ( DEFAULT_SYSTRAY                     ON  )
+SET ( DEFAULT_SHARED_LIBS                 ON  )
 
 # Configure CCache if available
 find_program(CCACHE_FOUND ccache)
@@ -62,7 +63,7 @@ else()
 endif(CCACHE_FOUND)
 
 # find QT libs
-find_package(Qt6 COMPONENTS Core Network SerialPort QUIET)
+find_package(Qt6 COMPONENTS Core Network SerialPort Widgets QUIET)
 
 if (Qt6Core_FOUND AND NOT (DO_NOT_USE_QT_VERSION_6_LIBS STREQUAL "ON"))	
 	message( STATUS "Found Qt Version: ${Qt6Core_VERSION}" )
@@ -74,7 +75,7 @@ ELSE()
 		message( STATUS "QT version 6 not found. Searching for QT version 5 instead." )
 	endif()
 	SET(QT_MIN_VERSION "5.10.0")
-	find_package(Qt5 COMPONENTS Core Network SerialPort REQUIRED)
+	find_package(Qt5 COMPONENTS Core Network SerialPort Widgets REQUIRED)
 	message( STATUS "Found Qt Version: ${Qt5Core_VERSION}" )
 	IF ( "${Qt5Core_VERSION}" VERSION_LESS "${QT_MIN_VERSION}" )
 		message( FATAL_ERROR "Your Qt version is to old! Minimum required ${QT_MIN_VERSION}" )
@@ -274,6 +275,12 @@ if (UNIX AND NOT APPLE AND (DEFAULT_POWER_MANAGEMENT OR DEFAULT_PIPEWIRE))
 	endif()
 endif()
 
+# Find OpenSSL
+find_package(OpenSSL)
+if (NOT OPENSSL_FOUND)
+	message( WARNING "OpenSSL could not be found. AmbilightApp HTTPS instance and Philips Hue support will be disabled." )
+endif()
+
 # Pipewire support
 if (DEFAULT_PIPEWIRE)
 	FIND_PACKAGE(PkgConfig REQUIRED)
@@ -330,6 +337,10 @@ if (WIN32)
 	else()
 		message( FATAL_ERROR  "Please install 7-zip")
 	endif (SEVENZIP_BIN)
+endif()
+
+if (CMAKE_CROSSCOMPILING)
+	SET ( DEFAULT_SHARED_LIBS                 OFF )
 endif()
 
 # set the build options
@@ -431,6 +442,9 @@ colorMe("ENABLE_XZ = " ${ENABLE_XZ})
 
 message( STATUS "\n${CyanColor}BUILD FEATURES${ColorReset}")
 
+option(USE_SHARED_LIBS "Prefer shared libraries over static ones" ${DEFAULT_SHARED_LIBS})
+colorMe("USE_SHARED_LIBS = " ${USE_SHARED_LIBS})
+
 option(USE_PRECOMPILED_HEADERS "Enable precompiled headers (PCH)" ${DEFAULT_PRECOMPILED_HEADERS})
 colorMe("USE_PRECOMPILED_HEADERS = " ${USE_PRECOMPILED_HEADERS})
 
@@ -440,8 +454,8 @@ colorMe("USE_SYSTEM_MQTT_LIBS = " ${USE_SYSTEM_MQTT_LIBS})
 option(USE_SYSTEM_FLATBUFFERS_LIBS "Use system flatbuffers libs" ${DEFAULT_USE_SYSTEM_FLATBUFFERS_LIBS})
 colorMe("USE_SYSTEM_FLATBUFFERS_LIBS = " ${USE_SYSTEM_FLATBUFFERS_LIBS})
 
-option(USE_SYSTEM_MBEDTLS_LIBS "Use system mbedtls libs" ${DEFAULT_USE_SYSTEM_MBEDTLS_LIBS})
-colorMe("USE_SYSTEM_MBEDTLS_LIBS = " ${USE_SYSTEM_MBEDTLS_LIBS})
+option(USE_STATIC_QT_PLUGINS "Enable static QT plugins" ${DEFAULT_STATIC_QT_PLUGINS})
+colorMe("USE_STATIC_QT_PLUGINS = " ${USE_STATIC_QT_PLUGINS})
 
 if(UNIX AND NOT APPLE)
 	option(USE_STANDARD_INSTALLER_NAME "Use the standardized Linux installer name" OFF)
@@ -576,6 +590,24 @@ find_package(TurboJPEG REQUIRED)
 message( STATUS "TURBOJPEG_LIBRARY_DIRS=${TurboJPEG_LIBRARY}")
 message( STATUS "TURBOJPEG_INCLUDE_DIRS=${TurboJPEG_INCLUDE_DIRS}")
 
+# Embedded QT plugins
+if (USE_STATIC_QT_PLUGINS AND TARGET Qt6::qmake)
+	get_target_property(QT6_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
+	execute_process(
+		COMMAND ${QT6_QMAKE_EXECUTABLE} -query QT_INSTALL_PLUGINS
+		OUTPUT_VARIABLE QT6_PLUGINS_DIR
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+
+	file(GLOB resultPlugins "${QT6_PLUGINS_DIR}/tls/*openssl*")
+	foreach(file ${resultPlugins})
+		if (NOT IS_SYMLINK ${file})
+			message("Using static QT plugin: " ${file})
+			set(STATIC_QT_PLUGINS_LIBS ${STATIC_QT_PLUGINS_LIBS} ${file})
+		endif()
+	endforeach()	
+endif()
+
 if (WIN32)
 	if(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
 		set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
@@ -614,8 +646,8 @@ add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_D
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/packages.cmake)
 
 # external targets
-if (WIN32 AND TARGET apidoc AND TARGET flatbuffers AND TARGET flatc AND TARGET mbedcrypto AND TARGET qmqtt AND TARGET liblzma AND TARGET sqlite3)
-	set_target_properties(qmqtt apidoc flatbuffers flatc lib mbedcrypto mbedtls mbedx509 resources uninstall liblzma sqlite3 PROPERTIES FOLDER ExternalLibsTargets)	
+if (WIN32 AND TARGET apidoc AND TARGET flatbuffers AND TARGET flatc AND TARGET qmqtt AND TARGET liblzma AND TARGET sqlite3)
+	set_target_properties(qmqtt apidoc flatbuffers flatc lib resources uninstall liblzma sqlite3 PROPERTIES FOLDER ExternalLibsTargets)	
 else()
 	set_target_properties(resources uninstall PROPERTIES FOLDER ExternalLibsTargets)
 endif()

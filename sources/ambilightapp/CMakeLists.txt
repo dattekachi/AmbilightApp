@@ -24,7 +24,8 @@ target_link_libraries(ambilightapp
 	ambilightimage
 	effectengine
 	jsonserver
-	flatbufserver
+	flatbuffers_server
+	flatbuffers_client
 	webserver
 	ssdp
 	database
@@ -47,6 +48,10 @@ if(ENABLE_XZ)
 	else()
 		target_link_libraries(ambilightapp liblzma)
 	endif()
+endif()
+
+if (USE_STATIC_QT_PLUGINS)
+	target_link_libraries(hyperhdr ${STATIC_QT_PLUGINS_LIBS})
 endif()
 
 if (ENABLE_PROTOBUF)

@@ -15,6 +15,7 @@
 	#include <stdio.h>
 #endif
 
+#include <QApplication>
 #include <csignal>
 
 #if !defined(__APPLE__) && !defined(_WIN32)
@@ -96,6 +97,12 @@ QCoreApplication* createApplication(bool& isGuiApp, int& argc, char* argv[])
 		std::cout << ((isGuiApp) ? "GUI" : "Console") << " application: " << std::endl;
 	}
 #endif
+
+	if (isGuiApp)
+	{
+		QApplication* app = new QApplication(argc, argv);
+		return app;
+	}
 
 	QCoreApplication* app = new QCoreApplication(argc, argv);
 	app->setApplicationName("AmbilightApp");
@@ -390,7 +397,7 @@ int main(int argc, char** argv)
 					systray->loop();
 					});
 
-				timer->setInterval(200);			
+				timer->setInterval(200);
 				timer->start();
 			#endif
 

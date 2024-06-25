@@ -2,10 +2,33 @@
 # SQLite
 #=============================================================================
 
-add_library(sqlite3 "${CMAKE_CURRENT_SOURCE_DIR}/sqlite/sqlite3.c")
+if (NOT USE_SHARED_LIBS)
+	add_library(sqlite3 "${CMAKE_CURRENT_SOURCE_DIR}/sqlite/sqlite3.c")
+else()
+	add_library(sqlite3 SHARED "${CMAKE_CURRENT_SOURCE_DIR}/sqlite/sqlite3.c")
+	if(WIN32)
+	   target_compile_definitions(sqlite3
+		  INTERFACE
+			 "SQLITE_API=__declspec(dllimport)"
+		  PRIVATE
+			 "SQLITE_API=__declspec(dllexport)"
+	   )
+	else()
+	   target_compile_definitions(sqlite3
+		  INTERFACE
+			 "SQLITE_API=__attribute__((visibility(\"default\")))"
+	   )
+	endif()
+endif()
+
 target_include_directories(sqlite3 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/sqlite")
 target_link_libraries(sqlite3 PRIVATE ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
 
+install(
+    TARGETS   sqlite3
+    LIBRARY   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+)
 
 set_target_properties(sqlite3 PROPERTIES
     OUTPUT_NAME   sqlite3
@@ -13,7 +36,7 @@ set_target_properties(sqlite3 PROPERTIES
 )
 
 target_compile_definitions(sqlite3 PUBLIC
-	SQLITE_THREADSAFE=1
+	SQLITE_THREADSAFE=2
 	SQLITE_DEFAULT_MEMSTATUS=0
 	SQLITE_DEFAULT_SYNCHRONOUS=3	
 	SQLITE_OMIT_AUTHORIZATION
@@ -63,6 +86,8 @@ if (USE_SYSTEM_FLATBUFFERS_LIBS AND NOT CMAKE_CROSSCOMPILING)
 endif()
 
 if (NOT USE_SYSTEM_FLATBUFFERS_LIBS OR CMAKE_CROSSCOMPILING)
+	cmake_policy(PUSH)
+
 	set(CMAKE_POLICY_DEFAULT_CMP0071 NEW)
 	set(FLATBUFFERS_BUILD_TESTS OFF CACHE BOOL "")	
 
@@ -105,9 +130,11 @@ if (NOT USE_SYSTEM_FLATBUFFERS_LIBS OR CMAKE_CROSSCOMPILING)
 
 	IF (NOT CMAKE_CROSSCOMPILING)
 		set(FLATBUFFERS_FLATC_EXECUTABLE "$<TARGET_FILE:flatc>")
+		else()
+		message( STATUS "Using host flatc compiler: ${FLATBUFFERS_FLATC_EXECUTABLE}")
 	endif()
 
-	message( STATUS "Using host flatc compiler: ${FLATBUFFERS_FLATC_EXECUTABLE}")
+	cmake_policy(POP)
 endif()
 
 set(FLATBUFFERS_FLATC_EXECUTABLE ${FLATBUFFERS_FLATC_EXECUTABLE} PARENT_SCOPE)
@@ -132,48 +159,6 @@ function(compile_flattbuffer_schema SRC_FBS OUTPUT_DIR)
 				"${SRC_FBS}"
 		DEPENDS "${FLATBUFFERS_FLATC_EXECUTABLE}" ${SRC_FBS})
 endfunction()
-
-#=============================================================================
-# MBEDTLS
-#=============================================================================
-
-if (USE_SYSTEM_MBEDTLS_LIBS)
-	message(STATUS "${YellowColor}Try using the mbedtls system libraries instead of the embedded submodule. Absolutely no guarantee.${ColorReset}")
-	find_package(mbedtls)
-
-	if (NOT MBEDTLS_FOUND)
-		message(STATUS "${RedColor}Could NOT find system mbedtls, fallback to build embedded mbedtl version${ColorReset}")
-		#Fallback: build mbedtls static libray inside project
-		set(DEFAULT_USE_SYSTEM_MBEDTLS_LIBS OFF PARENT_SCOPE)
-		set(USE_SYSTEM_MBEDTLS_LIBS OFF)
-	else()
-		message(STATUS "Found system MBEDTLS version: ${MBEDTLS_VERSION}")
-	endif()
-endif()
-
-if (NOT USE_SYSTEM_MBEDTLS_LIBS)
-	set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared mbedtls libraries")
-	set(ENABLE_TESTING OFF CACHE BOOL "Disable mbedTLS tests")
-	set(ENABLE_PROGRAMS OFF CACHE BOOL "Disable mbedTLS programs")
-	set(MBEDTLS_FATAL_WARNINGS OFF CACHE BOOL "Disable mbedTLS crash on warnings")
-	set(USE_SHARED_MBEDTLS_LIBRARY OFF CACHE BOOL "Disable mbedTLS shared libraries")
-	set(USE_STATIC_MBEDTLS_LIBRARY ON CACHE BOOL "Enable mbedTLS static libraries")
-
-	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/mbedtls)	
-
-	set(MBEDTLS_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/external/mbedtls/include")
-	set(MBEDTLS_INCLUDE_DIR ${MBEDTLS_INCLUDE_DIR} PARENT_SCOPE)
-
-	if (MBEDTLS_INCLUDE_DIR AND EXISTS "${MBEDTLS_INCLUDE_DIR}/mbedtls/build_info.h")
-		file(STRINGS "${MBEDTLS_INCLUDE_DIR}/mbedtls/build_info.h" _MBEDTLS_VERSION_STRING REGEX "^#define MBEDTLS_VERSION_STRING[ \t\r\n]+\"[0-9]+.[0-9]+.[0-9]+\"")
-		string(REGEX REPLACE "^#define MBEDTLS_VERSION_STRING[ \t\r\n]+\"([0-9]+.[0-9]+.[0-9]+)\"" "\\1" MBEDTLS_VERSION "${_MBEDTLS_VERSION_STRING}")
-		message(STATUS "Using static mbedtls libraries version: \"${MBEDTLS_VERSION}\"")
-	elseif (MBEDTLS_INCLUDE_DIR AND EXISTS "${MBEDTLS_INCLUDE_DIR}/mbedtls/version.h")
-		file(STRINGS "${MBEDTLS_INCLUDE_DIR}/mbedtls/version.h" _MBEDTLS_VERSION_STRING REGEX "^#[\t ]*define[\t ]+MBEDTLS_VERSION_STRING[\t ]+\"[0-9]+.[0-9]+.[0-9]+\"")
-		string(REGEX REPLACE "^.*MBEDTLS_VERSION_STRING.*([0-9]+.[0-9]+.[0-9]+).*" "\\1" MBEDTLS_VERSION "${_MBEDTLS_VERSION_STRING}")
-		message(STATUS "Using static mbedtls libraries (build version \"${MBEDTLS_VERSION}\")")
-	endif ()
-endif ()
 
 #=============================================================================
 # MQTT
@@ -202,12 +187,16 @@ if ( ENABLE_MQTT )
 		string(REPLACE "find_package" "#find_package" FILE_CONTENTS "${FILE_CONTENTS}")		
 		file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/qmqtt/CMakeLists.txt" "${FILE_CONTENTS}")
 
-		if (NOT WIN32)	
+		cmake_policy(PUSH)
+
+		if (NOT USE_SHARED_LIBS)	
 			set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 			set(qmqtt_SHARED OFF)
 		endif()
 
 		add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/qmqtt)
+
+		cmake_policy(POP)
 	endif()
 endif()
 

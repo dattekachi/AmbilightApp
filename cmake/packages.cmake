@@ -230,14 +230,3 @@ cpack_add_component(AmbilightAPP
 	GROUP Runtime
 	REQUIRED
 )
-
-if (NOT APPLE AND DISABLED_REMOTE)
-	cpack_add_component(AmbilightAPP_remote
-		DISPLAY_NAME "AmbilightApp Remote"
-		DESCRIPTION "AmbilightApp remote cli tool"
-		INSTALL_TYPES Full
-		GROUP Runtime
-		DEPENDS AmbilightAPP
-	)
-endif()
-

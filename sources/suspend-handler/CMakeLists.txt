@@ -22,7 +22,7 @@ else()
 endif()
 
 add_library(suspend-handler ${SUSPEND_HANDLER_SOURCES} )
-target_link_libraries(suspend-handler PUBLIC ${PIPEWIRE_LIBRARIES} ${APPKIT_FRAMEWORK} Qt${Qt_VERSION}::Core Qt${Qt_VERSION}::Network)
+target_link_libraries(suspend-handler PUBLIC ${PIPEWIRE_LIBRARIES} ${APPKIT_FRAMEWORK} Qt${Qt_VERSION}::Core Qt${Qt_VERSION}::Network Qt${Qt_VERSION}::Widgets)
 
 if(ENABLE_POWER_MANAGEMENT AND UNIX)
 	if(NOT APPLE)

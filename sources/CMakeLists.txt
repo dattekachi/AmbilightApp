@@ -16,7 +16,7 @@ add_subdirectory(blackborder)
 add_subdirectory(commandline)
 add_subdirectory(db)
 add_subdirectory(effectengine)
-add_subdirectory(flatbufserver)
+add_subdirectory(flatbuffers)
 add_subdirectory(grabber)
 add_subdirectory(ambilightimage)
 add_subdirectory(jsonserver)
@@ -50,8 +50,5 @@ endif()
 
 # Executables
 add_subdirectory(ambilightapp)
-if (NOT APPLE AND DISABLED_REMOTE)
-	add_subdirectory(ambilightapp-remote)
-endif()
 
 
