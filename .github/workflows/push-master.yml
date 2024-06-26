@@ -28,7 +28,7 @@ jobs:
             NICE_NAME: arm64_M1_M2
           - JOB_RUNNER: macos-13
             JOB_NAME: macOS 13 (x64)
-            QT_VERSION: 6
+            QT_VERSION: 5
             NICE_NAME: x64
     steps:
       # Checkout
@@ -67,8 +67,8 @@ jobs:
             export Qt5_DIR=`brew --prefix qt@5`;
             echo "Qt5_DIR=$Qt5_DIR" >> $GITHUB_ENV
 
-      - name: Grant execute permission to script
-        run: chmod +x ./.ci/ci_build.sh
+      # - name: Grant execute permission to script
+      #   run: chmod +x ./.ci/ci_build.sh
             
         # Build process
       - name: Build packages
