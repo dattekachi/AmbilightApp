@@ -258,8 +258,7 @@ void macOsGrabber::grabFrame()
 				_actualWidth = CGImageGetWidth(display);
 				_actualHeight = CGImageGetHeight(display);
 
-				size_t bytesPerRow = CGImageGetBytesPerRow(display);
-				processSystemFrameBGRA(rawData, static_cast<int>(bytesPerRow));
+				processSystemFrameBGRA(rawData);
 
 				CFRelease(sysData);
 			}
