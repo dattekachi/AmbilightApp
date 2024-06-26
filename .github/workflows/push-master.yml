@@ -66,6 +66,9 @@ jobs:
         run: |
             export Qt5_DIR=`brew --prefix qt@5`;
             echo "Qt5_DIR=$Qt5_DIR" >> $GITHUB_ENV
+
+      - name: Grant execute permission to script
+        run: chmod +x ./.ci/ci_build.sh
             
         # Build process
       - name: Build packages
