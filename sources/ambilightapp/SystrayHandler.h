@@ -57,6 +57,7 @@ public slots:
 	void setAutorunState();
 	void selectInstance();
 	void openScreenCap();
+	void killScrCap();
 	void runMusicLed();
 	void restartApp();
 

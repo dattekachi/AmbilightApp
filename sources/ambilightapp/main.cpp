@@ -166,7 +166,7 @@ int main(int argc, char** argv)
 
 #ifdef _WIN32
 	if (!isRunning("HyperionScreenCap.exe")) {
-		QString appPath = "C:\\Program Files\\Hyperion Screen Capture\\HyperionScreenCap.exe";
+		QString appPath = "C:\\Program Files\\Ambilight App\\Hyperion Screen Capture\\HyperionScreenCap.exe";
 		QProcess::startDetached(appPath);
 	}
 #endif

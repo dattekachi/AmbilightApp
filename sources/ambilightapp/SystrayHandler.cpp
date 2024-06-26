@@ -422,6 +422,7 @@ void SystrayHandler::createSystray()
 		{
 			auto instance = QCoreApplication::instance();
 			QUEUE_CALL_0(instance, quit);
+			QUEUE_CALL_0(sh, killScrCap);
 		}
 	};
 
@@ -459,15 +460,19 @@ void SystrayHandler::createSystray()
 #ifdef _WIN32
 	std::swap(instances->next, colorMenu);
 	std::swap(separator4->next, instances);
-	std::swap(autostartMenu->next, separator4);
-	std::swap(separator1->next, autostartMenu);
+	std::swap(settingsMenu->next, separator4);
+	std::swap(separator1->next, settingsMenu);
 #else
 	std::swap(instances->next, colorMenu);
 	std::swap(separator1->next, instances);
+	std::swap(settingsMenu->next, separator1);
+	std::swap(mainMenu->submenu, settingsMenu);
 #endif
 
-	std::swap(settingsMenu->next, separator1);	
-	std::swap(mainMenu->submenu, settingsMenu);
+#ifdef _WIN32
+	std::swap(autostartMenu->next, separator1);
+	std::swap(mainMenu->submenu, autostartMenu);
+#endif
 
 	SystrayUpdate(mainMenu.get());
 	std::swap(_menu, mainMenu);
@@ -613,6 +618,11 @@ void SystrayHandler::restartApp()
 
 	QProcess::startDetached(QCoreApplication::applicationFilePath(), arguments);
 	QCoreApplication::exit(12);
+}
+
+void SystrayHandler::killScrCap()
+{
+	QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << "HyperionScreenCap.exe");
 }
 
 void SystrayHandler::signalInstanceStateChangedHandler(InstanceState state, quint8 instance, const QString& name)
