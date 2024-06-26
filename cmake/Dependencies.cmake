@@ -157,7 +157,7 @@ macro(DeployApple TARGET)
 				endforeach()
 
 			include(BundleUtilities)							
-			fixup_bundle("${CMAKE_INSTALL_PREFIX}/ambilightapp.app" "" "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib")
+			fixup_bundle("${CMAKE_INSTALL_PREFIX}/ambilightapp.app" "${MYQT_PLUGINS}" "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib")
 				
 			file(REMOVE_RECURSE "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib")			
 			file(REMOVE_RECURSE "${CMAKE_INSTALL_PREFIX}/share")

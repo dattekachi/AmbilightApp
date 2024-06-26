@@ -5,7 +5,7 @@
 		<key>CFBundleIdentifier</key>
 		<string>com.thesetupstore.ambilightapp</string>
 		<key>CFBundleName</key>
-		<string>AmbilightApp</string>
+		<string>AmbilightAPP</string>
 		<key>CFBundleExecutable</key>
 		<string>ambilightapp</string>
 		<key>CFBundleIconFile</key>
