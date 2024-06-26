@@ -6,9 +6,9 @@
 	path = external/flatbuffers
 	url = https://github.com/google/flatbuffers
 	branch = master
-# [submodule "external/mbedtls"]
-# 	path = external/mbedtls
-# 	url = https://github.com/ARMmbed/mbedtls
+[submodule "external/mbedtls"]
+	path = external/mbedtls
+	url = https://github.com/ARMmbed/mbedtls
 [submodule "external/qmqtt"]
 	path = external/qmqtt
 	url = https://github.com/emqx/qmqtt.git
