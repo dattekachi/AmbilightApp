@@ -422,7 +422,9 @@ void SystrayHandler::createSystray()
 		{
 			auto instance = QCoreApplication::instance();
 			QUEUE_CALL_0(instance, quit);
+		#ifdef _WIN32
 			QUEUE_CALL_0(sh, killScrCap);
+		#endif
 		}
 	};
 
@@ -599,7 +601,7 @@ void SystrayHandler::runMusicLed()
 void SystrayHandler::openScreenCap()
 {
 	#ifdef _WIN32
-		QString szHyperionScreenCapPath = "C:\\Program Files\\Hyperion Screen Capture\\HyperionScreenCap.exe";
+		QString szHyperionScreenCapPath = "C:\\Program Files\\Ambilight App\\Hyperion Screen Capture\\HyperionScreenCap.exe";
 		QString szAppName = "HyperionScreenCap.exe";
 
 		if (QProcess::startDetached(szHyperionScreenCapPath)) {
@@ -620,10 +622,12 @@ void SystrayHandler::restartApp()
 	QCoreApplication::exit(12);
 }
 
+#ifdef _WIN32
 void SystrayHandler::killScrCap()
 {
 	QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << "HyperionScreenCap.exe");
 }
+#endif
 
 void SystrayHandler::signalInstanceStateChangedHandler(InstanceState state, quint8 instance, const QString& name)
 {
