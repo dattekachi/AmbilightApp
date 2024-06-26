@@ -422,9 +422,9 @@ void SystrayHandler::createSystray()
 		{
 			auto instance = QCoreApplication::instance();
 			QUEUE_CALL_0(instance, quit);
-			#ifdef _WIN32
-				QUEUE_CALL_0(sh, killScrCap);
-			#endif
+		#ifdef _WIN32
+			QUEUE_CALL_0(sh, killScrCap);
+		#endif
 		}
 	};
 
@@ -622,12 +622,12 @@ void SystrayHandler::restartApp()
 	QCoreApplication::exit(12);
 }
 
+#ifdef _WIN32
 void SystrayHandler::killScrCap()
 {
-	#ifdef _WIN32
-		QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << "HyperionScreenCap.exe");
-	#endif
+	QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << "HyperionScreenCap.exe");
 }
+#endif
 
 void SystrayHandler::signalInstanceStateChangedHandler(InstanceState state, quint8 instance, const QString& name)
 {
