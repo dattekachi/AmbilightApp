@@ -46,7 +46,6 @@ SET ( DEFAULT_PRECOMPILED_HEADERS         ON  )
 SET ( DEFAULT_XZ                          ON  )
 SET ( DEFAULT_POWER_MANAGEMENT            ON  )
 SET ( DEFAULT_SYSTRAY                     ON  )
-SET ( DEFAULT_SHARED_LIBS                 ON  )
 
 # Configure CCache if available
 find_program(CCACHE_FOUND ccache)
@@ -63,7 +62,7 @@ else()
 endif(CCACHE_FOUND)
 
 # find QT libs
-find_package(Qt6 COMPONENTS Core Network SerialPort Widgets QUIET)
+find_package(Qt6 COMPONENTS Core Network SerialPort QUIET)
 
 if (Qt6Core_FOUND AND NOT (DO_NOT_USE_QT_VERSION_6_LIBS STREQUAL "ON"))	
 	message( STATUS "Found Qt Version: ${Qt6Core_VERSION}" )
@@ -75,7 +74,7 @@ ELSE()
 		message( STATUS "QT version 6 not found. Searching for QT version 5 instead." )
 	endif()
 	SET(QT_MIN_VERSION "5.10.0")
-	find_package(Qt5 COMPONENTS Core Network SerialPort Widgets REQUIRED)
+	find_package(Qt5 COMPONENTS Core Network SerialPort REQUIRED)
 	message( STATUS "Found Qt Version: ${Qt5Core_VERSION}" )
 	IF ( "${Qt5Core_VERSION}" VERSION_LESS "${QT_MIN_VERSION}" )
 		message( FATAL_ERROR "Your Qt version is to old! Minimum required ${QT_MIN_VERSION}" )
@@ -278,7 +277,7 @@ endif()
 # Find OpenSSL
 find_package(OpenSSL)
 if (NOT OPENSSL_FOUND)
-	message( WARNING "OpenSSL could not be found. AmbilightApp HTTPS instance and Philips Hue support will be disabled." )
+	message( WARNING "OpenSSL could not be found. AmbilightAPP HTTPS instance and Philips Hue support will be disabled." )
 endif()
 
 # Pipewire support
@@ -337,10 +336,6 @@ if (WIN32)
 	else()
 		message( FATAL_ERROR  "Please install 7-zip")
 	endif (SEVENZIP_BIN)
-endif()
-
-if (CMAKE_CROSSCOMPILING)
-	SET ( DEFAULT_SHARED_LIBS                 OFF )
 endif()
 
 # set the build options
@@ -437,13 +432,13 @@ colorMe("ENABLE_PROTOBUF = " ${ENABLE_PROTOBUF})
 option(ENABLE_SYSTRAY "Enable SYSTRAY" ${DEFAULT_SYSTRAY})
 colorMe("ENABLE_SYSTRAY = " ${ENABLE_SYSTRAY})
 
+option(USE_STATIC_QT_PLUGINS "Enable static QT plugins" ${DEFAULT_STATIC_QT_PLUGINS})
+colorMe("USE_STATIC_QT_PLUGINS = " ${USE_STATIC_QT_PLUGINS})
+
 option(ENABLE_XZ "Enable XZ support" ${DEFAULT_XZ})
 colorMe("ENABLE_XZ = " ${ENABLE_XZ})
 
 message( STATUS "\n${CyanColor}BUILD FEATURES${ColorReset}")
-
-option(USE_SHARED_LIBS "Prefer shared libraries over static ones" ${DEFAULT_SHARED_LIBS})
-colorMe("USE_SHARED_LIBS = " ${USE_SHARED_LIBS})
 
 option(USE_PRECOMPILED_HEADERS "Enable precompiled headers (PCH)" ${DEFAULT_PRECOMPILED_HEADERS})
 colorMe("USE_PRECOMPILED_HEADERS = " ${USE_PRECOMPILED_HEADERS})
@@ -453,9 +448,6 @@ colorMe("USE_SYSTEM_MQTT_LIBS = " ${USE_SYSTEM_MQTT_LIBS})
 
 option(USE_SYSTEM_FLATBUFFERS_LIBS "Use system flatbuffers libs" ${DEFAULT_USE_SYSTEM_FLATBUFFERS_LIBS})
 colorMe("USE_SYSTEM_FLATBUFFERS_LIBS = " ${USE_SYSTEM_FLATBUFFERS_LIBS})
-
-option(USE_STATIC_QT_PLUGINS "Enable static QT plugins" ${DEFAULT_STATIC_QT_PLUGINS})
-colorMe("USE_STATIC_QT_PLUGINS = " ${USE_STATIC_QT_PLUGINS})
 
 if(UNIX AND NOT APPLE)
 	option(USE_STANDARD_INSTALLER_NAME "Use the standardized Linux installer name" OFF)
@@ -653,6 +645,5 @@ else()
 endif()
 
 if (NOT ENABLE_BONJOUR)	
-	message( FATAL_ERROR "The network discovery service (ENABLE_BONJOUR) is an important feature of AmbilightApp. If you know what you are doing, remove this safe-break.")
+	message( FATAL_ERROR "The network discovery service (ENABLE_BONJOUR) is an important feature of AmbilightAPP. If you know what you are doing, remove this safe-break.")
 endif()
-
