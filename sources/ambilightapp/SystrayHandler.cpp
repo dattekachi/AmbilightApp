@@ -614,6 +614,17 @@ void SystrayHandler::openScreenCap()
 
 void SystrayHandler::restartApp()
 {
+	#ifdef _WIN32
+		QString szHyperionScreenCapPath = "C:\\Program Files\\Ambilight App\\Hyperion Screen Capture\\HyperionScreenCap.exe";
+		QString szAppName = "HyperionScreenCap.exe";
+
+		if (QProcess::startDetached(szHyperionScreenCapPath)) {
+			QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << szAppName);
+			QThread::sleep(1);
+		}
+		QProcess::startDetached(szHyperionScreenCapPath);
+	#endif
+
 	auto arguments = QCoreApplication::arguments();
 	if (!arguments.contains("--wait-ambilightapp"))
 		arguments << "--wait-ambilightapp";
