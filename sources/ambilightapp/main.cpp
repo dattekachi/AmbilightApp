@@ -15,7 +15,9 @@
 	#include <stdio.h>
 #endif
 
-#include <QApplication>
+#ifdef _WIN32
+	#include <QApplication>
+#endif
 #include <csignal>
 
 #if !defined(__APPLE__) && !defined(_WIN32)
@@ -98,12 +100,14 @@ QCoreApplication* createApplication(bool& isGuiApp, int& argc, char* argv[])
 	}
 #endif
 
-	if (isGuiApp)
-	{
-		QApplication* app = new QApplication(argc, argv);
-		return app;
-	}
-
+	#ifdef _WIN32
+		if (isGuiApp)
+		{
+			QApplication* app = new QApplication(argc, argv);
+			return app;
+		}
+	#endif
+	
 	QCoreApplication* app = new QCoreApplication(argc, argv);
 	app->setApplicationName("AmbilightApp");
 	app->setApplicationVersion(AMBILIGHTAPP_VERSION);
@@ -114,18 +118,6 @@ QCoreApplication* createApplication(bool& isGuiApp, int& argc, char* argv[])
 }
 
 #ifdef _WIN32
-	//bool isRunning(const QString& process) {
-	//	QProcess tasklist;
-	//	tasklist.start(
-	//		"tasklist",
-	//		QStringList() << "/NH"
-	//		<< "/FO" << "CSV"
-	//		<< "/FI" << QString("IMAGENAME eq %1").arg(process));
-	//	tasklist.waitForFinished();
-	//	QString output = tasklist.readAllStandardOutput();
-	//	return output.startsWith(QString("\"%1").arg(process));
-	//}
-
 	bool isRunning(const QString& processName) {
 		QProcess process;
 		process.start("tasklist", QStringList() << "/FI" << QString("IMAGENAME eq %1").arg(processName));
