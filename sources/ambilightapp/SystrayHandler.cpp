@@ -331,15 +331,6 @@ void SystrayHandler::createSystray()
 		return a.name > b.name;
 	});
 
-	//std::copy_if(efxs.begin(), efxs.end(),
-	//	std::back_inserter(efxsSorted),
-	//	[](const EffectDefinition& a) { return a.name.contains("Music:"); });
-
-	//std::copy_if(efxs.begin(), efxs.end(),
-	//	std::back_inserter(efxsSorted),
-	//	[](const EffectDefinition& a) { return !a.name.contains("Music:"); });
-
-
 	for (const EffectDefinition& efx : efxs)
 	{
 		QString effectName = efx.name;

@@ -73,7 +73,6 @@ AmbilightAppDaemon* ambilightappd = nullptr;
 QCoreApplication* createApplication(bool& isGuiApp, int& argc, char* argv[])
 {
 	bool forceNoGui = false;
-
 	// command line
 	for (int i = 1; i < argc; ++i)
 	{
@@ -100,13 +99,13 @@ QCoreApplication* createApplication(bool& isGuiApp, int& argc, char* argv[])
 	}
 #endif
 
-	#ifdef _WIN32
-		if (isGuiApp)
-		{
-			QApplication* app = new QApplication(argc, argv);
-			return app;
-		}
-	#endif
+#ifdef _WIN32
+	if (isGuiApp)
+	{
+		QApplication* app = new QApplication(argc, argv);
+		return app;
+	}
+#endif
 	
 	QCoreApplication* app = new QCoreApplication(argc, argv);
 	app->setApplicationName("AmbilightApp");
@@ -118,7 +117,8 @@ QCoreApplication* createApplication(bool& isGuiApp, int& argc, char* argv[])
 }
 
 #ifdef _WIN32
-	bool isRunning(const QString& processName) {
+	bool isRunning(const QString& processName)
+	{
 		QProcess process;
 		process.start("tasklist", QStringList() << "/FI" << QString("IMAGENAME eq %1").arg(processName));
 		process.waitForFinished();
@@ -130,15 +130,15 @@ QCoreApplication* createApplication(bool& isGuiApp, int& argc, char* argv[])
 int main(int argc, char** argv)
 {
 
-	#ifdef _WIN32
-		if (isRunning("MusicLedStudio.exe"))
-		{
-			QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << "MusicLedStudio.exe");
-		}
-	#else
-		const char* command = "killall MusicLedStudio";
-		system(command);
-	#endif
+#ifdef _WIN32
+	if (isRunning("MusicLedStudio.exe"))
+	{
+		QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << "MusicLedStudio.exe");
+	}
+#else
+	const char* command = "killall MusicLedStudio";
+	system(command);
+#endif
 
 	QStringList params;
 
@@ -157,7 +157,8 @@ int main(int argc, char** argv)
 	DefaultSignalHandler::install();
 
 #ifdef _WIN32
-	if (!isRunning("HyperionScreenCap.exe")) {
+	if (!isRunning("HyperionScreenCap.exe"))
+	{
 		QString appPath = "C:\\Program Files\\Ambilight App\\Hyperion Screen Capture\\HyperionScreenCap.exe";
 		QProcess::startDetached(appPath);
 	}

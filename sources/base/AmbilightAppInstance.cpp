@@ -414,9 +414,9 @@ QJsonObject AmbilightAppInstance::getAverageColor()
 	return ret;
 }
 
-unsigned AmbilightAppInstance::updateSmoothingConfig(unsigned id, int settlingTime_ms, double ledUpdateFrequency_hz, bool directMode)
+unsigned AmbilightAppInstance::addEffectConfig(unsigned id, int settlingTime_ms, double ledUpdateFrequency_hz, bool pause)
 {
-	return _smoothing->UpdateConfig(id, settlingTime_ms, ledUpdateFrequency_hz, directMode);
+	return _smoothing->AddEffectConfig(id, settlingTime_ms, ledUpdateFrequency_hz, pause);
 }
 
 int AmbilightAppInstance::getLedCount() const
