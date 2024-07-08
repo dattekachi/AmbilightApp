@@ -49,8 +49,7 @@ public:
 	bool isInitialized();
 
 public slots:
-	// void setColor(ColorRgb color);
-	void setColor(const QColor& color);
+	void setColor(ColorRgb color);
 	void showColorDialog();
 	void settings();
 	void setEffect(QString effect);

@@ -394,8 +394,10 @@ int main(int argc, char** argv)
 				timer->start();
 			#endif
 
+		#ifdef _WIN32
 			QApplication::setQuitOnLastWindowClosed(false);
 			QObject::connect(qApp, &QGuiApplication::aboutToQuit, systray, &SystrayHandler::deleteLater);
+		#endif
 			rc = app->exec();
 
 			systray->close();
