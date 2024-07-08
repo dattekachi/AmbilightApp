@@ -36,6 +36,7 @@
 #include <base/AmbilightAppManager.h>
 #include <systray/Systray.h>
 class AmbilightAppDaemon;
+class QColorDialog;
 
 
 class SystrayHandler : public QObject
@@ -48,7 +49,9 @@ public:
 	bool isInitialized();
 
 public slots:
-	void setColor(ColorRgb color);
+	// void setColor(ColorRgb color);
+	void setColor(const QColor& color);
+	void showColorDialog();
 	void settings();
 	void setEffect(QString effect);
 	void clearEfxColor();	
@@ -77,5 +80,6 @@ private:
 	quint16							_webPort;
 	QString							_rootFolder;
 	int								_selectedInstance;
+	std::unique_ptr<QColorDialog>	_colorDlg;
 };
 

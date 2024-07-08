@@ -26,6 +26,7 @@
 */
 
 #ifndef PCH_ENABLED
+	#include <QColor>
 	#include <QSettings>
 	#include <list>
 #endif
@@ -48,6 +49,7 @@
 #include <QDir>
 #include <QStringList>
 #include <qprocess.h>
+#include <QColorDialog>
 
 #include <AmbilightappConfig.h>
 
@@ -79,6 +81,7 @@ SystrayHandler::SystrayHandler(AmbilightAppDaemon* ambilightappDaemon, quint16 w
 	: QObject(),
 	_menu(nullptr),
 	_haveSystray(false),
+	_colorDlg(nullptr),
 	_webPort(webPort),
 	_rootFolder(rootFolder),
 	_selectedInstance(-1)
@@ -287,35 +290,46 @@ void SystrayHandler::createSystray()
 	}
 	
 	// color menu
+	// std::unique_ptr<SystrayMenu> colorMenu = std::unique_ptr<SystrayMenu>(new SystrayMenu);
+	// loadSvg(colorMenu, ":/color.svg", _rootFolder);
+	// colorMenu->label = "&Chọn màu";
+	// colorMenu->context = this;
+
+	// std::list<std::string> colors{ "white", "red", "green", "blue", "yellow", "magenta", "cyan" };
+	// colors.reverse();
+	// for (const std::string& color : colors)
+	// {
+	// 	QString svgTemplate = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"32\" height=\"32\" version=\"1.1\" viewBox=\"0 0 32 32\">"
+	// 		"<rect width=\"26\" height=\"26\" x=\"3\" y=\"3\" fill=\"%1\" stroke-width=\"2\" stroke=\"gray\" />"
+	// 		"</svg>";
+	// 	QString svg = QString(svgTemplate).arg(QString::fromStdString(color));
+		
+	// 	std::unique_ptr<SystrayMenu> colorItem = std::unique_ptr<SystrayMenu>(new SystrayMenu);
+	// 	loadSvg(colorItem, svg, _rootFolder, QString("%1.png").arg(QString::fromStdString(color)));
+	// 	colorItem->label = color;		
+	// 	colorItem->context = this;
+	// 	colorItem->callback = [](SystrayMenu* m) {
+	// 		SystrayHandler* sh = qobject_cast<SystrayHandler*>(m->context);
+	// 		QString colorName = QString::fromStdString(m->label);
+	// 		ColorRgb color = AmbilightImage::ColorRgbfromString(colorName);
+	// 		if (sh != nullptr)
+	// 			QUEUE_CALL_1(sh, setColor, ColorRgb, color);
+	// 	};
+
+	// 	std::swap(colorMenu->submenu, colorItem->next);
+	// 	std::swap(colorMenu->submenu, colorItem);
+	// }
+
 	std::unique_ptr<SystrayMenu> colorMenu = std::unique_ptr<SystrayMenu>(new SystrayMenu);
 	loadSvg(colorMenu, ":/color.svg", _rootFolder);
 	colorMenu->label = "&Chọn màu";
 	colorMenu->context = this;
-
-	std::list<std::string> colors{ "white", "red", "green", "blue", "yellow", "magenta", "cyan" };
-	colors.reverse();
-	for (const std::string& color : colors)
-	{
-		QString svgTemplate = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"32\" height=\"32\" version=\"1.1\" viewBox=\"0 0 32 32\">"
-			"<rect width=\"26\" height=\"26\" x=\"3\" y=\"3\" fill=\"%1\" stroke-width=\"2\" stroke=\"gray\" />"
-			"</svg>";
-		QString svg = QString(svgTemplate).arg(QString::fromStdString(color));
-		
-		std::unique_ptr<SystrayMenu> colorItem = std::unique_ptr<SystrayMenu>(new SystrayMenu);
-		loadSvg(colorItem, svg, _rootFolder, QString("%1.png").arg(QString::fromStdString(color)));
-		colorItem->label = color;		
-		colorItem->context = this;
-		colorItem->callback = [](SystrayMenu* m) {
-			SystrayHandler* sh = qobject_cast<SystrayHandler*>(m->context);
-			QString colorName = QString::fromStdString(m->label);
-			ColorRgb color = AmbilightImage::ColorRgbfromString(colorName);
-			if (sh != nullptr)
-				QUEUE_CALL_1(sh, setColor, ColorRgb, color);
-		};
-
-		std::swap(colorMenu->submenu, colorItem->next);
-		std::swap(colorMenu->submenu, colorItem);
-	}
+	colorMenu->callback = [](SystrayMenu* m) {
+		SystrayHandler* sh = qobject_cast<SystrayHandler*>(m->context);
+		if (sh != nullptr) {
+			QUEUE_CALL_0(sh, showColorDialog);
+		}
+	};
 
 	// effects
 	std::list<EffectDefinition> efxs;
@@ -496,13 +510,43 @@ void SystrayHandler::selectInstance()
 	createSystray();
 }
 
-void SystrayHandler::setColor(ColorRgb color)
+// void SystrayHandler::setColor(ColorRgb color)
+// {
+// 	std::shared_ptr<AmbilightAppManager> instanceManager = _instanceManager.lock();
+// 	if (instanceManager)
+// 		QUEUE_CALL_4(instanceManager.get(), setInstanceColor, int, _selectedInstance, int, 1, ColorRgb, color, int, 0);
+// }
+
+void SystrayHandler::setColor(const QColor& color)
 {
+	ColorRgb colorRgb(color.red(), color.green(), color.blue());
 	std::shared_ptr<AmbilightAppManager> instanceManager = _instanceManager.lock();
 	if (instanceManager)
-		QUEUE_CALL_4(instanceManager.get(), setInstanceColor, int, _selectedInstance, int, 1, ColorRgb, color, int, 0);
+		QUEUE_CALL_4(instanceManager.get(), setInstanceColor, int, _selectedInstance, int, 1, ColorRgb, colorRgb, int, 0);
 }
 
+void SystrayHandler::showColorDialog()
+{
+	if (_colorDlg == nullptr)
+	{
+		_colorDlg = std::make_unique<QColorDialog>();
+		_colorDlg->setOptions(QColorDialog::NoButtons);
+		_colorDlg->setWindowTitle("Chọn màu");
+		connect(_colorDlg.get(), &QColorDialog::currentColorChanged, this, &SystrayHandler::setColor);
+	}
+
+	//_colorDlg->setVisible(!_colorDlg->isVisible());
+	if (_colorDlg->isVisible())
+	{
+		_colorDlg->hide();
+	}
+	else
+	{
+		_colorDlg->show();
+		_colorDlg->raise();
+		_colorDlg->activateWindow();
+	}
+}
 
 void SystrayHandler::settings()
 {
