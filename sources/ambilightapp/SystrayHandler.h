@@ -36,7 +36,9 @@
 #include <base/AmbilightAppManager.h>
 #include <systray/Systray.h>
 class AmbilightAppDaemon;
-class QColorDialog;
+#ifdef _WIN32
+	class QColorDialog;
+#endif
 
 
 class SystrayHandler : public QObject
@@ -79,6 +81,8 @@ private:
 	quint16							_webPort;
 	QString							_rootFolder;
 	int								_selectedInstance;
-	std::unique_ptr<QColorDialog>	_colorDlg;
+	#ifdef _WIN32
+		std::unique_ptr<QColorDialog>	_colorDlg;
+	#endif
 };
 

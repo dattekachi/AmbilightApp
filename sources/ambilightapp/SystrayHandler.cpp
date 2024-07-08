@@ -83,7 +83,9 @@ SystrayHandler::SystrayHandler(AmbilightAppDaemon* ambilightappDaemon, quint16 w
 	: QObject(),
 	_menu(nullptr),
 	_haveSystray(false),
+#ifdef _WIN32
 	_colorDlg(nullptr),
+#endif
 	_webPort(webPort),
 	_rootFolder(rootFolder),
 	_selectedInstance(-1)
