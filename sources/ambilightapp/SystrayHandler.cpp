@@ -241,7 +241,7 @@ void SystrayHandler::createSystray()
 
 	// instances
 	std::unique_ptr<SystrayMenu> instances = std::unique_ptr<SystrayMenu>(new SystrayMenu);
-	instances->label = "Chọn LED";
+	instances->label = "Chọn Led điều khiển";
 	loadSvg(instances, ":/instance.svg", _rootFolder);
 
 	std::shared_ptr<AmbilightAppManager> instanceManager = _instanceManager.lock();
@@ -279,7 +279,7 @@ void SystrayHandler::createSystray()
 		std::swap(instances->submenu, separatorInstance);
 
 		std::unique_ptr<SystrayMenu> instancesAll = std::unique_ptr<SystrayMenu>(new SystrayMenu);
-		instancesAll->label = "Tất cả";
+		instancesAll->label = "Tất cả Led";
 		instancesAll->isChecked = (_selectedInstance == -1);
 		instancesAll->context = this;
 		instancesAll->callback = [](SystrayMenu* m) {
@@ -297,7 +297,7 @@ void SystrayHandler::createSystray()
 #ifdef _WIN32
 	std::unique_ptr<SystrayMenu> colorMenu = std::unique_ptr<SystrayMenu>(new SystrayMenu);
 	loadSvg(colorMenu, ":/color.svg", _rootFolder);
-	colorMenu->label = "&Chọn màu";
+	colorMenu->label = "&Chọn màu sắc";
 	colorMenu->context = this;
 	colorMenu->callback = [](SystrayMenu* m) {
 		SystrayHandler* sh = qobject_cast<SystrayHandler*>(m->context);
@@ -308,7 +308,7 @@ void SystrayHandler::createSystray()
 #else
 	std::unique_ptr<SystrayMenu> colorMenu = std::unique_ptr<SystrayMenu>(new SystrayMenu);
 	loadSvg(colorMenu, ":/color.svg", _rootFolder);
-	colorMenu->label = "&Chọn màu";
+	colorMenu->label = "&Chọn màu sắc";
 	colorMenu->context = this;
 
 	std::list<std::string> colors{ "white", "red", "green", "blue", "yellow", "magenta", "cyan" };
@@ -624,8 +624,7 @@ void SystrayHandler::clearEfxColor()
 void SystrayHandler::runMusicLed()
 {
 #ifdef _WIN32
-	QString szMusicLedStudioPath = "C:\\Program Files\\Ambilight App\\MusicLedStudio\\MusicLedStudio.exe";
-	QProcess::startDetached(szMusicLedStudioPath);
+	QProcess::startDetached("C:\\Program Files\\Ambilight App\\MusicLedStudio\\MusicLedStudio.exe");
 #else
 	QProcess process;
 	process.start("open", QStringList() << "/Applications/MusicLedStudio.app");
@@ -635,29 +634,15 @@ void SystrayHandler::runMusicLed()
 
 void SystrayHandler::openScreenCap()
 {
-	#ifdef _WIN32
-		QString szHyperionScreenCapPath = "C:\\Program Files\\Ambilight App\\Hyperion Screen Capture\\HyperionScreenCap.exe";
-		QString szAppName = "HyperionScreenCap.exe";
-
-		if (QProcess::startDetached(szHyperionScreenCapPath)) {
-			QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << szAppName);
-			QThread::sleep(1);
-		}
-		QProcess::startDetached(szHyperionScreenCapPath, QStringList() << "-show");
-	#endif
+	QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << "HyperionScreenCap.exe");
+	QProcess::startDetached("C:\\Program Files\\Ambilight App\\Hyperion Screen Capture\\HyperionScreenCap.exe", QStringList() << "-show");
 }
 
 void SystrayHandler::restartApp()
 {
 	#ifdef _WIN32
-		QString szHyperionScreenCapPath = "C:\\Program Files\\Ambilight App\\Hyperion Screen Capture\\HyperionScreenCap.exe";
-		QString szAppName = "HyperionScreenCap.exe";
-
-		if (QProcess::startDetached(szHyperionScreenCapPath)) {
-			QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << szAppName);
-			QThread::sleep(1);
-		}
-		QProcess::startDetached(szHyperionScreenCapPath);
+		QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << "HyperionScreenCap.exe");
+		QProcess::startDetached("C:\\Program Files\\Ambilight App\\Hyperion Screen Capture\\HyperionScreenCap.exe");
 	#endif
 
 	auto arguments = QCoreApplication::arguments();

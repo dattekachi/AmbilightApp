@@ -130,16 +130,6 @@ QCoreApplication* createApplication(bool& isGuiApp, int& argc, char* argv[])
 int main(int argc, char** argv)
 {
 
-#ifdef _WIN32
-	if (isRunning("MusicLedStudio.exe"))
-	{
-		QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << "MusicLedStudio.exe");
-	}
-#else
-	const char* command = "killall MusicLedStudio";
-	system(command);
-#endif
-
 	QStringList params;
 
 	// check if we are running already an instance
@@ -157,11 +147,16 @@ int main(int argc, char** argv)
 	DefaultSignalHandler::install();
 
 #ifdef _WIN32
+	QProcess::execute("taskkill", QStringList() << "/F" << "/IM" << "MusicLedStudio.exe");
+
 	if (!isRunning("HyperionScreenCap.exe"))
 	{
-		QString appPath = "C:\\Program Files\\Ambilight App\\Hyperion Screen Capture\\HyperionScreenCap.exe";
-		QProcess::startDetached(appPath);
+		QString szHyperionScreenCapPath = "C:\\Program Files\\Ambilight App\\Hyperion Screen Capture\\HyperionScreenCap.exe";
+		QProcess::startDetached(szHyperionScreenCapPath);
 	}
+#else
+	const char* command = "killall MusicLedStudio";
+	system(command);
 #endif
 
 	// force the locale
