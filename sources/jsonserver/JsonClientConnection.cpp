@@ -15,12 +15,12 @@ JsonClientConnection::JsonClientConnection(QTcpSocket* socket, bool localConnect
 	connect(_socket, &QTcpSocket::disconnected, this, &JsonClientConnection::disconnected);
 	connect(_socket, &QTcpSocket::readyRead, this, &JsonClientConnection::readRequest);
 	// create a new instance of JsonAPI
-	_hmbilightAPI = new AmbilightAPI(socket->peerAddress().toString(), _log, localConnection, this);
+	_ambilightAPI = new AmbilightAPI(socket->peerAddress().toString(), _log, localConnection, this);
 	// get the callback messages from JsonAPI and send it to the client
-	connect(_hmbilightAPI, &AmbilightAPI::SignalCallbackJsonMessage, this, &JsonClientConnection::sendMessage);
-	connect(_hmbilightAPI, &AmbilightAPI::SignalPerformClientDisconnection, this, [&]() { _socket->close(); });
+	connect(_ambilightAPI, &AmbilightAPI::SignalCallbackJsonMessage, this, &JsonClientConnection::sendMessage);
+	connect(_ambilightAPI, &AmbilightAPI::SignalPerformClientDisconnection, this, [&]() { _socket->close(); });
 
-	_hmbilightAPI->initialize();
+	_ambilightAPI->initialize();
 }
 
 void JsonClientConnection::readRequest()
@@ -37,7 +37,7 @@ void JsonClientConnection::readRequest()
 		_receiveBuffer = _receiveBuffer.mid(bytes);
 
 		// handle message
-		_hmbilightAPI->handleMessage(message);
+		_ambilightAPI->handleMessage(message);
 
 		// try too look up '\n' again
 		bytes = _receiveBuffer.indexOf('\n') + 1;

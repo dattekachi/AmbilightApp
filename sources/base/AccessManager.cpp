@@ -9,10 +9,10 @@
 
 using namespace ambilightapp;
 
-AccessManager::AccessManager(QObject* parent)
+AccessManager::AccessManager(QObject* parent, bool readonlyMode)
 	: QObject(parent)
-	, _authTable(new AuthTable())
-	, _metaTable(new MetaTable())
+	, _authTable(new AuthTable(readonlyMode))
+	, _metaTable(new MetaTable(readonlyMode))
 	, _pendingRequests()
 	, _authRequired(true)
 	, _timer(new QTimer(this))

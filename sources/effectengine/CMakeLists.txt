@@ -10,8 +10,8 @@ add_library(effectengine
 
 target_link_libraries(effectengine
 	ambilightapp-base
-	ambilightimage
 	Qt${Qt_VERSION}::Core
+	Qt${Qt_VERSION}::Gui
 )
 
 if(USE_PRECOMPILED_HEADERS AND COMMAND target_precompile_headers)

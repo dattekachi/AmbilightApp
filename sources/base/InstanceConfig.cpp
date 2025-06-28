@@ -13,7 +13,7 @@ QJsonObject	InstanceConfig::_schemaJson;
 QMutex		InstanceConfig::_lockerSettingsManager;
 std::atomic<bool> InstanceConfig::_backupMade(false);
 
-InstanceConfig::InstanceConfig(bool master, quint8 instanceIndex, QObject* parent)
+InstanceConfig::InstanceConfig(bool master, quint8 instanceIndex, QObject* parent, bool readonlyMode)
 	: QObject(parent)
 	, _log(Logger::getInstance(QString("INSTANCE_CFG%1").arg((master) ? QString() : QString::number(instanceIndex))))
 {
@@ -22,6 +22,9 @@ InstanceConfig::InstanceConfig(bool master, quint8 instanceIndex, QObject* paren
 	Info(_log, "Loading instance configuration");
 
 	_sTable = std::unique_ptr<SettingsTable>(new SettingsTable(instanceIndex));
+	_readonlyMode = readonlyMode;
+
+	_sTable->setReadonlyMode(_readonlyMode);
 
 	// get schema
 	if (_schemaJson.isEmpty())
@@ -119,7 +122,7 @@ InstanceConfig::InstanceConfig(bool master, quint8 instanceIndex, QObject* paren
 	if (!valid.first || upgradeNeeded)
 	{
 		Info(_log, "Table upgrade required...");
-		if (!_backupMade.exchange(true))
+		if (!_backupMade.exchange(true) && !_readonlyMode)
 		{
 			_backupMade = true;
 			Info(_log, "Creating DB backup first.");
@@ -208,11 +211,6 @@ QJsonObject InstanceConfig::getSettings() const
 			dbConfig[key] = doc.object();
 	}
 	return dbConfig;
-}
-
-bool InstanceConfig::isReadOnlyMode()
-{
-	return _sTable->isReadOnlyMode();
 }
 
 bool InstanceConfig::saveSettings(QJsonObject config, bool correct)

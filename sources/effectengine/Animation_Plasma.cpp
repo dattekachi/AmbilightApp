@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -60,22 +60,23 @@ double  mapto(double x, double  in_min, double  in_max, double out_min, double o
 }
 
 void Animation_Plasma::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 
-	hyperImage.resize(PLASMA_WIDTH, PLASMA_HEIGHT);
+	ambilightImage = ambilightImage.scaled(PLASMA_WIDTH, PLASMA_HEIGHT);
 
 	SetSleepTime(int(round(0.1 * 1000.0)));
 
 	for (int h = 0; h < PAL_LEN; h++)
 	{
-		ColorRgb c;
-		c.fromHsv(h, 255, 255);
-		pal[h * 3] = c.red;
-		pal[h * 3 + 1] = c.green;
-		pal[h * 3 + 2] = c.blue;
+		uint8_t red, green, blue;
+		red = green = blue = 0;
+		ColorSys::hsv2rgb(h, 255, 255, red, green, blue);
+		pal[h * 3] = red;
+		pal[h * 3 + 1] = green;
+		pal[h * 3 + 2] = blue;
 	}
 
 
@@ -94,7 +95,7 @@ void Animation_Plasma::Init(
 
 
 
-bool Animation_Plasma::Play(AmbilightImage& painter)
+bool Animation_Plasma::Play(QPainter* painter)
 {
 	bool ret = true;
 
@@ -104,8 +105,8 @@ bool Animation_Plasma::Play(AmbilightImage& painter)
 			int delta = y * PLASMA_WIDTH;
 			int palIndex = int((plasma[delta + x] + mod) % PAL_LEN) * 3;
 
-			painter.setPen(ColorRgb(pal[palIndex], pal[palIndex + 1], pal[palIndex + 2]));
-			painter.drawPoint(x, y);
+			painter->setPen(qRgb(pal[palIndex], pal[palIndex + 1], pal[palIndex + 2]));
+			painter->drawPoint(x, y);
 		}
 	return ret;
 }

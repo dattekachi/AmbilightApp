@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -70,7 +70,7 @@ Animation_Swirl::Animation_Swirl(QString name) :
 	custom_colors2.append({ 0, 255, 255, 0 });
 };
 
-Point2d Animation_Swirl::getPoint(const AmbilightImage& hyperImage, bool random, double x, double y) {
+Point2d Animation_Swirl::getPoint(const QImage& ambilightImage, bool random, double x, double y) {
 	Point2d p;
 
 	if (random)
@@ -79,19 +79,19 @@ Point2d Animation_Swirl::getPoint(const AmbilightImage& hyperImage, bool random,
 		y = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
 	}
 
-	p.x = int(round(x * hyperImage.width()));
-	p.y = int(round(y * hyperImage.height()));
+	p.x = int(round(x * ambilightImage.width()));
+	p.y = int(round(y * ambilightImage.height()));
 
 	return p;
 }
 
-int Animation_Swirl::getSTime(int hyperLatchTime, int _rt, double steps = 360) {
+int Animation_Swirl::getSTime(int ambilightLatchTime, int _rt, double steps = 360) {
 
 	double rt = double(_rt);
 	double sleepTime = std::max(0.1, rt) / steps;
 
 
-	double minStepTime = double(std::max(hyperLatchTime, 15)) / 1000.0;
+	double minStepTime = double(std::max(ambilightLatchTime, 15)) / 1000.0;
 
 	if (minStepTime < 0.001)
 		minStepTime = 0.001;
@@ -116,35 +116,34 @@ void Animation_Swirl::buildGradient(QList<Animation_Swirl::SwirlGradient>& ba, b
 			if (withAlpha && c.items[3] == 0)
 				alpha = 0;
 
-			ba.append(Animation_Swirl::SwirlGradient({ uint8_t(pos), c.items[0], c.items[1], c.items[2], alpha }));
-
 			pos += posfac;
 
 			if (pos > 255)
 				pos = 255;
 
+			ba.append(Animation_Swirl::SwirlGradient({ uint8_t(pos), c.items[0], c.items[1], c.items[2], alpha }));
 		}
 
 		if (closeCircle)
 		{
 			uint8_t alpha = 255;
-			auto lC = cc[0];
+			auto lC = cc[cc.length() - 1];
 
 			if (withAlpha && lC.items[3] == 0)
 				alpha = 0;
-			ba.append(Animation_Swirl::SwirlGradient({ 255, lC.items[0], lC.items[1], lC.items[2], alpha }));
+			ba.append(Animation_Swirl::SwirlGradient({ 0, lC.items[0], lC.items[1], lC.items[2], alpha }));
 		}
 	}
 }
 
 void Animation_Swirl::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 	QList<Animation_Swirl::SwirlColor> _custColors, _custColors2;
 
-	hyperImage.resize(80, 45);
+	ambilightImage = ambilightImage.scaled(80, 45);
 
 	auto _rotationTime = rotation_time;
 	auto _reverse = reverse;
@@ -163,11 +162,11 @@ void Animation_Swirl::Init(
 
 	_custColors2 = custom_colors2;
 
-	pointS1 = getPoint(hyperImage, _randomCenter, _centerX, _centerY);
-	pointS2 = getPoint(hyperImage, _randomCenter2, _centerX2, _centerY2);
+	pointS1 = getPoint(ambilightImage, _randomCenter, _centerX, _centerY);
+	pointS2 = getPoint(ambilightImage, _randomCenter2, _centerX2, _centerY2);
 
 
-	SetSleepTime(getSTime(hyperLatchTime, _rotationTime));
+	SetSleepTime(getSTime(ambilightLatchTime, _rotationTime));
 
 	angle = 0;
 	angle2 = 0;
@@ -181,21 +180,15 @@ void Animation_Swirl::Init(
 		buildGradient(baS1, false, _custColors);
 	else
 	{
-		double x = 255.0 / 12;
-		baS1.append({ 0,   255, 0, 0, 255 });
-		baS1.append({ (uint8_t)(x*0.8),  255, 128, 0, 255 });
-		baS1.append({ (uint8_t)(x*2.2),  255, 255, 0, 255 });
-		baS1.append({ (uint8_t)(x*3.5),  128, 255, 0, 255 });
-		baS1.append({ (uint8_t)(x*4.3),  0,   255, 0, 255 });
-		baS1.append({ (uint8_t)(x*5.1), 0,   255, 128, 255 });
-		baS1.append({ (uint8_t)(x*6.0), 0,   255, 255, 255 });
-		baS1.append({ (uint8_t)(x*6.9), 0,   128, 255, 255 });
-		baS1.append({ (uint8_t)(x*7.9), 0,     0, 255, 255 });
-		baS1.append({ (uint8_t)(x*8.9), 128,   0, 255, 255 });
-		baS1.append({ (uint8_t)(x*10), 255,   0, 255, 255 });
-		baS1.append({ (uint8_t)(x*11), 255,   0, 128, 255 });
-		baS1.append({ 255, 255,   0,   0, 255 });
-		
+		baS1.append({ 0, 255, 0, 0, 255 });
+		baS1.append({ 25, 255, 230, 0, 255 });
+		baS1.append({ 63, 255, 255, 0, 255 });
+		baS1.append({ 100, 0, 255, 0, 255 });
+		baS1.append({ 127, 0, 255, 200, 255 });
+		baS1.append({ 159, 0, 255, 255, 255 });
+		baS1.append({ 191, 0, 0, 255, 255 });
+		baS1.append({ 224, 255, 0, 255, 255 });
+		baS1.append({ 255, 255, 0, 127, 255 });
 	}
 
 	if (_enableSecond && _custColors2.length() > 1)
@@ -205,7 +198,7 @@ void Animation_Swirl::Init(
 	}
 }
 
-bool Animation_Swirl::Play(AmbilightImage& painter)
+bool Animation_Swirl::Play(QPainter* painter)
 {
 	bool ret;
 	angle += increment;
@@ -220,27 +213,39 @@ bool Animation_Swirl::Play(AmbilightImage& painter)
 	if (angle2 < 0)
 		angle2 = 360;
 
-	ret = imageConicalGradient(painter, pointS1.x, pointS1.y, angle, baS1, true);
+	ret = imageConicalGradient(painter, pointS1.x, pointS1.y, angle, baS1);
 	if (S2)
-		ret |= imageConicalGradient(painter, pointS2.x, pointS2.y, angle2, baS2, false);
+		ret |= imageConicalGradient(painter, pointS2.x, pointS2.y, angle2, baS2);
 	return ret;
 }
 
 
-bool Animation_Swirl::imageConicalGradient(AmbilightImage& painter, int centerX, int centerY, int angle, const QList<Animation_Swirl::SwirlGradient>& bytearray, bool reset)
+bool Animation_Swirl::imageConicalGradient(QPainter* painter, int centerX, int centerY, int angle, const QList<Animation_Swirl::SwirlGradient>& bytearray)
 {
+	int startX = 0;
+	int startY = 0;
+	int width = painter->device()->width();
+	int height = painter->device()->height();
+
 	angle = qMax(qMin(angle, 360), 0);
 
-	std::vector<uint8_t> arr;
+
+	QRect myQRect(startX, startY, width, height);
+	QConicalGradient gradient(QPoint(centerX, centerY), angle);
+
 	foreach(Animation_Swirl::SwirlGradient item, bytearray)
-	{		
-		arr.push_back(item.items[0]);
-		arr.push_back(item.items[1]);
-		arr.push_back(item.items[2]);
-		arr.push_back(item.items[3]);
-		arr.push_back(item.items[4]);
+	{
+		gradient.setColorAt(
+			((uint8_t)item.items[0]) / 255.0,
+			QColor(
+				(uint8_t)(item.items[1]),
+				(uint8_t)(item.items[2]),
+				(uint8_t)(item.items[3]),
+				(uint8_t)(item.items[4])
+			));
 	}
-	painter.conicalFill(angle, arr, reset);
+
+	painter->fillRect(myQRect, gradient);
 
 	return true;
 

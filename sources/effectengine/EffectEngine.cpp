@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -35,13 +35,12 @@
 #include <utils/jsonschema/QJsonSchemaChecker.h>
 #include <utils/JsonUtils.h>
 #include <utils/Components.h>
-#include <base/Smoothing.h>
 
 #include <effectengine/EffectEngine.h>
 #include <effectengine/Effect.h>
 
 EffectEngine::EffectEngine(AmbilightAppInstance* ambilightapp)
-	: _hyperInstance(ambilightapp)
+	: _ambilightInstance(ambilightapp)
 	, _availableEffects(Effect::getAvailableEffects())
 	, _log(Logger::getInstance(QString("EFFECTENGINE%1").arg(ambilightapp->getInstanceIndex())))
 {
@@ -79,19 +78,19 @@ int EffectEngine::runEffectScript(const QString& name, int priority, int timeout
 
 	// create the effect
 	auto effect = std::unique_ptr<Effect, void(*)(Effect*)>(
-		new Effect(_hyperInstance, _hyperInstance->getCurrentPriority(), priority, timeout, *it),
+		new Effect(_ambilightInstance, _ambilightInstance->getCurrentPriority(), priority, timeout, *it),
 		[](Effect* oldEffect) {
 			oldEffect->requestInterruption();
 			ambilightapp::THREAD_REMOVER(oldEffect->getDescription(), oldEffect->thread(), oldEffect);
 		}
 	);
 	connect(effect.get(), &Effect::SignalSetLeds, this, &EffectEngine::handlerSetLeds);
-	connect(effect.get(), &Effect::SignalSetImage, _hyperInstance, &AmbilightAppInstance::setInputImage);
+	connect(effect.get(), &Effect::SignalSetImage, _ambilightInstance, &AmbilightAppInstance::setInputImage);
 	connect(effect.get(), &Effect::SignalEffectFinished, this, &EffectEngine::handlerEffectFinished);
 
 	// start the effect
 	Debug(_log, "Start the effect: name [%s]", QSTRING_CSTR(name));
-	_hyperInstance->registerInput(priority, ambilightapp::COMP_EFFECT, origin, name, (*it).smoothingConfig);
+	_ambilightInstance->registerInput(priority, ambilightapp::COMP_EFFECT, origin, name, (*it).smoothingConfig);
 
 	// start the effect
 	QThread* newThread = new QThread();
@@ -109,7 +108,7 @@ void EffectEngine::handlerEffectFinished(int priority, QString name, bool forced
 {
 	if (!forced)
 	{
-		_hyperInstance->clear(priority);
+		_ambilightInstance->clear(priority);
 	}
 
 	Info(_log, "Effect '%s' has finished.", QSTRING_CSTR(name));
@@ -154,9 +153,9 @@ std::list<ActiveEffectDefinition> EffectEngine::getActiveEffects() const
 
 void EffectEngine::handlerSetLeds(int priority, const std::vector<ColorRgb>& ledColors, int timeout_ms, bool clearEffect)
 {
-	int ledNum = _hyperInstance->getLedCount();
+	int ledNum = _ambilightInstance->getLedCount();
 	if (ledNum == static_cast<int>(ledColors.size()))
-		_hyperInstance->setInputLeds(priority, ledColors, timeout_ms, false);
+		_ambilightInstance->setInputLeds(priority, ledColors, timeout_ms, false);
 	else for (auto&& effect : _activeEffects)
 	{
 		effect->setLedCount(ledNum);
@@ -165,17 +164,17 @@ void EffectEngine::handlerSetLeds(int priority, const std::vector<ColorRgb>& led
 
 void EffectEngine::createSmoothingConfigs()
 {
-	unsigned defaultEffectConfig = SMOOTHING_EFFECT_CONFIGS_START;
-	unsigned dynamicId = defaultEffectConfig + 1;
+	unsigned id = 2;
+	unsigned dynamicId = 3;
 
-	_hyperInstance->addEffectConfig(defaultEffectConfig);
+	_ambilightInstance->updateSmoothingConfig(id);
 
 	for (EffectDefinition& def : _availableEffects)
 	{
-		// add smoothing configs to A
+		// add smoothing configs to AmbilightApp
 		if (def.smoothingCustomSettings)
 		{
-			def.smoothingConfig = _hyperInstance->addEffectConfig(
+			def.smoothingConfig = _ambilightInstance->updateSmoothingConfig(
 				dynamicId++,
 				def.smoothingTime,
 				def.smoothingFrequency,
@@ -183,7 +182,7 @@ void EffectEngine::createSmoothingConfigs()
 		}
 		else
 		{
-			def.smoothingConfig = _hyperInstance->addEffectConfig(defaultEffectConfig);
+			def.smoothingConfig = _ambilightInstance->updateSmoothingConfig(id);
 		}
 	}
 }

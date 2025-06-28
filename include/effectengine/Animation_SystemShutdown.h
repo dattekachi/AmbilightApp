@@ -13,10 +13,10 @@ public:
 	Animation_SystemShutdown();
 
 	void Init(
-		AmbilightImage& hyperImage,
-		int hyperLatchTime) override;
+		QImage& ambilightImage,
+		int ambilightLatchTime) override;
 
-	bool Play(AmbilightImage& painter) override;
+	bool Play(QPainter* painter) override;
 
 	static EffectDefinition getDefinition();
 
@@ -31,6 +31,6 @@ private:
 	int initial_blink_index;
 	int yIndex;
 
-	void setLine(AmbilightImage& painter, int y, Point3d rgb);
-	void setFill(AmbilightImage& painter, Point3d rgb);
+	void setLine(QPainter* painter, int y, Point3d rgb);
+	void setFill(QPainter* painter, Point3d rgb);
 };

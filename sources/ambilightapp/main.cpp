@@ -1,11 +1,13 @@
 #ifndef PCH_ENABLED
 	#include <QCoreApplication>
+	#include <QApplication>
 	#include <QLocale>
 	#include <QFile>
 	#include <QString>
 	#include <QResource>
 	#include <QDir>
 	#include <QStringList>
+	#include <QSystemTrayIcon>
 	#include <QStringList>
 
 	#include <exception>
@@ -15,9 +17,8 @@
 	#include <stdio.h>
 #endif
 
-#ifdef _WIN32
-	#include <QApplication>
-#endif
+#include <QApplication>
+#include <QProcess>
 #include <csignal>
 
 #if !defined(__APPLE__) && !defined(_WIN32)
@@ -37,15 +38,15 @@
 
 #include <AmbilightappConfig.h>
 
-#include "SystrayHandler.h"
 #include <utils/Logger.h>
 #include <commandline/Parser.h>
+#include <commandline/IntOption.h>
 #include <utils/DefaultSignalHandler.h>
 #include <db/AuthTable.h>
 
 #include "detectProcess.h"
 #include "AmbilightAppDaemon.h"
-#include <qprocess.h>
+#include "systray.h"
 
 using namespace commandline;
 
@@ -70,9 +71,11 @@ void CreateConsole()
 
 AmbilightAppDaemon* ambilightappd = nullptr;
 
-QCoreApplication* createApplication(bool& isGuiApp, int& argc, char* argv[])
+QCoreApplication* createApplication(int& argc, char* argv[])
 {
+	bool isGuiApp = false;
 	bool forceNoGui = false;
+
 	// command line
 	for (int i = 1; i < argc; ++i)
 	{
@@ -99,26 +102,31 @@ QCoreApplication* createApplication(bool& isGuiApp, int& argc, char* argv[])
 	}
 #endif
 
-#ifdef _WIN32
 	if (isGuiApp)
 	{
 		QApplication* app = new QApplication(argc, argv);
+		// add optional library path
+		app->addLibraryPath(QApplication::applicationDirPath() + "/../lib");
+		app->setApplicationDisplayName("AmbilightApp");
+#if defined(__APPLE__)
+		app->setWindowIcon(QIcon(":/ambilightapp-icon-64px.png"));
+#else
+		app->setWindowIcon(QIcon(":/ambilightapp-icon-32px.png"));
+#endif
 		return app;
 	}
-#endif
-	
+
 	QCoreApplication* app = new QCoreApplication(argc, argv);
 	app->setApplicationName("AmbilightApp");
 	app->setApplicationVersion(AMBILIGHTAPP_VERSION);
 	// add optional library path
-	app->addLibraryPath(QCoreApplication::applicationDirPath() + "/../lib");
+	app->addLibraryPath(QApplication::applicationDirPath() + "/../lib");
 
 	return app;
 }
 
 #ifdef _WIN32
-	bool isRunning(const QString& processName)
-	{
+	bool isRunning(const QString& processName) {
 		QProcess process;
 		process.start("tasklist", QStringList() << "/FI" << QString("IMAGENAME eq %1").arg(processName));
 		process.waitForFinished();
@@ -141,8 +149,9 @@ int main(int argc, char** argv)
 #endif
 
 	// Initialising QCoreApplication
-	bool isGuiApp = false;
-	QScopedPointer<QCoreApplication> app(createApplication(isGuiApp, argc, argv));
+	QScopedPointer<QCoreApplication> app(createApplication(argc, argv));
+
+	bool isGuiApp = (qobject_cast<QApplication*>(app.data()) != 0 && QSystemTrayIcon::isSystemTrayAvailable());
 
 	DefaultSignalHandler::install();
 
@@ -295,7 +304,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-		DBManager::initializeDatabaseFilename(dbFile, readonlyMode);
+		DBManager::initializeDatabaseFilename(dbFile);
 
 		// reset Password without spawning daemon
 		if (parser.isSet(resetPassword))
@@ -307,7 +316,7 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-				std::unique_ptr<AuthTable> table = std::unique_ptr<AuthTable>(new AuthTable());
+				std::unique_ptr<AuthTable> table = std::unique_ptr<AuthTable>(new AuthTable(false));
 				if (table->resetAmbilightappUser()) {
 					Info(log, "Password reset successful");
 					exit(0);
@@ -348,7 +357,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-		Info(log, "Starting AmbilightApp - %s, %s, built: %s:%s", AMBILIGHTAPP_VERSION, AMBILIGHTAPP_BUILD_ID, __DATE__, __TIME__);
+		Info(log, "Starting AmbilightApp - %s", AMBILIGHTAPP_VERSION);
 		Debug(log, "QtVersion [%s]", QT_VERSION_STR);
 
 		if (!readonlyMode)
@@ -359,60 +368,31 @@ int main(int argc, char** argv)
 		{
 			Warning(log, "The user data path '%s' is not writeable. AmbilightApp starts in read-only mode. Configuration updates will not be persisted!", QSTRING_CSTR(userDataDirectory.absolutePath()));
 		}
-
-		#ifdef _WIN32
-			SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-		#endif	
-
+		
 		try
 		{
 			ambilightappd = new AmbilightAppDaemon(userDataDirectory.absolutePath(), qApp, bool(logLevelCheck), readonlyMode, params, isGuiApp);
 		}
 		catch (std::exception& e)
 		{
-			Error(log, "Main AmbilightApp service aborted: %s", e.what());
+			Error(log, "AmbilightApp Daemon aborted: %s", e.what());
 			throw;
 		}
 
 		// run the application
-		SystrayHandler* systray = (isGuiApp) ? new SystrayHandler(ambilightappd, ambilightappd->getWebPort(), userDataDirectory.absolutePath()) : nullptr;
-
-		if (systray != nullptr && systray->isInitialized())
+		if (isGuiApp)
 		{
-			#ifdef __APPLE__
-				QTimer* timer = new QTimer(systray);
-				QObject::connect(timer, &QTimer::timeout, systray, [&systray]() {
-					systray->loop();
-					});
-
-				timer->setInterval(200);
-				timer->start();
-			#endif
-
-		#ifdef _WIN32
+			Info(log, "start systray");
 			QApplication::setQuitOnLastWindowClosed(false);
-			QObject::connect(qApp, &QGuiApplication::aboutToQuit, systray, &SystrayHandler::deleteLater);
-		#endif
-			rc = app->exec();
-
-			systray->close();
+			SysTray* tray = new SysTray(ambilightappd, ambilightappd->getWebPort());
+			QObject::connect(qApp, &QGuiApplication::aboutToQuit, tray, &SysTray::deleteLater);
+			rc = (qobject_cast<QApplication*>(app.data()))->exec();
 		}
 		else
 		{
-			#if defined(ENABLE_SYSTRAY)
-				if (isGuiApp)
-				{
-					Error(log, "Could not inilized the systray. Make sure that the libgtk-3-0/gtk3 package is installed.");
-				}
-			#endif
 			rc = app->exec();
 		}
-
-		Info(log, "The application closed with code %d", rc);
-
-		delete systray;
-		systray = nullptr;
-
+		Info(log, "Application closed with code %d", rc);
 		delete ambilightappd;
 		ambilightappd = nullptr;
 	}

@@ -2,12 +2,14 @@
 
 #ifndef PCH_ENABLED
 	#include <cmath>
+	#include <QPainter>
 #endif
 
-#include <ambilightimage/AmbilightImage.h>
+#include <QPainter>
 
 #include <utils/Image.h>
 #include <effectengine/EffectDefinition.h>
+#include <utils/ColorSys.h>
 
 template <typename T>
 AnimationBase* EffectFactory()
@@ -21,8 +23,8 @@ public:
 	AnimationBase(QString name);
 	virtual ~AnimationBase() = default;
 	QString GetName();
-	virtual bool Play(AmbilightImage& painter) = 0;
-	virtual void Init(AmbilightImage& hyperImage, int hyperLatchTime) = 0;
+	virtual bool Play(QPainter* painter) = 0;
+	virtual void Init(QImage& ambilightImage, int ambilightLatchTime) = 0;
 	virtual bool hasLedData(QVector<ColorRgb>& buffer);
 	bool		 isStop();
 	void		 SetSleepTime(int sleepTime);

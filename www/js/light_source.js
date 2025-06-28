@@ -3,6 +3,9 @@ var finalLedArray = [];
 var conf_editor = null;
 var aceEdt = null;
 var ledStarter = false;
+var editor_brightness = null;
+var foregroundEffect_editor = null;
+// var editor_backgroundEffect = null;
 
 function round(number)
 {
@@ -53,7 +56,8 @@ function createLedPreview(leds, origin)
 	
 	ledStarter = true;
 
-	$('#previewledcount').html(`${$.i18n('conf_leds_layout_preview_totalleds', leds.length)} (${$.i18n('conf_leds_layout_preview_ledpower', ((leds.length * 0.06) * 1.1).toFixed(1))})`);
+	// $('#previewledcount').html(`${$.i18n('conf_leds_layout_preview_totalleds', leds.length)} (${$.i18n('conf_leds_layout_preview_ledpower', ((leds.length * 0.06) * 1.1).toFixed(1))})`);
+	$('#previewledcount').html(`${$.i18n('conf_leds_layout_preview_totalleds', leds.length)}`);
 
 	$('.st_helper').css("border", "8px solid grey");
 
@@ -93,7 +97,8 @@ function createLedPreview(leds, origin)
 			"top:" + Math.round(led.vmin * canvas_height) + "px;" +
 			"width:" + Math.min((led.hmax - led.hmin) * canvas_width + 1, (canvas_width - 1)) + "px;" +
 			"height:" + Math.min((led.vmax - led.vmin) * canvas_height + 1, (canvas_height - 1)) + "px;";
-		leds_html += '<div id="' + led_id + '" group="'+led.group+'" class="led" style="background-color: ' + bgcolor + ';' + pos + '" title="' + idx + optGroup + '"><span id="' + led_id + '_num" class="led_prev_num">' + ((led.name) ? led.name : idx) + '</span></div>';
+		// leds_html += '<div id="' + led_id + '" group="'+led.group+'" class="led" style="background-color: ' + bgcolor + ';' + pos + '" title="' + idx + optGroup + '"><span id="' + led_id + '_num" class="led_prev_num">' + ((led.name) ? led.name : idx) + '</span></div>';
+		leds_html += '<div id="' + led_id + '" group="'+led.group+'" class="led" style="background-color: ' + bgcolor + ';' + pos + '" title="' + idx + optGroup + '"></div>';
 
 	}
 
@@ -128,8 +133,8 @@ function createLedPreview(leds, origin)
 			$('#ledc_'+i).addClass((i>=3) ? "crosslineDark" : "crosslineWhite");			
 		}
 
-	if ($('#leds_prev_toggle_num').hasClass('btn-success'))
-		$('.led_prev_num').css("display", "inline");
+	// if ($('#leds_prev_toggle_num').hasClass('btn-success'))
+	// 	$('.led_prev_num').css("display", "inline");
 
 	// update ace Editor content
 	aceEdt.set(finalLedArray);
@@ -543,6 +548,17 @@ function isEmpty(obj)
 	return true;
 }
 
+// function getLedType() {
+//     // Lấy editor instance
+//     let editor = conf_editor.getEditor("root.specificOptions");
+//     if(editor) {
+//         // Lấy giá trị ledType
+//         let values = editor.getValue();
+//         return values.rate;
+//     }
+//     return null;
+// }
+
 $(document).ready(function()
 {
 	// translate
@@ -552,11 +568,131 @@ $(document).ready(function()
 	if (window.showOptHelp)
 	{
 		createHintH("callout-info", $.i18n('conf_leds_device_intro'), "leddevice_intro");
-		createHintH("callout-info", $.i18n('conf_leds_layout_intro'), "layout_intro");
-		$('#led_vis_help').html('<div><div class="led_ex" style="background-color:black;margin-right:5px;margin-top:3px"></div><div style="display:inline-block;vertical-align:top">' + $.i18n('conf_leds_layout_preview_l1') + '</div></div><div class="led_ex" style="background-color:grey;margin-top:3px;margin-right:2px"></div><div class="led_ex" style="background-color: rgb(169, 169, 169);margin-right:5px;margin-top:3px;"></div><div style="display:inline-block;vertical-align:top">' + $.i18n('conf_leds_layout_preview_l2') + '</div>');
+		createHint("intro", $.i18n('conf_leds_device_brightness_intro'), "leddevice_brightness_intro");
+		createHint("intro", $.i18n('conf_effect_bgeff_intro'), "leddevice_backgroundEffect_intro");
+		createHint("intro", $.i18n('conf_effect_fgeff_intro'), "leddevice_foregroundEffect_intro");
+		// $('#led_vis_help').html('<div><div class="led_ex" style="background-color:rgb(92, 92, 92);margin-right:5px;margin-top:3px"></div><div style="display:inline-block;vertical-align:top">' + $.i18n('conf_leds_layout_preview_l1') + '</div></div><div class="led_ex" style="background-color:rgb(173, 173, 173);margin-top:3px;margin-right:2px"></div><div class="led_ex" style="background-color: rgb(199, 199, 199);margin-right:5px;margin-top:3px;"></div><div style="display:inline-block;vertical-align:top">' + $.i18n('conf_leds_layout_preview_l2') + '</div>');
 	}
 
-	var slConfig = window.serverConfig.ledConfig;	
+	//brightness
+	editor_brightness = createJsonEditor('editor_container_brightness', {
+		color: window.schema.color
+	}, true, true, undefined, true);
+
+	$("#editor_container_brightness .json-editor-btn-add").hide();
+	$("#editor_container_brightness [data-schemapath='root.color.imageToLedMappingType']").hide();
+	$("#editor_container_brightness [data-schemapath='root.color.sparse_processing']").hide();
+	$("#editor_container_brightness [data-schemapath='root.color.channelAdjustment'] .json-editor-btn-add").hide();
+	$("#editor_container_brightness [data-schemapath='root.color.channelAdjustment'] > h5 > label").hide();	
+	$("#editor_container_brightness [data-schemapath^='root.color.channelAdjustment']").each(function() {
+		const path = $(this).attr('data-schemapath');
+		if (path.includes('id') || 
+			path.includes('leds') || 
+			path.includes('classic_config') ||
+			path.includes('white') ||
+			path.includes('red') ||
+			path.includes('green') ||
+			path.includes('blue') ||
+			path.includes('cyan') ||
+			path.includes('magenta') ||
+			path.includes('yellow') ||
+			path.includes('gammaRed') ||
+			path.includes('gammaGreen') ||
+			path.includes('gammaBlue') ||
+			path.includes('temperatureRed') ||
+			path.includes('temperatureGreen') ||
+			path.includes('temperatureBlue') ||
+			path.includes('saturationGain') ||
+			path.includes('luminanceGain')) {
+			$(this).hide();
+		}
+	});
+
+	let lastBrightnessValue = JSON.stringify(editor_brightness.getValue());
+
+    editor_brightness.on('change', function() {
+        const currentValue = JSON.stringify(editor_brightness.getValue());
+        if (currentValue !== lastBrightnessValue) {
+            lastBrightnessValue = currentValue;
+            requestWriteConfig(editor_brightness.getValue());
+        }
+    });
+
+	//background effect
+	// var newEffects = window.serverInfo.effects;
+	// var _backgroundEffect = window.schema.backgroundEffect;
+
+	// _backgroundEffect.properties.effect.enum = [];
+	// _backgroundEffect.properties.effect.options.enum_titles = [];
+
+	// for(var i = 0; i < newEffects.length; i++)
+	// {
+	// 	var effectName = newEffects[i].name.toString();
+	// 	_backgroundEffect.properties.effect.enum.push(effectName);
+	// 	_backgroundEffect.properties.effect.options.enum_titles.push(effectName);
+	// }
+	
+	
+	// editor_backgroundEffect = createJsonEditor('editor_container_backgroundEffect', {
+	// 	backgroundEffect   : _backgroundEffect
+	// }, true, true, undefined, true);
+
+	// $("#editor_container_backgroundEffect [data-schemapath='root.backgroundEffect.enable']").hide();
+
+	// let lastBackgroundEffectValue = JSON.stringify(editor_backgroundEffect.getValue());
+
+	// editor_backgroundEffect.on('change', function() {
+	// 	var value = editor_backgroundEffect.getValue();
+	// 	var type = value.backgroundEffect.type;
+	// 	var enable = value.backgroundEffect.enable;
+
+	// 	if (type === "screen" && enable !== false) {
+	// 		editor_backgroundEffect.getEditor("root.backgroundEffect.enable").setValue(false);
+	// 		return;
+	// 	}
+	// 	if ((type === "color" || type === "effect") && enable !== true) {
+	// 		editor_backgroundEffect.getEditor("root.backgroundEffect.enable").setValue(true);
+	// 		return;
+	// 	}
+
+	// 	const currentValue = JSON.stringify(value);
+	// 	if (currentValue !== lastBackgroundEffectValue) {
+	// 		lastBackgroundEffectValue = currentValue;
+	// 		requestWriteConfig(value);
+	// 	}
+	// });
+
+	//foreground effect
+	var newEffects = window.serverInfo.effects;
+	var _foregroundEffect = window.schema.foregroundEffect;
+	_foregroundEffect.properties.effect.enum = [];
+	_foregroundEffect.properties.effect.options.enum_titles = [];
+
+	for(var i = 0; i < newEffects.length; i++)
+	{
+		var effectName = newEffects[i].name.toString();
+		_foregroundEffect.properties.effect.enum.push(effectName);
+		_foregroundEffect.properties.effect.options.enum_titles.push(effectName);
+	}
+	
+	foregroundEffect_editor = createJsonEditor('editor_container_foregroundEffect', {
+		foregroundEffect   : _foregroundEffect
+	}, true, true, undefined, true);
+
+	foregroundEffect_editor.on('ready',function() {
+	});
+
+	let lastForegroundEffectValue = JSON.stringify(foregroundEffect_editor.getValue());
+
+	foregroundEffect_editor.on('change',function() {
+		const currentValue = JSON.stringify(foregroundEffect_editor.getValue());
+		if (currentValue !== lastForegroundEffectValue) {
+			lastForegroundEffectValue = currentValue;
+			requestWriteConfig(foregroundEffect_editor.getValue());
+		}
+	});
+
+	var slConfig = window.serverConfig.ledConfig;
 
 	//restore ledConfig - Classic
 	for (var key in slConfig.classic)
@@ -643,6 +779,135 @@ $(document).ready(function()
 	{
 		valValue(this.id, this.value, this.min, this.max);
 		createClassicLeds();
+	});
+
+	$('#showAdvancedOptions').on('click', function() {
+		// Lấy trạng thái hiện tại của panel
+		const isVisible = $('#led_main_panel').is(':visible');
+		
+		// Toggle panel và thay đổi style của nút
+		if (isVisible) {
+			$('#led_main_panel').hide();
+			$(this).removeClass('btn-primary').addClass('btn-danger');
+		} else {
+			$('#led_main_panel').show();
+			$(this).removeClass('btn-danger').addClass('btn-primary');
+		}
+	});
+
+	const sizeLedValues = {
+		// Giá trị cho màn hình
+		"13": { top: 14, bottom: 14, left: 8, right: 8, position: 36 },
+		"17": { top: 19, bottom: 19, left: 9, right: 9, position: 47 },
+		"19": { top: 21, bottom: 21, left: 10, right: 10, position: 52 },
+		"20": { top: 22, bottom: 22, left: 11, right: 11, position: 55 },
+		"22": { top: 25, bottom: 25, left: 12, right: 12, position: 62 },
+		"24": { top: 27, bottom: 27, left: 14, right: 14, position: 68 },
+		"25": { top: 29, bottom: 29, left: 15, right: 15, position: 73 },
+		"27": { top: 31, bottom: 31, left: 16, right: 16, position: 78 },
+		"28": { top: 33, bottom: 33, left: 17, right: 17, position: 83 },
+		"29": { top: 36, bottom: 36, left: 13, right: 13, position: 85 },
+		"30": { top: 38, bottom: 38, left: 14, right: 14, position: 90 },
+		"32": { top: 37, bottom: 37, left: 19, right: 19, position: 93 },
+		"34": { top: 43, bottom: 43, left: 16, right: 16, position: 102 },
+		
+		// Giá trị cho cạnh bàn
+		"1m": { top: 0, bottom: 59, left: 0, right: 0, position: 0 },
+		"1m2": { top: 0, bottom: 71, left: 0, right: 0, position: 0 },
+		"1m4": { top: 0, bottom: 83, left: 0, right: 0, position: 0 },
+		"1m6": { top: 0, bottom: 95, left: 0, right: 0, position: 0 },
+		"1m8": { top: 0, bottom: 107, left: 0, right: 0, position: 0 },
+		"2m": { top: 0, bottom: 119, left: 0, right: 0, position: 0 }
+	};
+	
+	// Theo dõi thay đổi từ form JSON schema
+	function handleSizeChange() {
+		// Lấy giá trị ledType từ form
+		const ledType = conf_editor.getEditor("root.specificOptions.ledType").getValue();
+		
+		// Xử lý LED 2 màn hình
+		if (ledType === "dualscreen") {
+			const sideScreen = conf_editor.getEditor("root.specificOptions.sideScreen").getValue();
+			
+			if (sideScreen === "right") {
+				// Cấu hình cho màn hình trái
+				$('#ip_cl_ptlh').val(50);
+				$('#ip_cl_pblh').val(50);
+				$('#ip_cl_ptrh').val(100);
+				$('#ip_cl_pbrh').val(100);
+			} 
+			else if (sideScreen === "left") {
+				// Cấu hình cho màn hình phải  
+				$('#ip_cl_ptlh').val(0);
+				$('#ip_cl_pblh').val(0);
+				$('#ip_cl_ptrh').val(50);
+				$('#ip_cl_pbrh').val(50);
+			}
+		} else {
+			// Khôi phục giá trị mặc định khi không phải dualscreen
+			$('#ip_cl_ptlh').val(0);
+			$('#ip_cl_pblh').val(0);
+			$('#ip_cl_ptrh').val(100);
+			$('#ip_cl_pbrh').val(100);
+		}
+		
+		let selectedSize;
+		// Lấy giá trị kích thước dựa vào ledType
+		if (ledType === "screen" || ledType === "dualscreen") {
+			selectedSize = conf_editor.getEditor("root.specificOptions.screenSize").getValue();
+		} else {
+			selectedSize = conf_editor.getEditor("root.specificOptions.edgeSize").getValue();
+		}
+
+		// Cập nhật giá trị LED nếu có trong bảng
+		if (selectedSize && sizeLedValues[selectedSize]) {
+			const ledValues = sizeLedValues[selectedSize];
+			$('#ip_cl_top').val(ledValues.top);
+			$('#ip_cl_bottom').val(ledValues.bottom);
+			$('#ip_cl_left').val(ledValues.left);
+			$('#ip_cl_right').val(ledValues.right);
+			
+			// Kiểm tra trạng thái của checkbox reverseLed
+			const isReversed = $('#reverseLed').is(':checked');
+			
+			// Cập nhật position dựa vào trạng thái của checkbox
+			const position = isReversed ? ledValues.position - ledValues.top : ledValues.position;
+			$('#ip_cl_position').val(position);
+			
+			// Đồng bộ trạng thái với ip_cl_reverse
+			$('#ip_cl_reverse').prop('checked', isReversed);
+		}
+		
+		createClassicLeds();
+	}
+
+	const isReversed = $('#ip_cl_reverse').is(':checked');
+	$('#reverseLed').prop('checked', isReversed);
+
+	// Thêm hàm xử lý sự kiện cho checkbox reverseLed
+	$('#reverseLed').on('change', function() {
+		// Đồng bộ giá trị với ip_cl_reverse
+		$('#ip_cl_reverse').prop('checked', this.checked);
+		
+		// Cập nhật position trong sizeLedValues nếu checkbox được tích
+		const ledType = conf_editor.getEditor("root.specificOptions.ledType").getValue();
+		let selectedSize;
+		
+		if (ledType === "screen" || ledType === "dualscreen") {
+		selectedSize = conf_editor.getEditor("root.specificOptions.screenSize").getValue();
+		} else {
+		selectedSize = conf_editor.getEditor("root.specificOptions.edgeSize").getValue();
+		}
+	
+		if (selectedSize && sizeLedValues[selectedSize]) {
+		const ledValues = sizeLedValues[selectedSize];
+		
+		// Nếu checkbox được tích, position = position - top
+		// Ngược lại giữ nguyên position gốc
+		$('#ip_cl_position').val(this.checked ? ledValues.position - ledValues.top : ledValues.position);
+		
+		createClassicLeds();
+		}
 	});
 
 	$('.ledMAconstr').bind("change", function()
@@ -733,6 +998,10 @@ $(document).ready(function()
 				$('#leds_custom_save').attr("disabled", true);
 			}
 
+			if (window.readOnlyMode)
+			{
+				$('#leds_custom_save').attr('disabled', true);
+			}
 		}
 	}, window.serverConfig.leds);
 
@@ -772,6 +1041,9 @@ $(document).ready(function()
 			specificOptions: specificOptions,
 		});
 
+		$("div[data-schemapath='root.generalOptions.colorOrder']").hide();
+		$("div[data-schemapath='root.generalOptions.refreshTime']").hide();
+
 		var values_general = {};
 		var values_specific = {};
 		var isCurrentDevice = (window.serverConfig.device.type == ledType);
@@ -807,7 +1079,7 @@ $(document).ready(function()
 
 		// change save button state based on validation result
 		var firstValid = conf_editor.validate();
-		if ((firstValid.length > 1 || (firstValid.length == 1 && firstValid[0].path != "root.generalOptions.type")))
+		if ((firstValid.length > 1 || (firstValid.length == 1 && firstValid[0].path != "root.generalOptions.type")) || window.readOnlyMode)
 		{
 			$('#btn_submit_controller').attr('disabled', true);
 		}
@@ -818,9 +1090,13 @@ $(document).ready(function()
 
 		conf_editor.on('change', function()
 		{
-			$('#btn_submit').attr('disabled', false);
-			$('#btn_submit').attr('disabled', false);
-			$('#btn_submit').attr('disabled', false);
+			window.readOnlyMode ? $('#btn_cl_save').attr('disabled', true) : $('#btn_submit').attr('disabled', false);
+			window.readOnlyMode ? $('#btn_ma_save').attr('disabled', true) : $('#btn_submit').attr('disabled', false);
+			window.readOnlyMode ? $('#leds_custom_save').attr('disabled', true) : $('#btn_submit').attr('disabled', false);
+			conf_editor.watch('root.specificOptions.ledType', handleSizeChange);
+			conf_editor.watch('root.specificOptions.screenSize', handleSizeChange);
+			conf_editor.watch('root.specificOptions.edgeSize', handleSizeChange);
+			conf_editor.watch('root.specificOptions.sideScreen', handleSizeChange);
 		});
 
 		// led controller sepecific wizards
@@ -954,14 +1230,29 @@ $(document).ready(function()
 			optArr[5].push(ledDevices[idx]);
 	}
 
+	// Tạo dropdown như bình thường
 	$("#leddevices").append(createSel(optArr[0], $.i18n('conf_leds_optgroup_RPiSPI')));
 	$("#leddevices").append(createSel(optArr[1], $.i18n('conf_leds_optgroup_RPiPWM')));
 	$("#leddevices").append(createSel(optArr[2], $.i18n('conf_leds_optgroup_RPiGPIO')));
 	$("#leddevices").append(createSel(optArr[3], $.i18n('conf_leds_optgroup_network')));
 	$("#leddevices").append(createSel(optArr[4], $.i18n('conf_leds_optgroup_usb')));
 	$("#leddevices").append(createSel(optArr[5], $.i18n('conf_leds_optgroup_debug')));
+
+	// Ẩn tất cả options trừ ambilightusb và wled
+	$("#leddevices option").each(function() {
+		if ($(this).val() !== 'ambilightusb' && $(this).val() !== 'wled') {
+			$(this).hide();
+		}
+	});
+
+	// Ẩn optgroup Debug
+	$("#leddevices optgroup").each(function() {
+		if ($(this).attr('label') === $.i18n('conf_leds_optgroup_debug')) {
+			$(this).hide();
+		}
+	});
+
 	$("#leddevices").val(window.serverConfig.device.type);
-	
 
 	// validate textfield and update preview
 	$("#leds_custom_updsim").off().on("click", function()
@@ -989,88 +1280,100 @@ $(document).ready(function()
 	});
 
 	// toggle led numbers
-	$('#leds_prev_toggle_num').off().on("click", function()
-	{
-		$('.led_prev_num').toggle();
-		toggleClass('#leds_prev_toggle_num', "btn-danger", "btn-success");
-	});
+	// $('#leds_prev_toggle_num').off().on("click", function()
+	// {
+	// 	$('.led_prev_num').toggle();
+	// 	toggleClass('#leds_prev_toggle_num', "btn-danger", "btn-success");
+	// });
 
-	var _backupLastOrigin;
+	// var _backupLastOrigin;
 
-	$('#leds_prev_zoom').off().on("click", function()
-	{
-		if ($('#led_zoom_panel').hasClass("col-lg-6"))
-		{
-			$('#cmd_zoom_in_icon').addClass('d-none');
-			$('#cmd_zoom_out_icon').removeClass('d-none');
+	// $('#leds_prev_zoom').off().on("click", function()
+	// {
+	// 	if ($('#led_zoom_panel').hasClass("col-lg-6"))
+	// 	{
+	// 		$('#cmd_zoom_in_icon').addClass('d-none');
+	// 		$('#cmd_zoom_out_icon').removeClass('d-none');
 
-			_backupLastOrigin = _lastOrigin;
-			_lastOrigin = "zoom";
-			 $('#ledPropertiesForm > .modal-dialog').addClass("modal-dialog-centered");
-			$('#led_zoom_panel').removeClass("col-lg-6");
-			$('#led_zoom_panel').addClass("col-lg-12");
-			$('#led_zoom_panel').addClass("order-1");
-			$('#hyper-subpage').children('h3').addClass("d-none");
-			$('#leds_cfg_nav').addClass("d-none");
-			$('#layout_intro').addClass("d-none");
-			$('#previewledcount').addClass("d-none");
-			$('#previewledpower').addClass("d-none");
-			$('#led_vis_help').addClass("d-none");
-			$('#led_main_panel').addClass("order-2");
-			window.scrollTo(0, 0);
-		}
-		else
-		{
-			$('#cmd_zoom_in_icon').removeClass('d-none');
-			$('#cmd_zoom_out_icon').addClass('d-none');
+	// 		_backupLastOrigin = _lastOrigin;
+	// 		_lastOrigin = "zoom";
+	// 		 $('#ledPropertiesForm > .modal-dialog').addClass("modal-dialog-centered");
+	// 		$('#led_zoom_panel').removeClass("col-lg-6");
+	// 		$('#led_zoom_panel').addClass("col-lg-12");
+	// 		$('#led_zoom_panel').addClass("order-1");
+	// 		$('#hyper-subpage').children('h3').addClass("d-none");
+	// 		$('#leds_cfg_nav').addClass("d-none");
+	// 		$('#layout_intro').addClass("d-none");
+	// 		$('#previewledcount').addClass("d-none");
+	// 		$('#previewledpower').addClass("d-none");
+	// 		$('#led_vis_help').addClass("d-none");
+	// 		$('#led_main_panel').addClass("order-2");
+	// 		window.scrollTo(0, 0);
+	// 	}
+	// 	else
+	// 	{
+	// 		$('#cmd_zoom_in_icon').removeClass('d-none');
+	// 		$('#cmd_zoom_out_icon').addClass('d-none');
 
-			_lastOrigin = _backupLastOrigin;
-			$('#ledPropertiesForm > .modal-dialog').removeClass("modal-dialog-centered");
-			$('#led_zoom_panel').addClass("col-lg-6");
-			$('#led_zoom_panel').removeClass("col-lg-12");
-			$('#led_zoom_panel').removeClass("order-1");
-			$('#hyper-subpage').children('h3').removeClass("d-none");
-			$('#leds_cfg_nav').removeClass("d-none");
-			$('#layout_intro').removeClass("d-none");
-			$('#previewledcount').removeClass("d-none");
-			$('#previewledpower').removeClass("d-none");
-			$('#led_vis_help').removeClass("d-none");
-			$('#led_main_panel').removeClass("order-2");
-		}
-	});
+	// 		_lastOrigin = _backupLastOrigin;
+	// 		$('#ledPropertiesForm > .modal-dialog').removeClass("modal-dialog-centered");
+	// 		$('#led_zoom_panel').addClass("col-lg-6");
+	// 		$('#led_zoom_panel').removeClass("col-lg-12");
+	// 		$('#led_zoom_panel').removeClass("order-1");
+	// 		$('#hyper-subpage').children('h3').removeClass("d-none");
+	// 		$('#leds_cfg_nav').removeClass("d-none");
+	// 		$('#layout_intro').removeClass("d-none");
+	// 		$('#previewledcount').removeClass("d-none");
+	// 		$('#previewledpower').removeClass("d-none");
+	// 		$('#led_vis_help').removeClass("d-none");
+	// 		$('#led_main_panel').removeClass("order-2");
+	// 	}
+	// });
 
 	// open checklist
-	$('#leds_prev_checklist').off().on("click", function()
-	{
-		var liList = [$.i18n('conf_leds_layout_checkp1'), $.i18n('conf_leds_layout_checkp3'), $.i18n('conf_leds_layout_checkp2'), $.i18n('conf_leds_layout_checkp4')];
-		var ul = document.createElement("ul");
-		ul.className = "checklist"
+	// $('#leds_prev_checklist').off().on("click", function()
+	// {
+	// 	var liList = [$.i18n('conf_leds_layout_checkp1'), $.i18n('conf_leds_layout_checkp3'), $.i18n('conf_leds_layout_checkp2'), $.i18n('conf_leds_layout_checkp4')];
+	// 	var ul = document.createElement("ul");
+	// 	ul.className = "checklist"
 
-		for (var i = 0; i < liList.length; i++)
-		{
-			var li = document.createElement("li");
-			li.innerHTML = liList[i];
-			ul.appendChild(li);
-		}
-		showInfoDialog('checklist', "", ul);
-	});
+	// 	for (var i = 0; i < liList.length; i++)
+	// 	{
+	// 		var li = document.createElement("li");
+	// 		li.innerHTML = liList[i];
+	// 		ul.appendChild(li);
+	// 	}
+	// 	showInfoDialog('checklist', "", ul);
+	// });
 
 	// nav
-	$('#leds_cfg_nav').on('shown.bs.tab', function(e)
-	{
-		var target = $(e.target).attr("href") // activated tab
-		if (target == "#menu_gencfg" && !ledsCustomCfgInitialized)
-		{
-			$('#leds_custom_updsim').trigger('click');
-			ledsCustomCfgInitialized = true;
+	// $('#leds_cfg_nav').on('shown.bs.tab', function(e)
+	// {
+	// 	var target = $(e.target).attr("href") // activated tab
+	// 	if (target == "#menu_gencfg" && !ledsCustomCfgInitialized)
+	// 	{
+	// 		$('#leds_custom_updsim').trigger('click');
+	// 		ledsCustomCfgInitialized = true;
 			
-			if (typeof _resizeObserver === "object" && !(_resizeObserver === null))
-			{
-				_resizeObserver.unobserve(document.getElementById("leds_preview"));
-				_resizeObserver.observe(document.getElementById("leds_preview"));
-			}
+	// 		if (typeof _resizeObserver === "object" && !(_resizeObserver === null))
+	// 		{
+	// 			_resizeObserver.unobserve(document.getElementById("leds_preview"));
+	// 			_resizeObserver.observe(document.getElementById("leds_preview"));
+	// 		}
+	// 	}
+	// });
+
+	if (!ledsCustomCfgInitialized)
+	{
+		$('#leds_custom_updsim').trigger('click');
+		ledsCustomCfgInitialized = true;
+		
+		if (typeof _resizeObserver === "object" && !(_resizeObserver === null))
+		{
+			_resizeObserver.unobserve(document.getElementById("leds_preview"));
+			_resizeObserver.observe(document.getElementById("leds_preview"));
 		}
-	});
+	}
 
 	// context LED editor
 	let selectedObject = null;
@@ -1337,6 +1640,11 @@ $(document).ready(function()
 		}
 		result.device.type = ledDevice;
 		requestWriteConfig(result)
+		requestWriteConfig(
+		{
+			"leds": finalLedArray
+		});
+		saveValues();
 	});
 	
 	$(".stepper-down").off().on("click", function(event)
@@ -1372,7 +1680,76 @@ $(document).ready(function()
 		putInstanceName(document.getElementById('instTarget3'));
 	
 	putInstanceName(document.getElementById('instTarget2'));
+	putInstanceName(document.getElementById('instTarget4'));
+	putInstanceName(document.getElementById('instTarget5'));
 
 	$("#leddevices").trigger("change");
 	
+	// Cập nhật trạng thái thiết bị LED
+	function updateLedDeviceStatus() {
+		var components = window.comps;
+		var ledDevice = window.serverConfig.device;
+		
+		if (ledDevice && ledDevice.type) {
+			$("#led_device_name").text(ledDevice.type);
+			var ledEnabled = false;
+			for (var i = 0; i < components.length; i++) {
+				if (components[i].name === "LEDDEVICE") {
+					ledEnabled = components[i].enabled;
+					break;
+				}
+			}
+			
+			// Cập nhật icon trạng thái
+			var statusIcon = $("#led_device_status svg");
+			if (ledEnabled) {
+				statusIcon.attr("data-src", "svg/overview_component_on.svg");
+			} else {
+				statusIcon.attr("data-src", "svg/overview_component_off.svg");
+			}
+		}
+	}
+	updateLedDeviceStatus();
+	$(window.ambilightapp).on("components-updated", updateLedDeviceStatus);
+
+	// Current mode
+	function updateCurrentMode() {
+		const modeText = document.getElementById('current_mode_text');
+		if (!modeText) return;
+
+		let currentMode = 'Theo màu màn hình';
+		
+		// Kiểm tra priorities để xác định chế độ hiện tại
+		if (window.serverInfo && window.serverInfo.priorities) {
+			for (let i = 0; i < window.serverInfo.priorities.length; i++) {
+				const priority = window.serverInfo.priorities[i];
+				if (priority.active) {
+					if (priority.componentId === "EFFECT") {
+						currentMode = `Hiệu ứng - ${priority.owner}`;
+						break;
+					} else if (priority.componentId === "COLOR") {
+						currentMode = `Màu sắc - ${priority.value}`;
+						break;
+					}
+				}
+			}
+		}
+		
+		modeText.textContent = currentMode;
+	}
+
+	// Cập nhật khi có thay đổi từ server
+	$(window.ambilightapp).on("instance-update", function(data) {
+		updateCurrentMode();
+	});
+
+	// Cập nhật khi priorities thay đổi
+	$(window.ambilightapp).on("priorities-update", function(data) {
+		updateCurrentMode();
+	});
+
+	// Cập nhật lần đầu khi trang được tải
+	$(document).ready(function() {
+		updateCurrentMode();
+	});
 });

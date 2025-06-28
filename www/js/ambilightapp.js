@@ -2,7 +2,7 @@
 window.webPrio = 1;
 window.webOrigin = "Web Configuration";
 window.showOptHelp = true;
-window.gitHubReleaseApiUrl = "https://api.github.com/repos/awawa-dev/HyperHDR/releases";
+window.gitHubReleaseApiUrl = "https://api.github.com/repos/thesetupstore/ambilightapp-update/releases";
 window.currentChannel = null;
 window.currentVersion = null;
 window.latestVersion = null;
@@ -478,14 +478,9 @@ function requestSetColor(r, g, b, duration)
 	sendToAmbilightapp("color", "", '"color":[' + r + ',' + g + ',' + b + '], "priority":' + window.webPrio + ',"duration":' + validateDuration(duration) + ',"origin":"' + window.webOrigin + '"');
 }
 
-
-
-function requestSetImage(data, SX, SY, duration, name)
+function requestSetImage(data, duration, name)
 {
-	sendToAmbilightapp("image", "",  `"priority": ${window.webPrio},`+
-		`"duration": ${validateDuration(duration)} ,"imagedata":"${data}", "format":"auto", `+
-		`"imagewidth": ${SX}, "imageheight": ${SY},`+
-		`"origin": "${window.webOrigin}", "name": "${name}"`);
+	sendToAmbilightapp("image", "", '"imagedata":"' + data + '", "priority":' + window.webPrio + ',"duration":' + validateDuration(duration) + ', "format":"auto", "origin":"' + window.webOrigin + '", "name":"' + name + '"');
 }
 
 function requestSetComponentState(comp, state)

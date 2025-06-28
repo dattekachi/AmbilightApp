@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,7 @@ Animation_Waves::Animation_Waves(QString name) :
 	reverse = false;
 };
 
-Point2d Animation_Waves::getPoint(const AmbilightImage& hyperImage, bool random, double x, double y) {
+Point2d Animation_Waves::getPoint(const QImage& ambilightImage, bool random, double x, double y) {
 	Point2d p;
 
 	if (random)
@@ -65,13 +65,13 @@ Point2d Animation_Waves::getPoint(const AmbilightImage& hyperImage, bool random,
 		center_y = y = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
 	}
 
-	p.x = int(round(x * hyperImage.width()));
-	p.y = int(round(y * hyperImage.height()));
+	p.x = int(round(x * ambilightImage.width()));
+	p.y = int(round(y * ambilightImage.height()));
 
 	return p;
 }
 
-int Animation_Waves::getSTime(int hyperLatchTime, int _rt, double steps = 360)
+int Animation_Waves::getSTime(int ambilightLatchTime, int _rt, double steps = 360)
 {
 	double sleepTime = std::max(1 / (512 / rotation_time), 0.02);
 
@@ -81,14 +81,14 @@ int Animation_Waves::getSTime(int hyperLatchTime, int _rt, double steps = 360)
 
 
 void Animation_Waves::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 
-	hyperImage.resize(80, 45);
+	ambilightImage = ambilightImage.scaled(80, 45);
 
-	pointS1 = getPoint(hyperImage, random_center, center_x, center_y);
+	pointS1 = getPoint(ambilightImage, random_center, center_x, center_y);
 
 	double cX = center_x, cY = 0.0 + center_y;
 
@@ -98,9 +98,9 @@ void Animation_Waves::Init(
 		cY = 1.0 - center_y;
 
 	rotation_time = std::max(rotation_time, 10.0);
-	SetSleepTime(getSTime(hyperLatchTime, rotation_time));
+	SetSleepTime(getSTime(ambilightLatchTime, rotation_time));
 
-	diag = int(round(std::sqrt((cX * std::pow(hyperImage.width(), 2)) + ((cY * std::pow(hyperImage.height(), 2))))));
+	diag = int(round(std::sqrt((cX * std::pow(ambilightImage.width(), 2)) + ((cY * std::pow(ambilightImage.height(), 2))))));
 	diag = int(diag * 1.3);
 
 
@@ -119,7 +119,7 @@ void Animation_Waves::Init(
 	targetTime = InternalClock::now() + reverse_time;
 }
 
-bool Animation_Waves::Play(AmbilightImage& painter)
+bool Animation_Waves::Play(QPainter* painter)
 {
 	bool ret = true;
 
@@ -147,34 +147,6 @@ bool Animation_Waves::Play(AmbilightImage& painter)
 		it += 1;
 	}
 
-	std::sort(gradientBa.begin(), gradientBa.end(),
-		[](const Animation_Swirl::SwirlGradient& a, const Animation_Swirl::SwirlGradient& b) -> bool {
-			return a.items[0] < b.items[0];
-	});
-
-	if (gradientBa.size() > 1)
-	{
-		int l = gradientBa.size() - 1;
-		if (gradientBa[0].items[0] != 0 || gradientBa[l].items[0] != 255)
-		{
-			
-			float asp2 = gradientBa[0].items[0] / ((float)gradientBa[1].items[0] - (float)gradientBa[0].items[0]);
-			float asp1 = 1.0 - asp2;
-
-			Animation_Swirl::SwirlGradient elem{ 0,
-				ColorRgb::clamp(gradientBa[0].items[1] * asp1 + gradientBa[l].items[1] * asp2),
-				ColorRgb::clamp(gradientBa[0].items[2] * asp1 + gradientBa[l].items[2] * asp2),
-				ColorRgb::clamp(gradientBa[0].items[3] * asp1 + gradientBa[l].items[3] * asp2) };
-			gradientBa.insert(0, elem);
-			Animation_Swirl::SwirlGradient elem2{ 255,
-				ColorRgb::clamp(gradientBa[l].items[1] * asp2 + gradientBa[l].items[1] * asp1),
-				ColorRgb::clamp(gradientBa[0].items[2] * asp2 + gradientBa[l].items[2] * asp1),
-				ColorRgb::clamp(gradientBa[0].items[3] * asp2 + gradientBa[l].items[3] * asp1) };
-			gradientBa.append(elem2);
-
-		}
-	}
-
 	imageRadialGradient(painter, pointS1.x, pointS1.y, diag, gradientBa);
 
 	for (int i = 0; i < positions.length(); i++)
@@ -190,21 +162,31 @@ bool Animation_Waves::Play(AmbilightImage& painter)
 }
 
 
-bool Animation_Waves::imageRadialGradient(AmbilightImage& painter, int centerX, int centerY, int angle, const QList<Animation_Swirl::SwirlGradient>& bytearray)
+bool Animation_Waves::imageRadialGradient(QPainter* painter, int centerX, int centerY, int angle, const QList<Animation_Swirl::SwirlGradient>& bytearray)
 {
+	int startX = 0;
+	int startY = 0;
+	int width = painter->device()->width();
+	int height = painter->device()->height();
 
 	angle = qMax(qMin(angle, 360), 0);
 
-	std::vector<uint8_t> arr;
+
+	QRect myQRect(startX, startY, width, height);
+	QRadialGradient gradient(QPoint(centerX, centerY), qMax(angle, 0));
+
 	foreach(Animation_Swirl::SwirlGradient item, bytearray)
 	{
-		arr.push_back(item.items[0]);
-		arr.push_back(item.items[1]);
-		arr.push_back(item.items[2]);
-		arr.push_back(item.items[3]);
-		arr.push_back(255);
+		gradient.setColorAt(
+			((uint8_t)item.items[0]) / 255.0,
+			QColor(
+				(uint8_t)(item.items[1]),
+				(uint8_t)(item.items[2]),
+				(uint8_t)(item.items[3])
+			));
 	}
-	painter.radialFill(centerX, centerY, angle, arr);
+	gradient.setSpread(static_cast<QGradient::Spread>(0));
+	painter->fillRect(myQRect, gradient);
 
 	return true;
 

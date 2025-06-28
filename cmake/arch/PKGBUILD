@@ -1,19 +1,17 @@
-pkgname=AmbilightApp
+pkgname=Ambilight App
 pkgver={VERSION}
 pkgrel=1
-pkgdesc="AmbilightApp is an open source ambient light implementation."
-url="https://ambilightled.com"
+pkgdesc="Ambilight App is an open source ambient light implementation."
+url="http://ambilightled.com"
 license=('MIT')
 arch=('x86_64')
 install=INSTALL
 depends=('xz')
-optdepends=('shared-mime-info' 'gtk3')
+optdepends=('libx11' 'shared-mime-info')
 # not needed fot Github Action
-# source=("git+https://ambilightled.com.git")
 # md5sums=('SKIP')
 
 build() {
-    export LDFLAGS=${LDFLAGS/-Wl,-z,pack-relative-relocs/}
     cmake -B build -S .. \
         -DCMAKE_BUILD_TYPE='None' \
         -DCMAKE_INSTALL_PREFIX='/usr' \

@@ -1,5 +1,6 @@
 #ifndef PCH_ENABLED	
 	#include <QResource>
+	#include <QImage>
 	#include <QBuffer>
 	#include <QByteArray>
 	#include <QTimer>
@@ -29,9 +30,10 @@
 #include <base/SoundCapture.h>
 #include <base/ImageToLedManager.h>
 #include <base/AccessManager.h>
-#include <flatbuffers/server/FlatBuffersServer.h>
+#include <flatbufserver/FlatBufferServer.h>
 #include <utils/jsonschema/QJsonUtils.h>
 #include <utils/jsonschema/QJsonSchemaChecker.h>
+#include <utils/ColorSys.h>
 #include <utils/JsonUtils.h>
 #include <utils/PerformanceCounters.h>
 
@@ -39,7 +41,7 @@
 #ifdef ENABLE_BONJOUR
 	#include <bonjour/DiscoveryWrapper.h>
 #endif
-#include <qprocess.h>
+#include <QProcess>
 
 using namespace ambilightapp;
 
@@ -265,7 +267,7 @@ void AmbilightAPI::handleImageCommand(const QJsonObject& message, const QString&
 	idata.scale = message["scale"].toInt(-1);
 	idata.format = message["format"].toString();
 	idata.imgName = message["name"].toString("");
-	idata.imagedata = message["imagedata"].toString();
+	idata.data = QByteArray::fromBase64(QByteArray(message["imagedata"].toString().toUtf8()));
 	QString replyMsg;
 
 	if (!BaseAPI::setImage(idata, COMP_IMAGE, replyMsg))

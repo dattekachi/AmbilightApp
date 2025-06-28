@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef PCH_ENABLED
+	#include <QExplicitlySharedDataPointer>
+#endif
+
 #include <utils/ImageData.h>
 
 template <typename ColorSpace>

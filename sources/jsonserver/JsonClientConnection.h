@@ -31,7 +31,7 @@ private slots:
 
 private:
 	QTcpSocket* _socket;
-	AmbilightAPI* _hmbilightAPI;
+	AmbilightAPI* _ambilightAPI;
 	QByteArray _receiveBuffer;
 	Logger* _log;
 };

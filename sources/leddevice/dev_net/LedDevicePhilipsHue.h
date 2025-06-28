@@ -164,7 +164,7 @@ protected:
 
 	void log(const char* msg, const char* type, ...) const;
 
-	std::list<QString> getCiphersuites() override;
+	const int* getCiphersuites() const override;
 
 	QJsonDocument getGroupStateV2(QString groupId);
 	QJsonDocument setGroupStateV2(QString groupId, bool state);

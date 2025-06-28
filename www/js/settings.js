@@ -1,7 +1,4 @@
 var storedLang;
-// var availLang = ['cs','de','en','es','fr','it','nl','pl','ro','sv','vi','ru','tr','zh-CN'];
-// var availLangText = ['Čeština', 'Deutsch', 'English', 'Español', 'Français', 'Italiano', 'Nederlands', 'Polski', 'Română', 'Svenska', 'Tiếng Việt', 'Русский', 'Türkçe', '汉语'];
-
 var availLang = ['vi', 'en'];
 var availLangText = ['Tiếng Việt', 'English'];
 
@@ -27,7 +24,7 @@ function changePassword(){
 
 
 	$('#newPw, #oldPw').off().on('input',function(e) {
-		($('#oldPw').val().length >= 8 && $('#newPw').val().length >= 8) ? $('#id_btn_ok').attr('disabled', false) : $('#id_btn_ok').attr('disabled', true);
+		($('#oldPw').val().length >= 8 && $('#newPw').val().length >= 8) && !window.readOnlyMode ? $('#id_btn_ok').attr('disabled', false) : $('#id_btn_ok').attr('disabled', true);
 	});
 }
 
@@ -37,6 +34,7 @@ $(document).ready( function() {
 	function initTrans(lc){
 		if (lc == 'auto')
 		{
+			$.i18n().locale = 'vi';
 			$.i18n().load().done(
 			function() {
 				performTranslation();

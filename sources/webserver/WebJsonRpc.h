@@ -24,7 +24,7 @@ private:
 	QtHttpServer* _server;
 	QtHttpClientWrapper* _wrapper;
 	Logger*		_log;
-	AmbilightAPI*	_hmbilightAPI;
+	AmbilightAPI*	_ambilightAPI;
 
 	bool _stopHandle = false;
 	bool _unlocked = false;

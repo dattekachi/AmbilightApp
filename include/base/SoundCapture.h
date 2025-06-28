@@ -5,6 +5,7 @@
 	#include <QMutex>
 	#include <QJsonObject>
 	#include <QJsonArray>
+	#include <QColor>
 
 	#include <utils/Logger.h>
 	#include <utils/settings.h>
@@ -26,7 +27,6 @@ protected:
 	
 	QList<QString>	_availableDevices;
 	bool			_isActive;
-	bool			_enable_smoothing;
 	QString			_selectedDevice;
 	QString			_normalizedName;
 	bool			_isRunning;

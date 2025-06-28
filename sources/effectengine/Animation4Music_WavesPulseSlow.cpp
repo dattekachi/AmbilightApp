@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ Animation4Music_WavesPulseSlow::Animation4Music_WavesPulseSlow() :
 {
 	for (int i = 0; i < 5; i++)
 	{
-		_buffer.push_back(ColorRgb(0, 0, 0));
+		_buffer.push_back(QColor(0, 0, 0));
 	}
 };
 
@@ -47,14 +47,14 @@ EffectDefinition Animation4Music_WavesPulseSlow::getDefinition()
 }
 
 void Animation4Music_WavesPulseSlow::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 	SetSleepTime(15);
 }
 
-bool Animation4Music_WavesPulseSlow::Play(AmbilightImage& painter)
+bool Animation4Music_WavesPulseSlow::Play(QPainter* painter)
 {
 	return false;
 }
@@ -73,7 +73,7 @@ bool Animation4Music_WavesPulseSlow::getImage(Image<ColorRgb>& newImage)
 	if (r == nullptr || !newData)
 		return false;
 
-	ColorRgb empty, selected;
+	QColor empty, selected;
 	uint32_t maxSingle, average;
 
 	newImage.clear();
@@ -104,19 +104,19 @@ bool Animation4Music_WavesPulseSlow::getImage(Image<ColorRgb>& newImage)
 			w2 = std::min((int)((y * (_buffer.length() - 1)) % (scaleY / 2)) * 100 / (scaleY / 2), (int)100);
 			w1 = 100 - w2;
 		}
-		selected = ColorRgb(
-			std::min((_buffer[ind].Red() * w1 + _buffer[ind + 1].Red() * w2) / 100, 255),
-			std::min((_buffer[ind].Green() * w1 + _buffer[ind + 1].Green() * w2) / 100, 255),
-			std::min((_buffer[ind].Blue() * w1 + _buffer[ind + 1].Blue() * w2) / 100, 255)
+		selected = QColor::fromRgb(
+			std::min((_buffer[ind].red() * w1 + _buffer[ind + 1].red() * w2) / 100, 255),
+			std::min((_buffer[ind].green() * w1 + _buffer[ind + 1].green() * w2) / 100, 255),
+			std::min((_buffer[ind].blue() * w1 + _buffer[ind + 1].blue() * w2) / 100, 255)
 		);
 
-		newImage.gradientVBox(0, h1, width, h1 + hm, selected.Red(), selected.Green(), selected.Blue());
+		newImage.gradientVBox(0, h1, width, h1 + hm, selected.red(), selected.green(), selected.blue());
 		if (y != scaleY / 2)
-			newImage.gradientVBox(0, h2, width, h2 - hm, selected.Red(), selected.Green(), selected.Blue());
+			newImage.gradientVBox(0, h2, width, h2 - hm, selected.red(), selected.green(), selected.blue());
 
-		newImage.gradientVBox(newImage.width() - 1 - width, h1, newImage.width() - 1, h1 + hm, selected.Red(), selected.Green(), selected.Blue());
+		newImage.gradientVBox(newImage.width() - 1 - width, h1, newImage.width() - 1, h1 + hm, selected.red(), selected.green(), selected.blue());
 		if (y != scaleY / 2)
-			newImage.gradientVBox(newImage.width() - 1 - width, h2, newImage.width() - 1, h2 - hm, selected.Red(), selected.Green(), selected.Blue());
+			newImage.gradientVBox(newImage.width() - 1 - width, h2, newImage.width() - 1, h2 - hm, selected.red(), selected.green(), selected.blue());
 	}
 
 	for (int x = 0, scaleX = 27; x <= scaleX / 2; x++)
@@ -137,19 +137,19 @@ bool Animation4Music_WavesPulseSlow::getImage(Image<ColorRgb>& newImage)
 			we2 = std::min((int)((x * (_buffer.length() - 1)) % (scaleX / 2)) * 100 / (scaleX / 2), (int)100);
 			we1 = 100 - we2;
 		}
-		selected = ColorRgb(
-			std::min((_buffer[ind].Red() * we1 + _buffer[ind + 1].Red() * we2) / 100, 255),
-			std::min((_buffer[ind].Green() * we1 + _buffer[ind + 1].Green() * we2) / 100, 255),
-			std::min((_buffer[ind].Blue() * we1 + _buffer[ind + 1].Blue() * we2) / 100, 255)
+		selected = QColor::fromRgb(
+			std::min((_buffer[ind].red() * we1 + _buffer[ind + 1].red() * we2) / 100, 255),
+			std::min((_buffer[ind].green() * we1 + _buffer[ind + 1].green() * we2) / 100, 255),
+			std::min((_buffer[ind].blue() * we1 + _buffer[ind + 1].blue() * we2) / 100, 255)
 		);
 
-		newImage.gradientHBox(w1, 0, w1 + wm + 1, height, selected.Red(), selected.Green(), selected.Blue());
+		newImage.gradientHBox(w1, 0, w1 + wm + 1, height, selected.red(), selected.green(), selected.blue());
 		if (x != scaleX / 2)
-			newImage.gradientHBox(w2, 0, w2 - wm, height, selected.Red(), selected.Green(), selected.Blue());
+			newImage.gradientHBox(w2, 0, w2 - wm, height, selected.red(), selected.green(), selected.blue());
 
-		newImage.gradientHBox(w1, newImage.height() - 1 - height, w1 + wm + 1, newImage.height() - 1, selected.Red(), selected.Green(), selected.Blue());
+		newImage.gradientHBox(w1, newImage.height() - 1 - height, w1 + wm + 1, newImage.height() - 1, selected.red(), selected.green(), selected.blue());
 		if (x != scaleX / 2)
-			newImage.gradientHBox(w2, newImage.height() - 1 - height, w2 - wm, newImage.height() - 1, selected.Red(), selected.Green(), selected.Blue());
+			newImage.gradientHBox(w2, newImage.height() - 1 - height, w2 - wm, newImage.height() - 1, selected.red(), selected.green(), selected.blue());
 	}
 
 	return true;

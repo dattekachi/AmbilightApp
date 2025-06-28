@@ -11,10 +11,10 @@ public:
 	Animation4Music_StereoBlue();
 
 	void Init(
-		AmbilightImage& hyperImage,
-		int hyperLatchTime) override;
+		QImage& ambilightImage,
+		int ambilightLatchTime) override;
 
-	bool Play(AmbilightImage& painter) override;
+	bool Play(QPainter* painter) override;
 
 	static EffectDefinition getDefinition();
 

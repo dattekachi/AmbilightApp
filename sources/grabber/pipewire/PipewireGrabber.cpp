@@ -4,7 +4,7 @@
 *
 *  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,7 @@
 
 #include <grabber/pipewire/PipewireGrabber.h>
 #include <grabber/pipewire/smartPipewire.h>
+#include <utils/ColorSys.h>
 #include <utils/GlobalSignals.h>
 #include <dlfcn.h>
 

@@ -10,10 +10,10 @@ public:
 	Animation_Sparks();
 
 	void Init(
-		AmbilightImage& hyperImage,
-		int hyperLatchTime) override;
+		QImage& ambilightImage,
+		int ambilightLatchTime) override;
 
-	bool Play(AmbilightImage& painter) override;
+	bool Play(QPainter* painter) override;
 	bool hasLedData(QVector<ColorRgb>& buffer) override;
 
 	static EffectDefinition getDefinition();

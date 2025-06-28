@@ -6,7 +6,7 @@
 *
 *  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ public:
 
 	static void goingSleep(QSerialPort* _serialPort)
 	{
-		uint8_t comBuffer[] = { 0x41, 0x77, 0x41, 0x2a, 0xa2, 0x35, 0x68, 0x79, 0x70, 0x65, 0x72, 0x68, 0x64, 0x72 };
+		uint8_t comBuffer[] = { 0x41, 0x64, 0x61, 0x2a, 0xa2, 0x35, 0x68, 0x79, 0x70, 0x65, 0x72, 0x68, 0x64, 0x72 };
 		_serialPort->write((char*)comBuffer, sizeof(comBuffer));
 	}
 
@@ -121,7 +121,7 @@ public:
 				QString result = QString(incoming).remove('*').replace('\n', ' ').trimmed();
 				if (result.indexOf("ESP driver", Qt::CaseInsensitive) >= 0)
 				{
-					Info(_log, "DETECTED DEVICE USING HyperSerialEsp8266/HyperSerialESP32/HyperSerialPico FIRMWARE (%s) at %i msec", QSTRING_CSTR(result), int(InternalClock::now() - start));
+					Info(_log, "DETECTED DEVICE Ambilight USB (%s) at %i msec", QSTRING_CSTR(result), int(InternalClock::now() - start));
 					start = 0;
 					break;
 				}
@@ -131,7 +131,7 @@ public:
 		}
 
 		if (start != 0)
-			Error(_log, "Could not detect HyperSerialEsp8266/HyperSerialESP32/HyperSerialPico device");
+			Error(_log, "Could not detect Ambilight USB device");
 	}
 };
 

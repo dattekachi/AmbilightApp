@@ -10,7 +10,6 @@
 #include <base/AmbilightAppInstance.h>
 #include <api/AmbilightAPI.h>
 #include <utils/FrameDecoder.h>
-#include <ambilightimage/AmbilightImage.h>
 
 #include "WebSocketClient.h"
 #include "QtHttpRequest.h"
@@ -32,10 +31,10 @@ WebSocketClient::WebSocketClient(
 	const QString client = request->getClientInfo().clientAddress.toString();
 
 	// Json processor
-	_hmbilightAPI = new AmbilightAPI(client, _log, localConnection, this);
-	connect(_hmbilightAPI, &AmbilightAPI::SignalCallbackJsonMessage, this, &WebSocketClient::sendMessage);
-	connect(_hmbilightAPI, &AmbilightAPI::SignalCallbackBinaryImageMessage, this, &WebSocketClient::signalCallbackBinaryImageMessageHandler);
-	connect(_hmbilightAPI, &AmbilightAPI::SignalPerformClientDisconnection, this, [this]() { this->sendClose(CLOSECODE::NORMAL); });
+	_ambilightAPI = new AmbilightAPI(client, _log, localConnection, this);
+	connect(_ambilightAPI, &AmbilightAPI::SignalCallbackJsonMessage, this, &WebSocketClient::sendMessage);
+	connect(_ambilightAPI, &AmbilightAPI::SignalCallbackBinaryImageMessage, this, &WebSocketClient::signalCallbackBinaryImageMessageHandler);
+	connect(_ambilightAPI, &AmbilightAPI::SignalPerformClientDisconnection, this, [this]() { this->sendClose(CLOSECODE::NORMAL); });
 
 	Debug(_log, "New connection from %s", QSTRING_CSTR(client));
 
@@ -52,7 +51,7 @@ WebSocketClient::WebSocketClient(
 	_socket->flush();
 
 	// Init JsonAPI
-	_hmbilightAPI->initialize();
+	_ambilightAPI->initialize();
 }
 
 void WebSocketClient::handleBinaryMessage(QByteArray& data)
@@ -145,7 +144,7 @@ void WebSocketClient::handleWebSocketFrame()
 						if (_wsh.opCode == OPCODE::TEXT)
 						{
 
-							_hmbilightAPI->handleMessage(QString(_wsReceiveBuffer));
+							_ambilightAPI->handleMessage(QString(_wsReceiveBuffer));
 						}
 						else
 						{
@@ -307,7 +306,7 @@ qint64 WebSocketClient::signalCallbackBinaryImageMessageHandler(Image<ColorRgb> 
 		return 0;
 
 	MemoryBuffer<uint8_t> mb;
-	AmbilightImage::encodeJpeg(mb, image, (image.width() > 800));
+	FrameDecoder::encodeJpeg(mb, image, (image.width() > 800));
 	
 	qint64 payloadWritten = 0;
 	quint32 payloadSize = static_cast<quint32>(mb.size());

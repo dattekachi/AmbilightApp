@@ -17,7 +17,8 @@
 	#include <stdlib.h>
 #endif
 
-#include <QCoreApplication>
+#include <QApplication>
+
 #include <utils/Components.h>
 #include <utils/JsonUtils.h>
 #include <utils/Image.h>
@@ -28,11 +29,17 @@
 #include <base/GrabberHelper.h>
 #include <base/NetworkForwarder.h>
 
+#ifdef USE_STATIC_QT_PLUGINS
+	#include <QtPlugin>
+	Q_IMPORT_PLUGIN(QJpegPlugin)
+	Q_IMPORT_PLUGIN(QGifPlugin)
+#endif
+
 #include <jsonserver/JsonServer.h>
 #include <webserver/WebServer.h>
 
 // Flatbuffer Server
-#include <flatbuffers/server/FlatBuffersServer.h>
+#include <flatbufserver/FlatBufferServer.h>
 
 // ProtoNanoBuffer Server
 #include <proto-nano-server/ProtoServer.h>
@@ -56,7 +63,7 @@
 
 #include "AmbilightAppDaemon.h"
 
-AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QCoreApplication* parent, bool logLvlOverwrite, bool readonlyMode, QStringList params, bool isGuiApp)
+AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QApplication* parent, bool logLvlOverwrite, bool readonlyMode, QStringList params, bool isGuiApp)
 	: QObject(parent)
 	, _log(Logger::getInstance("DAEMON"))
 	, _instanceManager(nullptr)
@@ -87,10 +94,10 @@ AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QCoreApplication
 	qRegisterMetaType<std::vector<ColorRgb>>("std::vector<ColorRgb>");
 
 	// First load default configuration for other objects
-	_instanceZeroConfig = std::unique_ptr<InstanceConfig>(new InstanceConfig(true, 0, this));
+	_instanceZeroConfig = std::unique_ptr<InstanceConfig>(new InstanceConfig(true, 0, this, readonlyMode));
 
 	// Instance manager
-	_instanceManager = std::shared_ptr<AmbilightAppManager>(new AmbilightAppManager(rootPath),
+	_instanceManager = std::shared_ptr<AmbilightAppManager>(new AmbilightAppManager(rootPath, readonlyMode),
 		[](AmbilightAppManager* instanceManager) {
 			SMARTPOINTER_MESSAGE("AmbilightAppManager");
 			delete instanceManager;
@@ -98,7 +105,7 @@ AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QCoreApplication
 	connect(GlobalSignals::getInstance(), &GlobalSignals::SignalGetInstanceManager, this, &AmbilightAppDaemon::getInstanceManager, Qt::DirectConnection);
 
 	// Access Manager
-	_accessManager = std::shared_ptr<AccessManager>(new AccessManager(this),
+	_accessManager = std::shared_ptr<AccessManager>(new AccessManager(this, readonlyMode),
 		[](AccessManager* accessManager) {
 			SMARTPOINTER_MESSAGE("AccessManager");
 			delete accessManager;
@@ -172,6 +179,18 @@ AmbilightAppDaemon::AmbilightAppDaemon(const QString& rootPath, QCoreApplication
 	connect(_instanceManager.get(), &AmbilightAppManager::SignalInstanceStateChanged, this, &AmbilightAppDaemon::instanceStateChangedHandler);
 	connect(_instanceManager.get(), &AmbilightAppManager::SignalSettingsChanged, this, &AmbilightAppDaemon::settingsChangedHandler);
 
+	// power management
+	//#if defined(HAVE_POWER_MANAGEMENT)
+	//	bool lockedEnable = genConfig["disableOnLocked"].toBool(false);
+
+	//	_suspendHandler = std::unique_ptr<SuspendHandler>(new SuspendHandler(lockedEnable));
+	//	connect(_suspendHandler.get(), &SuspendHandler::SignalHibernate, _instanceManager.get(), &AmbilightAppManager::hibernate);
+
+	//	#ifdef _WIN32
+	//		if (QAbstractEventDispatcher::instance() != nullptr)
+	//			QAbstractEventDispatcher::instance()->installNativeEventFilter(_suspendHandler.get());
+	//	#endif
+	//#endif
 
 	// ---- network services -----
 	startNetworkServices();
@@ -186,7 +205,7 @@ void AmbilightAppDaemon::instanceStateChangedHandler(InstanceState state, quint8
 	{
 		if (_instanceManager->areInstancesReady())
 		{
-			// power management
+
 			#if defined(HAVE_POWER_MANAGEMENT)
 				if (_suspendHandler == nullptr)
 				{
@@ -319,18 +338,18 @@ void AmbilightAppDaemon::startNetworkServices()
 
 	_flatProtoThread->setObjectName("FlatProtoThread");
 
-	FlatBuffersServer* _flatBufferServer = new FlatBuffersServer(_netOrigin, getSetting(settings::type::FLATBUFSERVER), _rootPath);
+	FlatBufferServer* _flatBufferServer = new FlatBufferServer(_netOrigin, getSetting(settings::type::FLATBUFSERVER), _rootPath);
 	_flatBufferServer->moveToThread(_flatProtoThread);
 	flatProtoThreadClients.push_back(_flatBufferServer);
 	if (_videoGrabber == nullptr)
 	{
 		Warning(_log, "The USB grabber was disabled during build. FlatbufferServer now controlls the HDR state.");		
-		connect(_flatBufferServer, &FlatBuffersServer::SignalSetNewComponentStateToAllInstances, _instanceManager.get(), &AmbilightAppManager::SignalSetNewComponentStateToAllInstances);
+		connect(_flatBufferServer, &FlatBufferServer::SignalSetNewComponentStateToAllInstances, _instanceManager.get(), &AmbilightAppManager::SignalSetNewComponentStateToAllInstances);
 	}
-	connect(GlobalSignals::getInstance(), &GlobalSignals::SignalRequestComponent, _flatBufferServer, &FlatBuffersServer::signalRequestSourceHandler);
-	connect(_flatProtoThread, &QThread::started, _flatBufferServer, &FlatBuffersServer::initServer);
-	connect(_flatProtoThread, &QThread::finished, _flatBufferServer, &FlatBuffersServer::deleteLater);
-	connect(_instanceManager.get(), &AmbilightAppManager::SignalSettingsChanged, _flatBufferServer, &FlatBuffersServer::handleSettingsUpdate);
+	connect(GlobalSignals::getInstance(), &GlobalSignals::SignalRequestComponent, _flatBufferServer, &FlatBufferServer::signalRequestSourceHandler);
+	connect(_flatProtoThread, &QThread::started, _flatBufferServer, &FlatBufferServer::initServer);
+	connect(_flatProtoThread, &QThread::finished, _flatBufferServer, &FlatBufferServer::deleteLater);
+	connect(_instanceManager.get(), &AmbilightAppManager::SignalSettingsChanged, _flatBufferServer, &FlatBufferServer::handleSettingsUpdate);
 
 	NetworkForwarder* _networkForwarder = new NetworkForwarder();
 	_networkForwarder->moveToThread(_flatProtoThread);
@@ -344,7 +363,7 @@ void AmbilightAppDaemon::startNetworkServices()
 	flatProtoThreadClients.push_back(_protoServer);
 	connect(_flatProtoThread, &QThread::started, _protoServer, &ProtoServer::initServer);
 	connect(_flatProtoThread, &QThread::finished, _protoServer, &ProtoServer::deleteLater);
-	connect(_protoServer, &ProtoServer::SignalImportFromProto, _flatBufferServer, &FlatBuffersServer::SignalImportFromProto);
+	connect(_protoServer, &ProtoServer::SignalImportFromProto, _flatBufferServer, &FlatBufferServer::SignalImportFromProto);
 	connect(_instanceManager.get(), &AmbilightAppManager::SignalSettingsChanged, _protoServer, &ProtoServer::handleSettingsUpdate);
 #endif
 

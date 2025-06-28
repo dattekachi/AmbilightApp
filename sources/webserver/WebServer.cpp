@@ -14,11 +14,6 @@
 #include "StaticFileServing.h"
 #include "QtHttpServer.h"
 
-#ifdef USE_STATIC_QT_PLUGINS
-	#include <QtPlugin>
-	Q_IMPORT_PLUGIN(QTlsBackendOpenSSLPlugin)
-#endif
-
 // bonjour
 #ifdef ENABLE_BONJOUR
 	#include <bonjour/BonjourServiceRegister.h>

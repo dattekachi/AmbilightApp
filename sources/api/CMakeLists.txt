@@ -16,6 +16,7 @@ target_link_libraries(ambilightapp-api
 	ambilightapp-base
 	ambilightapp-utils
 	Qt${Qt_VERSION}::Core
+	Qt${Qt_VERSION}::Gui
 	Qt${Qt_VERSION}::Network
 )
 

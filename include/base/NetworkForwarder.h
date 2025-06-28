@@ -23,7 +23,7 @@
 // Forward declaration
 class AmbilightAppInstance;
 class QTcpSocket;
-class FlatBuffersClient;
+class FlatBufferConnection;
 
 class NetworkForwarder : public QObject
 {
@@ -41,7 +41,6 @@ signals:
 
 public slots:
 	void startedHandler();
-	void signalColorIsSetHandler(ColorRgb color, int duration);
 	void signalForwardImageHandler();
 	void handlerInstanceImageUpdated(const Image<ColorRgb>& ret);
 
@@ -61,7 +60,7 @@ private:
 
 	const int	_priority;
 
-	QList<FlatBuffersClient*> _forwardClients;
+	QList<FlatBufferConnection*> _forwardClients;
 	std::atomic<bool> _hasImage;
 	Image<ColorRgb>	_image;
 };

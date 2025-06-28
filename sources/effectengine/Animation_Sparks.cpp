@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -35,14 +35,14 @@ Animation_Sparks::Animation_Sparks() :
 };
 
 void Animation_Sparks::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 	SetSleepTime((int)(sleep_time * 1000.0));
 }
 
-bool Animation_Sparks::Play(AmbilightImage& painter)
+bool Animation_Sparks::Play(QPainter* painter)
 {
 	return true;
 }

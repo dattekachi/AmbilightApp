@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -39,9 +39,6 @@ Animation_AtomicSwirl::Animation_AtomicSwirl(QString name) :
 	center_y = 0.5;
 	reverse = false;
 
-	
-	custom_colors.append({ 0,0,0 });
-	custom_colors.append({ 255,255,0 });
 	custom_colors.append({ 0,0,0 });
 	custom_colors.append({ 0,0,0 });
 	custom_colors.append({ 255,255,0 });
@@ -49,6 +46,8 @@ Animation_AtomicSwirl::Animation_AtomicSwirl(QString name) :
 	custom_colors.append({ 0,0,0 });
 	custom_colors.append({ 255,255,0 });
 	custom_colors.append({ 0,0,0 });
+	custom_colors.append({ 0,0,0 });
+	custom_colors.append({ 255,255,0 });
 
 	random_center = false;
 	enable_second = false;

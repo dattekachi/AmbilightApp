@@ -8,8 +8,6 @@
 	#include <QStringList>
 #endif
 
-#include <QCoreApplication>
-
 #ifdef ENABLE_V4L2
 	#include <grabber/v4l2/V4L2Wrapper.h>
 #else
@@ -110,13 +108,13 @@ class GrabberHelper;
 class QApplication;
 
 #if defined(_WIN32) && defined(ENABLE_POWER_MANAGEMENT)
-	#include <suspend-handler/SuspendHandlerWindows.h>
+	#include "SuspendHandlerWindows.h"
 #elif defined(__APPLE__) && defined(ENABLE_POWER_MANAGEMENT)
-	#include <suspend-handler/SuspendHandlerMacOS.h>
-#elif defined(__linux__) && defined(ENABLE_POWER_MANAGEMENT)
-	#include <suspend-handler/SuspendHandlerLinux.h>
+	#include "SuspendHandlerMacOS.h"
+#elif defined(__linux__) && defined(AMBILIGHTAPP_HAVE_DBUS) && defined(ENABLE_POWER_MANAGEMENT)
+	#include "SuspendHandlerLinux.h"
 #else
-	#include <suspend-handler/SuspendHandlerDummy.h>
+	typedef QObject SuspendHandler;
 #endif
 
 namespace ambilightapp { enum class InstanceState; }
@@ -127,7 +125,7 @@ class AmbilightAppDaemon : public QObject
 
 
 public:
-	AmbilightAppDaemon(const QString& rootPath, QCoreApplication* parent, bool logLvlOverwrite, bool readonlyMode = false, QStringList params = QStringList(), bool isGuiApp = true);
+	AmbilightAppDaemon(const QString& rootPath, QApplication* parent, bool logLvlOverwrite, bool readonlyMode = false, QStringList params = QStringList(), bool isGuiApp = true);
 	~AmbilightAppDaemon();
 
 	QJsonDocument getSetting(settings::type type) const;	

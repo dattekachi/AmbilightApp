@@ -10,7 +10,7 @@
 *
 *  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -121,15 +121,6 @@ inline void SAFE_CALL_TEST_FUN() {};
 		QMetaObject::invokeMethod(target, #method, Qt::QueuedConnection, Q_ARG(p1type, p1value), Q_ARG(p2type, p2value), Q_ARG(p3type, p3value), Q_ARG(p4type, p4value)); \
 	else \
 		target->method((p1type) p1value, (p2type) p2value, (p3type) p3value, (p4type) p4value); \
-}
-
-#define QUEUE_CALL_5(target, method, p1type, p1value, p2type, p2value, p3type, p3value, p4type, p4value , p5type, p5value , ...) \
-{ \
-	SAFE_CALL_TEST_FUN(__VA_ARGS__); \
-	if (true) \
-		QMetaObject::invokeMethod(target, #method, Qt::QueuedConnection, Q_ARG(p1type, p1value), Q_ARG(p2type, p2value), Q_ARG(p3type, p3value), Q_ARG(p4type, p4value), Q_ARG(p5type, p5value)); \
-	else \
-		target->method((p1type) p1value, (p2type) p2value, (p3type) p3value, (p4type) p4value, (p5type) p5value); \
 }
 
 #define BLOCK_CALL_0(target, method, ...) \

@@ -3,9 +3,10 @@
 #include <db/AuthTable.h>
 using namespace ambilightapp;
 
-AuthTable::AuthTable()
+AuthTable::AuthTable(bool readonlyMode)
 	: DBManager()
 {
+	setReadonlyMode(readonlyMode);
 	// init Auth table
 	setTable("auth");
 	// create table columns

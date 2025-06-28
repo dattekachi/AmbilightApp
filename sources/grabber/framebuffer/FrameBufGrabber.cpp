@@ -4,7 +4,7 @@
 *
 *  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,7 @@
 #include <QCoreApplication>
 
 #include <grabber/framebuffer/FrameBufGrabber.h>
+#include <utils/ColorSys.h>
 
 FrameBufGrabber::FrameBufGrabber(const QString& device, const QString& configurationPath)
 	: Grabber(configurationPath, "FRAMEBUFFER_SYSTEM:" + device.left(14))

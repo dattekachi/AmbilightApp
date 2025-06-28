@@ -3,9 +3,11 @@
 
 #include <db/MetaTable.h>
 
-MetaTable::MetaTable()
+MetaTable::MetaTable(bool readonlyMode)
 	: DBManager()
 {
+	setReadonlyMode(readonlyMode);
+
 	setTable("meta");
 	createTable(QStringList() << "uuid TEXT" << "created_at TEXT");
 };

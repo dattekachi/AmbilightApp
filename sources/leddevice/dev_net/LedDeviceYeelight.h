@@ -2,6 +2,8 @@
 
 #ifndef PCH_ENABLED	
 	#include <QHostAddress>
+	#include <QColor>
+
 	#include <chrono>
 #endif
 
@@ -129,7 +131,7 @@ private:
 	QTcpSocket* _tcpStreamSocket;
 	int _correlationID;
 	qint64	_lastWriteTime;
-	ColorRgb _color;
+	QColor _color;
 	int _lastColorRgbValue;
 
 	API_EFFECT _transitionEffect;

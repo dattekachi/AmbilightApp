@@ -149,7 +149,8 @@ case "$STARTUP_MSG" in
 esac
 [ -z "$REBOOTMESSAGE" ] || printf " |  \033[31;1m%-67s\033[0m  |\n" "$REBOOTMESSAGE"
 echo " +-----------------------------------------------------------------------+"
-echo " |  Webpage: \033[36;1mhttps://ambilightled.com\033[0m                                         |"
+echo " |  Webpage: \033[36;1mhttp://ambilightled.com\033[0m                                         |"
+echo " |  GitHub: \033[36;1mhttp://ambilightled.com\033[0m                        |"
 echo " +-----------------------------------------------------------------------+\n"
 
 exit 0

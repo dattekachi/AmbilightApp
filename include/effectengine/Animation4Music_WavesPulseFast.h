@@ -11,10 +11,10 @@ public:
 	Animation4Music_WavesPulseFast();
 
 	void Init(
-		AmbilightImage& hyperImage,
-		int hyperLatchTime) override;
+		QImage& ambilightImage,
+		int ambilightLatchTime) override;
 
-	bool Play(AmbilightImage& painter) override;
+	bool Play(QPainter* painter) override;
 
 	static EffectDefinition getDefinition();
 
@@ -23,5 +23,5 @@ public:
 private:
 	uint32_t _internalIndex;
 	int		 _oldMulti;
-	QList<ColorRgb> _buffer;
+	QList<QColor> _buffer;
 };

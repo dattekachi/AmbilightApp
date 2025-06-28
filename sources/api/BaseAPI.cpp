@@ -1,6 +1,7 @@
 #ifndef PCH_ENABLED
 	#include <QResource>
 	#include <QCryptographicHash>
+	#include <QImage>
 	#include <QBuffer>
 	#include <QByteArray>
 	#include <QTimer>
@@ -16,7 +17,6 @@
 #endif
 
 #include <QHostInfo>
-#include <QSslSocket>
 
 #include <AmbilightappConfig.h>
 #include <api/BaseAPI.h>
@@ -25,11 +25,11 @@
 #include <base/SystemWrapper.h>
 #include <base/Muxer.h>
 #include <db/AuthTable.h>
-#include <flatbuffers/server/FlatBuffersServer.h>
+#include <flatbufserver/FlatBufferServer.h>
+#include <utils/ColorSys.h>
 #include <utils/jsonschema/QJsonSchemaChecker.h>
 #include <utils/GlobalSignals.h>
 #include <base/GrabberHelper.h>
-#include <ambilightimage/AmbilightImage.h>
 
 #ifdef ENABLE_XZ
 	#include <lzma.h>
@@ -154,6 +154,8 @@ bool BaseAPI::startInstance(quint8 index, int tan)
 	bool res;
 
 	SAFE_CALL_3_RET(_instanceManager.get(), startInstance, bool, res, quint8, index, QObject*, this, int, tan);
+	// if (res)
+	// 	addMusicDevice(index);
 
 	return res;
 }
@@ -161,7 +163,177 @@ bool BaseAPI::startInstance(quint8 index, int tan)
 void BaseAPI::stopInstance(quint8 index)
 {
 	QUEUE_CALL_1(_instanceManager.get(), stopInstance, quint8, index);
+	// removeMusicDevice(index);
 }
+
+// bool BaseAPI::addMusicDevice(const quint8 inst)
+// {
+//     Info(_log, "Adding music device for instance %d", inst);
+
+//     auto instance = _instanceManager->getAmbilightAppInstance(inst);
+//     if (!instance) {
+//         Error(_log, "Invalid instance %d", inst);
+//         return false;
+//     }
+
+//     // Lấy thông tin instance
+//     QJsonObject info;
+//     BLOCK_CALL_2(_ambilightapp.get(), putJsonInfo, QJsonObject&, info, bool, true);
+
+//     QJsonArray instanceInfo = info["instance"].toArray();
+//     if (inst >= instanceInfo.size()) {
+//         Error(_log, "Instance index %d out of range", inst);
+//         return false;
+//     }
+
+//     // Kiểm tra và tạo thư mục
+//     QString configDir = QDir::homePath() + "/.mls";
+//     QDir dir(configDir);
+//     if (!dir.exists()) {
+//         Info(_log, "Creating config directory: %s", QSTRING_CSTR(configDir));
+//         dir.mkpath(".");
+//     }
+
+//     // Đọc file config
+//     QString configPath = configDir + "/config.json";
+//     Info(_log, "Reading config file: %s", QSTRING_CSTR(configPath));
+    
+//     QFile file(configPath);
+//     QJsonObject config;
+
+//     if (file.exists()) {
+//         if (!file.open(QIODevice::ReadWrite)) {
+//             Error(_log, "Cannot open config file: %s", QSTRING_CSTR(file.errorString()));
+//             return false;
+//         }
+//         QByteArray data = file.readAll();
+//         QJsonDocument doc = QJsonDocument::fromJson(data);
+//         config = doc.object();
+//         file.close();
+//     }
+
+//     // Tạo device config
+//     QJsonObject instObj = instanceInfo[inst].toObject();
+//     QString instanceName = instObj["name"].toString();
+//     QString deviceId = instanceName.toLower().replace(" ", "-");
+
+//     Info(_log, "Creating device config for: %s (id: %s)", 
+//          QSTRING_CSTR(instanceName), QSTRING_CSTR(deviceId));
+
+//     QJsonObject deviceConfig;
+//     deviceConfig["baudrate"] = 1000000;
+//     deviceConfig["center_offset"] = 0;
+//     deviceConfig["color_order"] = "RGB";
+//     deviceConfig["com_port"] = instObj["output"].toString();
+//     deviceConfig["icon_name"] = "mdi:led-strip";
+//     deviceConfig["name"] = instanceName;
+//     deviceConfig["pixel_count"] = instObj["ledCount"].toInt();
+//     deviceConfig["refresh_rate"] = 62;
+
+//     QJsonObject device;
+//     device["config"] = deviceConfig;
+//     device["id"] = deviceId;
+//     device["type"] = "ambilightusb";
+
+//     // Thêm vào mảng devices
+//     QJsonArray devices = config["devices"].toArray();
+//     bool exists = false;
+    
+//     for (const auto& dev : devices) {
+//         if (dev.toObject()["id"].toString() == deviceId) {
+//             Info(_log, "Device already exists");
+//             exists = true;
+//             break;
+//         }
+//     }
+
+//     if (!exists) {
+//         Info(_log, "Adding new device to config");
+//         devices.append(device);
+//         config["devices"] = devices;
+
+//         // Ghi file
+//         if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+//             Error(_log, "Cannot open file for writing: %s", QSTRING_CSTR(file.errorString()));
+//             return false;
+//         }
+
+//         QJsonDocument saveDoc(config);
+//         QByteArray saveData = saveDoc.toJson(QJsonDocument::Indented);
+        
+//         Info(_log, "Writing config: %s", QSTRING_CSTR(QString(saveData)));
+        
+//         qint64 bytesWritten = file.write(saveData);
+//         file.close();
+
+//         if (bytesWritten <= 0) {
+//             Error(_log, "Failed to write config file");
+//             return false;
+//         }
+
+//         Info(_log, "Device added successfully");
+//         return true;
+//     }
+
+//     return exists;
+// }
+
+// bool BaseAPI::removeMusicDevice(const quint8 inst)
+// {
+//     auto instance = _instanceManager->getAmbilightAppInstance(inst);
+//     if (!instance)
+//         return false;
+
+//     // Lấy thông tin instance
+//     QJsonObject info;
+//     BLOCK_CALL_2(_ambilightapp.get(), putJsonInfo, QJsonObject&, info, bool, true);
+
+//     QJsonArray instanceInfo = info["instance"].toArray();
+//     if (inst >= instanceInfo.size())
+//         return false;
+
+//     // Kiểm tra file config
+//     QString configPath = QDir::homePath() + "/.mls/config.json";
+//     if (!QFile::exists(configPath))
+//         return true;
+
+//     QFile file(configPath);
+//     if (!file.open(QIODevice::ReadWrite))
+//         return false;
+
+//     // Đọc config hiện tại
+//     QByteArray data = file.readAll();
+//     QJsonDocument doc = QJsonDocument::fromJson(data);
+//     QJsonObject config = doc.object();
+
+//     // Lấy device ID từ tên instance
+//     QJsonObject instObj = instanceInfo[inst].toObject();
+//     QString deviceId = instObj["name"].toString().toLower().replace(" ", "-");
+
+//     // Xóa device khỏi mảng devices
+//     QJsonArray devices = config["devices"].toArray();
+//     QJsonArray newDevices;
+//     bool removed = false;
+
+//     for (const auto& dev : devices) {
+//         if (dev.toObject()["id"].toString() != deviceId) {
+//             newDevices.append(dev);
+//         } else {
+//             removed = true;
+//         }
+//     }
+
+//     if (removed) {
+//         config["devices"] = newDevices;
+        
+//         // Lưu lại file config
+//         file.resize(0);
+//         file.write(QJsonDocument(config).toJson(QJsonDocument::Indented));
+//     }
+    
+//     file.close();
+//     return true;
+// }
 
 bool BaseAPI::deleteInstance(quint8 index, QString& replyMsg)
 {
@@ -215,43 +387,77 @@ void BaseAPI::setColor(int priority, const std::vector<uint8_t>& ledColors, int 
 
 bool BaseAPI::setImage(ImageCmdData& data, ambilightapp::Components comp, QString& replyMsg, ambilightapp::Components callerComp)
 {
-	Image<ColorRgb> image;
 	// truncate name length
 	data.imgName.truncate(16);
 
-	auto imageMemory = QByteArray::fromBase64(QByteArray(data.imagedata.toUtf8()));
-
-	if (data.format == "rgb")
-	{		
-		if (imageMemory.size() != static_cast<long long>(data.width) * data.height * 3 || imageMemory.size() == 0)
+	if (data.format == "auto")
+	{
+		QImage img = QImage::fromData(data.data);
+		if (img.isNull())
 		{
-			replyMsg = "Size of image data does not match with the width and height";
+			replyMsg = "Failed to parse picture, the file might be corrupted";
 			return false;
 		}
-		else if (imageMemory.size() >= 6ll*1024*1024)
+
+		// check for requested scale
+		if (data.scale > 24)
 		{
-			replyMsg = "Image too large (max. 6MB)";
-			return false;
+			if (img.height() > data.scale)
+			{
+				img = img.scaledToHeight(data.scale);
+			}
+			if (img.width() > data.scale)
+			{
+				img = img.scaledToWidth(data.scale);
+			}
 		}
-		image.resize(data.width, data.height);
-		memcpy(image.rawMem(), imageMemory.data(), imageMemory.size());
-	}
-	else if (data.format == "auto")
-	{		
-		image = AmbilightImage::load2image(imageMemory);
 
-
-		if (image.width() == 1)
+		// check if we need to force a scale
+		if (img.width() > 2000 || img.height() > 2000)
 		{
-			replyMsg = "Unsupported image";
-			return false;
+			data.scale = 2000;
+			if (img.height() > data.scale)
+			{
+				img = img.scaledToHeight(data.scale);
+			}
+			if (img.width() > data.scale)
+			{
+				img = img.scaledToWidth(data.scale);
+			}
+		}
+
+		data.width = img.width();
+		data.height = img.height();
+
+		// extract image
+		img = img.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+		data.data.clear();
+		data.data.reserve(img.width() * img.height() * 3);
+		for (int i = 0; i < img.height(); ++i)
+		{
+			const QRgb* scanline = reinterpret_cast<const QRgb*>(img.scanLine(i));
+			for (int j = 0; j < img.width(); ++j)
+			{
+				data.data.append((char)qRed(scanline[j]));
+				data.data.append((char)qGreen(scanline[j]));
+				data.data.append((char)qBlue(scanline[j]));
+			}
 		}
 	}
 	else
 	{
-		replyMsg = "Unsupported image type";
-		return false;
+		// check consistency of the size of the received data
+		if (data.data.size() != data.width * data.height * 3)
+		{
+			replyMsg = "Size of image data does not match with the width and height";
+			return false;
+		}
 	}
+
+	// copy image
+	Image<ColorRgb> image(data.width, data.height);
+	memcpy(image.rawMem(), data.data.data(), data.data.size());
+
 
 	QUEUE_CALL_4(_ambilightapp.get(), registerInput, int, data.priority, ambilightapp::Components, comp, QString, data.origin, QString, data.imgName);
 	QUEUE_CALL_3(_ambilightapp.get(), setInputImage, int, data.priority, Image<ColorRgb>, image, int64_t, data.duration);
@@ -747,5 +953,4 @@ void BaseAPI::putSystemInfo(QJsonObject& system)
 	system["hostName"] = _sysInfo.hostName;
 	system["domainName"] = _sysInfo.domainName;
 	system["qtVersion"] = QT_VERSION_STR;
-	system["openssl"] = (QSslSocket::supportsSsl()) ? QSslSocket::sslLibraryVersionString() : "unsupported";
 }

@@ -1,1 +1,1 @@
-- Update
+Improved performance and added new features

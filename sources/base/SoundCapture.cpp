@@ -4,7 +4,7 @@
 *
 *  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,6 @@ namespace
 
 SoundCapture::SoundCapture(const QJsonDocument& effectConfig, QObject* parent) :
 	_isActive(false),
-	_enable_smoothing(true),
 	_selectedDevice(""),
 	_isRunning(false),
 	_maxInstance(0)
@@ -112,8 +111,6 @@ void SoundCapture::settingsChangedHandler(settings::type type, const QJsonDocume
 
 		if (sndEffectConfig["enable"].toBool(true))
 		{
-			_enable_smoothing = sndEffectConfig["enable_smoothing"].toBool(true);
-
 			const QString  dev = sndEffectConfig["device"].toString("");
 			if (dev.trimmed().length() > 0)
 			{
@@ -290,7 +287,7 @@ SoundCaptureResult* SoundCapture::hasResult(AnimationBaseMusic* effect, uint32_t
 
 	effect->restore(&resultFFT.mtWorking);
 
-	if (*isMulti <= 0 || !_enable_smoothing)
+	if (*isMulti <= 0)
 	{
 		return nullptr;
 	}

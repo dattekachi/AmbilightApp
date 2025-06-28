@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -44,14 +44,14 @@ EffectDefinition Animation4Music_StereoMulti::getDefinition()
 }
 
 void Animation4Music_StereoMulti::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 	SetSleepTime(15);
 }
 
-bool Animation4Music_StereoMulti::Play(AmbilightImage& painter)
+bool Animation4Music_StereoMulti::Play(QPainter* painter)
 {
 	return false;
 }
@@ -69,7 +69,7 @@ bool Animation4Music_StereoMulti::getImage(Image<ColorRgb>& newImage)
 	if (r == nullptr || !newData)
 		return false;
 
-	ColorRgb selected;
+	QColor selected;
 	uint32_t maxSingle, average;
 
 	newImage.clear();
@@ -90,8 +90,8 @@ bool Animation4Music_StereoMulti::getImage(Image<ColorRgb>& newImage)
 	{
 		int width = newImage.width() * 0.04;
 
-		newImage.gradientVBox(0, h1, width, h2, selected.Red(), selected.Green(), selected.Blue());
-		newImage.gradientVBox(newImage.width() - 1 - width, h1, newImage.width() - 1, h2, selected.Red(), selected.Green(), selected.Blue());
+		newImage.gradientVBox(0, h1, width, h2, selected.red(), selected.green(), selected.blue());
+		newImage.gradientVBox(newImage.width() - 1 - width, h1, newImage.width() - 1, h2, selected.red(), selected.green(), selected.blue());
 	}
 
 	return true;

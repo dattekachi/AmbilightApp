@@ -51,13 +51,13 @@ class AmbilightAppInstance : public QObject
 	Q_OBJECT
 
 public:
-	AmbilightAppInstance(quint8 instance, bool disableOnstartup, QString name);
+	AmbilightAppInstance(quint8 instance, bool readonlyMode, bool disableOnstartup, QString name);
 	~AmbilightAppInstance();
 	
 	quint8 getInstanceIndex() const { return _instIndex; }
 	QSize getLedGridSize() const { return _ledGridSize; }
 	bool getScanParameters(size_t led, double& hscanBegin, double& hscanEnd, double& vscanBegin, double& vscanEnd) const;
-	unsigned addEffectConfig(unsigned id, int settlingTime_ms = 200, double ledUpdateFrequency_hz = 25.0, bool pause = false);
+	unsigned updateSmoothingConfig(unsigned id, int settlingTime_ms = 200, double ledUpdateFrequency_hz = 25.0, bool directMode = false);
 
 	static void signalTerminateTriggered();
 	static bool isTerminated();
@@ -72,7 +72,7 @@ public slots:
 	int getCurrentPriority() const;
 	std::list<EffectDefinition> getEffects() const;
 	int getLedCount() const;
-	bool getReadOnlyMode() const;
+	bool getReadOnlyMode() const { return _readOnlyMode; };
 	QJsonDocument getSetting(settings::type type) const;
 	int hasLedClock();
 	void identifyLed(const QJsonObject& params);
@@ -121,7 +121,6 @@ signals:
 	void SignalSmoothingRestarted(int suggestedInterval);
 	void SignalRawColorsChanged(const std::vector<ColorRgb>& ledValues);
 	void SignalInstanceJustStarted();
-	void SignalColorIsSet(ColorRgb color, int duration);
 
 private slots:
 	void handleVisibleComponentChanged(ambilightapp::Components comp);
@@ -153,6 +152,7 @@ private:
 	std::vector<ColorRgb>	_currentLedColors;
 	QString					_name;
 
+	bool					_readOnlyMode;
 	bool					_disableOnStartup;
 
 	static std::atomic<bool>	_signalTerminate;

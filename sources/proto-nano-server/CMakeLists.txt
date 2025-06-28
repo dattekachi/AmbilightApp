@@ -24,5 +24,5 @@ target_include_directories(proto-nano-server PRIVATE ${CURRENT_HEADER_DIR})
 target_link_libraries(proto-nano-server
 	ambilightapp-base
 	ambilightapp-utils
-	Qt${Qt_VERSION}::Core
+	Qt${Qt_VERSION}::Gui
 )

@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -44,14 +44,14 @@ EffectDefinition Animation4Music_PulseWhite::getDefinition()
 }
 
 void Animation4Music_PulseWhite::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 	SetSleepTime(15);
 }
 
-bool Animation4Music_PulseWhite::Play(AmbilightImage& painter)
+bool Animation4Music_PulseWhite::Play(QPainter* painter)
 {
 	return false;
 }
@@ -74,8 +74,8 @@ bool Animation4Music_PulseWhite::getImage(Image<ColorRgb>& newImage)
 	if (value < 0)
 		return false;
 
-	ColorRgb selected(value, value, value);
-	newImage.fastBox(0, 0, newImage.width() - 1, newImage.height() - 1, selected.Red(), selected.Green(), selected.Blue());
+	QColor selected(value, value, value);
+	newImage.fastBox(0, 0, newImage.width() - 1, newImage.height() - 1, selected.red(), selected.green(), selected.blue());
 
 	return true;
 };

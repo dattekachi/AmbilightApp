@@ -45,8 +45,7 @@ runs:
         python3-minimal \
         qtbase5-dev \
         qdbus-qt5 \
-        rpm \
-        libsystemd-dev
+        rpm
 
   - name: Checkout repository
     uses: actions/checkout@v4

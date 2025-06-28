@@ -4,7 +4,7 @@
 *
 *  Copyright (c) 2020-2024 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -122,10 +122,10 @@ void SystemControl::handleSettingsUpdate(settings::type type, const QJsonDocumen
 	if (type == settings::type::SYSTEMCONTROL)
 	{
 		const QJsonObject& obj = config.object();
-		if (_sysCaptPrio != obj["systemInstancePriority"].toInt(245))
+		if (_sysCaptPrio != obj["systemInstancePriority"].toInt(100))
 		{
 			setSysCaptureEnable(false); // clear prio
-			_sysCaptPrio = obj["systemInstancePriority"].toInt(245);
+			_sysCaptPrio = obj["systemInstancePriority"].toInt(100);
 		}
 
 		setSysCaptureEnable(obj["systemInstanceEnable"].toBool(false));

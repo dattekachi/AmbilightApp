@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ Animation_SystemShutdown::Animation_SystemShutdown() :
 	initial_blink = true,
 		set_post_color = true;
 	initial_blink_index = 0;
-	yIndex = SYSTEMSHUTDOWN_HEIGHT + 1;
+	yIndex = SYSTEMSHUTDOWN_HEIGHT;
 };
 
 EffectDefinition Animation_SystemShutdown::getDefinition()
@@ -48,28 +48,28 @@ EffectDefinition Animation_SystemShutdown::getDefinition()
 }
 
 void Animation_SystemShutdown::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 
-	hyperImage.resize(SYSTEMSHUTDOWN_WIDTH, SYSTEMSHUTDOWN_HEIGHT);
+	ambilightImage = ambilightImage.scaled(SYSTEMSHUTDOWN_WIDTH, SYSTEMSHUTDOWN_HEIGHT);
 
 	SetSleepTime(int(round(speed * 1000.0)));
 }
 
-void Animation_SystemShutdown::setLine(AmbilightImage& painter, int y, Point3d rgb)
+void Animation_SystemShutdown::setLine(QPainter* painter, int y, Point3d rgb)
 {
-	painter.setPen(ColorRgb(rgb.x, rgb.y, rgb.z));
-	painter.drawHorizontalLine(0, SYSTEMSHUTDOWN_WIDTH - 1, y);
+	painter->setPen(QColor().fromRgb(rgb.x, rgb.y, rgb.z));
+	painter->drawLine(0, y, SYSTEMSHUTDOWN_WIDTH, y);
 }
 
-void Animation_SystemShutdown::setFill(AmbilightImage& painter, Point3d rgb)
+void Animation_SystemShutdown::setFill(QPainter* painter, Point3d rgb)
 {
-	painter.fillRect(0, 0, SYSTEMSHUTDOWN_WIDTH, SYSTEMSHUTDOWN_HEIGHT, ColorRgb(rgb.x, rgb.y, rgb.z));
+	painter->fillRect(0, 0, SYSTEMSHUTDOWN_WIDTH, SYSTEMSHUTDOWN_HEIGHT, QColor().fromRgb(rgb.x, rgb.y, rgb.z));
 }
 
-bool Animation_SystemShutdown::Play(AmbilightImage& painter)
+bool Animation_SystemShutdown::Play(QPainter* painter)
 {
 	bool ret = true;
 

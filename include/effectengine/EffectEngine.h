@@ -42,7 +42,7 @@ private:
 	int runEffectScript(const QString& name, int priority, int timeout, const QString& origin);
 	void createSmoothingConfigs();
 
-	AmbilightAppInstance* _hyperInstance;
+	AmbilightAppInstance* _ambilightInstance;
 	std::list<EffectDefinition> _availableEffects;
 	std::list<std::unique_ptr<Effect, void(*)(Effect*)>> _activeEffects;
 

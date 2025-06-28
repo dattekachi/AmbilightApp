@@ -4,7 +4,7 @@
 *
 *  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -95,4 +95,6 @@ signals:
 	void SignalDiscoveryRequestToScan(DiscoveryRecord::Service type);
 
 	void SignalDiscoveryEvent(DiscoveryRecord message);	
+
+	void SignalPortChanged(const QString& instanceKey, const QString& newPort);
 };

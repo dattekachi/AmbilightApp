@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -67,9 +67,9 @@ void AnimationBaseMusic::restore(MovingTarget* target) {
 
 void MovingTarget::Clear()
 {
-	_averageColor = ColorRgb(0, 0, 0);
-	_fastColor = ColorRgb(0, 0, 0);
-	_slowColor = ColorRgb(0, 0, 0);
+	_averageColor = QColor(0, 0, 0);
+	_fastColor = QColor(0, 0, 0);
+	_slowColor = QColor(0, 0, 0);
 	_targetAverageR = 0;
 	_targetAverageG = 0;
 	_targetAverageB = 0;

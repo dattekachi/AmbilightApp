@@ -10,7 +10,8 @@
 #include <base/ComponentController.h>
 #include <base/Muxer.h>
 #include <base/ImageToLedManager.h>
-#include <flatbuffers/server/FlatBuffersServer.h>
+#include <flatbufserver/FlatBufferServer.h>
+#include <utils/ColorSys.h>
 #include <utils/PerformanceCounters.h>
 
 using namespace ambilightapp;

@@ -12,7 +12,7 @@ class AuthTable : public DBManager
 {
 
 public:
-	AuthTable();
+	AuthTable(bool readonlyMode);
 	bool createUser(const QString& user, const QString& pw);
 	void savePipewire(const QString& wToken);
 	bool userExist(const QString& user);

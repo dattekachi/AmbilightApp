@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -59,29 +59,29 @@ Animation_MoodBlobs::Animation_MoodBlobs(QString name) :
 	baseColorRangeLeft = 0.0;
 	baseColorRangeRight = 360.0;
 	baseColorChangeRate = 10.0;
-	hyperledCount = -1;
+	ambilightledCount = -1;
 };
 
 
 
 void Animation_MoodBlobs::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 
 }
 
-bool Animation_MoodBlobs::Play(AmbilightImage& painter)
+bool Animation_MoodBlobs::Play(QPainter* painter)
 {
 	return true;
 }
 
 bool Animation_MoodBlobs::hasLedData(QVector<ColorRgb>& buffer)
 {
-	if (buffer.length() != hyperledCount && buffer.length() > 1)
+	if (buffer.length() != ambilightledCount && buffer.length() > 1)
 	{
-		hyperledCount = buffer.length();
+		ambilightledCount = buffer.length();
 
 
 		if ((baseColorRangeRight > baseColorRangeLeft && (baseColorRangeRight - baseColorRangeLeft) < 10) ||
@@ -101,7 +101,7 @@ bool Animation_MoodBlobs::hasLedData(QVector<ColorRgb>& buffer)
 		blobs = std::max(1, blobs);
 		baseColorChangeRate = std::max(0.0, baseColorChangeRate);
 
-		ColorRgb::rgb2hsv(color.x, color.y, color.z, baseHsv.x, baseHsv.y, baseHsv.z);
+		ColorSys::rgb2hsv(color.x, color.y, color.z, baseHsv.x, baseHsv.y, baseHsv.z);
 
 		double baseHsvx = baseHsv.x / double(360);
 		if (colorRandom)
@@ -110,13 +110,13 @@ bool Animation_MoodBlobs::hasLedData(QVector<ColorRgb>& buffer)
 		}
 
 		colorData.clear();
-		for (int i = 0; i < hyperledCount; i++)
+		for (int i = 0; i < ambilightledCount; i++)
 		{
 			Point3d rgb;
-			int hue = (int(360.0 * fmod((baseHsvx + hueChange * std::sin(2 * M_PI * i / hyperledCount)), 1.0)));
+			int hue = (int(360.0 * fmod((baseHsvx + hueChange * std::sin(2 * M_PI * i / ambilightledCount)), 1.0)));
 			while (hue < 0)
 				hue += 360;
-			ColorRgb::hsv2rgb(hue, baseHsv.y, baseHsv.z, rgb.x, rgb.y, rgb.z);
+			ColorSys::hsv2rgb(hue, baseHsv.y, baseHsv.z, rgb.x, rgb.y, rgb.z);
 			colorData.append(rgb);
 		}
 
@@ -142,7 +142,7 @@ bool Animation_MoodBlobs::hasLedData(QVector<ColorRgb>& buffer)
 		SetSleepTime(int(round(sleepTime * 1000.0)));
 	}
 
-	if (buffer.length() == hyperledCount)
+	if (buffer.length() == ambilightledCount)
 	{
 		if (baseColorChange)
 		{
@@ -163,13 +163,13 @@ bool Animation_MoodBlobs::hasLedData(QVector<ColorRgb>& buffer)
 				}
 
 				colorData.clear();
-				for (int i = 0; i < hyperledCount; i++)
+				for (int i = 0; i < ambilightledCount; i++)
 				{
 					Point3d rgb;
-					int hue = (int(360.0 * fmod((baseHSVValue + hueChange * std::sin(2 * M_PI * i / hyperledCount)), 1.0)));
+					int hue = (int(360.0 * fmod((baseHSVValue + hueChange * std::sin(2 * M_PI * i / ambilightledCount)), 1.0)));
 					while (hue < 0)
 						hue += 360;
-					ColorRgb::hsv2rgb(hue, baseHsv.y, baseHsv.z, rgb.x, rgb.y, rgb.z);
+					ColorSys::hsv2rgb(hue, baseHsv.y, baseHsv.z, rgb.x, rgb.y, rgb.z);
 					colorData.append(rgb);
 				}
 
@@ -183,9 +183,9 @@ bool Animation_MoodBlobs::hasLedData(QVector<ColorRgb>& buffer)
 			baseColorChangeStepCount += 1;
 		}
 
-		for (int i = 0; i < hyperledCount; i++)
+		for (int i = 0; i < ambilightledCount; i++)
 		{
-			double amplitude = std::max(0.0, std::sin(-amplitudePhase + (2 * M_PI * blobs * i) / double(hyperledCount)));
+			double amplitude = std::max(0.0, std::sin(-amplitudePhase + (2 * M_PI * blobs * i) / double(ambilightledCount)));
 			buffer[i].red = int(colorData[i].x * amplitude);
 			buffer[i].green = int(colorData[i].y * amplitude);
 			buffer[i].blue = int(colorData[i].z * amplitude);
@@ -202,7 +202,7 @@ bool Animation_MoodBlobs::hasLedData(QVector<ColorRgb>& buffer)
 				for (int i = 0; i < -colorDataIncrement; i++)
 					colorData.move(0, colorData.size() - 1);
 
-			numberOfRotates = (numberOfRotates + 1) % hyperledCount;
+			numberOfRotates = (numberOfRotates + 1) % ambilightledCount;
 		}
 		rotateColors = !rotateColors;
 	}

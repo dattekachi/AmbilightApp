@@ -4,14 +4,30 @@ if (WIN32)
 	generate_win_rc_file(ambilightapp)
 endif()
 
+if (NOT ENABLE_POWER_MANAGEMENT)	
+elseif (WIN32)
+	set(ambilightapp_POWER_MNG "SuspendHandlerWindows.cpp;SuspendHandlerWindows.h")
+elseif (APPLE)
+	set(ambilightapp_POWER_MNG "SuspendHandlerMacOS.mm;SuspendHandlerMacOS.h")
+	find_library(APPKIT_FRAMEWORK AppKit REQUIRED)
+elseif (Qt${Qt_VERSION}DBus_FOUND)
+	set(ambilightapp_POWER_MNG "SuspendHandlerLinux.cpp;SuspendHandlerLinux.h")
+	set(ambilightapp_POWER_MNG_DBUS "Qt${Qt_VERSION}::DBus")
+endif()
+
 add_executable(ambilightapp
 	AmbilightAppDaemon.h
-	SystrayHandler.h
+	systray.h
 	AmbilightAppDaemon.cpp
-	SystrayHandler.cpp
+	systray.cpp
 	main.cpp
 	${ambilightapp_WIN_RC_PATH}
+	${ambilightapp_POWER_MNG}
 )
+
+if (UNIX AND NOT APPLE AND Qt${Qt_VERSION}DBus_FOUND)
+	target_compile_definitions(ambilightapp PUBLIC AMBILIGHTAPP_HAVE_DBUS)
+endif()
 
 # promote ambilightapp as GUI app
 if (WIN32)
@@ -21,25 +37,21 @@ endif()
 target_link_libraries(ambilightapp
 	commandline
 	ambilightapp-base
-	ambilightimage
 	effectengine
 	jsonserver
-	flatbuffers_server
-	flatbuffers_client
+	flatbufserver
 	webserver
 	ssdp
 	database
 	resources
-	suspend-handler
+	Qt${Qt_VERSION}::Widgets
+	${ambilightapp_POWER_MNG_DBUS}
 	${APPKIT_FRAMEWORK}
+	${TURBOJPEG_LINK_LIBRARIES}
 )
 
-if (WIN32 OR APPLE)
-target_link_libraries(ambilightapp systray-widget)
-else()
-	install(TARGETS systray-widget
-		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-		PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+if (USE_STATIC_QT_PLUGINS)
+	target_link_libraries(ambilightapp ${STATIC_QT_PLUGINS_LIBS})
 endif()
 
 if(ENABLE_XZ)
@@ -48,10 +60,6 @@ if(ENABLE_XZ)
 	else()
 		target_link_libraries(ambilightapp liblzma)
 	endif()
-endif()
-
-if (USE_STATIC_QT_PLUGINS)
-	target_link_libraries(hyperhdr ${STATIC_QT_PLUGINS_LIBS})
 endif()
 
 if (ENABLE_PROTOBUF)

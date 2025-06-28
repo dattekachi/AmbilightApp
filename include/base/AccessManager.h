@@ -17,7 +17,7 @@ class AccessManager : public QObject
 	Q_OBJECT
 private:
 	friend class AmbilightAppDaemon;
-	AccessManager(QObject* parent);
+	AccessManager(QObject* parent, bool readonlyMode);
 
 public:
 	~AccessManager();

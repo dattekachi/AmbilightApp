@@ -4,7 +4,7 @@
 *
 *  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,7 @@
 #include <QCoreApplication>
 
 #include <grabber/AVF/AVFGrabber.h>
+#include <utils/ColorSys.h>
 
 // Apple frameworks
 #include <Accelerate/Accelerate.h>
@@ -152,7 +153,7 @@ bool AVFGrabber::getPermission()
 				if (_isAVF)
 				{
 					if (!_permission)
-						QMetaObject::invokeMethod(this, [this]{ QTimer::singleShot(5000, this, &AVFGrabber::getPermission); });
+						QTimer::singleShot(5000, this, &AVFGrabber::getPermission);
 					else
 					{
 						Info(_log, "Got the video permission. Now trying to start Ambilight App's video grabber.");

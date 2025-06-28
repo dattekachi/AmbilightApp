@@ -82,8 +82,10 @@ public slots:
 
 	std::vector<QString> getInstances();
 
-	void setInstanceColor(int instance, int priority,ColorRgb ledColors, int timeout_ms);
+	void setInstanceColor(int instance, int priority, ColorRgb ledColors, int timeout_ms);
 	void setInstanceEffect(int instance, QString effectName, int priority);
+	void setInstanceBrightness(int instance, int brightness);
+	void setInstanceComponentState(int instance, ambilightapp::Components component, bool enable);
 	void clearInstancePriority(int instance, int priority);
 	std::list<EffectDefinition> getEffects();
 
@@ -104,17 +106,20 @@ signals:
 
 private slots:
 	void handleInstanceJustStarted();
+	void handlePortChanged(const QString& instanceKey, const QString& newPort);
 
 private:
 	friend class AmbilightAppDaemon;
 
-	AmbilightAppManager(const QString& rootPath);
+	AmbilightAppManager(const QString& rootPath, bool readonlyMode);
 
 	void startAll(bool disableOnStartup);
 
 	void stopAllonExit();
 
 	bool isInstAllowed(quint8 inst) const { return (inst > 0); }
+	bool syncMusicLedDevice(const quint8 inst);
+    bool removeMusicLedDevice(const quint8 inst);
 
 private:
 	
@@ -124,6 +129,7 @@ private:
 	QMap<quint8, std::shared_ptr<AmbilightAppInstance>> _runningInstances;
 	QMap<quint8, std::shared_ptr<AmbilightAppInstance>>	_startingInstances;
 
+	bool	_readonlyMode;
 	int		_fireStarter;
 
 	QMap<quint8, PendingRequests> _pendingRequests;

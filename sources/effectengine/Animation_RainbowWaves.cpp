@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -37,14 +37,14 @@ Animation_RainbowWaves::Animation_RainbowWaves(QString name) :
 
 
 void Animation_RainbowWaves::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 
 }
 
-bool Animation_RainbowWaves::Play(AmbilightImage& painter)
+bool Animation_RainbowWaves::Play(QPainter* painter)
 {
 	return true;
 }
@@ -54,7 +54,7 @@ bool Animation_RainbowWaves::hasLedData(QVector<ColorRgb>& buffer)
 	if (buffer.length() > 0)
 	{
 		ColorRgb newColor{ 0,0,0 };
-		ColorRgb::hsv2rgb(hue, 255, 255, newColor.red, newColor.green, newColor.blue);
+		ColorSys::hsv2rgb(hue, 255, 255, newColor.red, newColor.green, newColor.blue);
 
 		if (++hue > 359)
 			hue = 0;

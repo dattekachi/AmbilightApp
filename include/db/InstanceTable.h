@@ -7,7 +7,7 @@ class InstanceTable : public DBManager
 {
 
 public:
-	InstanceTable();
+	InstanceTable(bool readonlyMode);
 
 	bool createInstance(const QString& name, quint8& inst);
 	bool deleteInstance(quint8 inst);

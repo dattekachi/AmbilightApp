@@ -4,7 +4,7 @@
 *
 *  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -46,9 +46,10 @@
 #include <QFileInfo>
 #include <QCoreApplication>
 
+#include <utils/ColorSys.h>
 #include <grabber/DX/DxGrabber.h>
-#include <grabber/DX/VertexShaderHyperHDR.h>
-#include <grabber/DX/PixelShaderHyperHDR.h>
+#include <grabber/DX/VertexShaderAmbilightAPP.h>
+#include <grabber/DX/PixelShaderAmbilightAPP.h>
 
 #pragma comment (lib, "ole32.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -598,7 +599,7 @@ bool DxGrabber::initShaders()
 
 	if (CHECK(status))
 	{
-		status = _d3dDevice->CreateVertexShader(g_VertexShaderHyperHDR, sizeof(g_VertexShaderHyperHDR), nullptr, &_d3dVertexShader);
+		status = _d3dDevice->CreateVertexShader(g_VertexShaderAmbilightAPP, sizeof(g_VertexShaderAmbilightAPP), nullptr, &_d3dVertexShader);
 		if (CHECK(status))
 		{
 			_d3dContext->VSSetShader(_d3dVertexShader, NULL, 0);
@@ -610,7 +611,7 @@ bool DxGrabber::initShaders()
 
 	if (CHECK(status))
 	{
-		status = _d3dDevice->CreatePixelShader(g_PixelShaderHyperHDR, sizeof(g_PixelShaderHyperHDR), nullptr, &_d3dPixelShader);
+		status = _d3dDevice->CreatePixelShader(g_PixelShaderAmbilightAPP, sizeof(g_PixelShaderAmbilightAPP), nullptr, &_d3dPixelShader);
 		if (CHECK(status))
 		{
 			_d3dContext->PSSetShader(_d3dPixelShader, NULL, 0);
@@ -624,7 +625,7 @@ bool DxGrabber::initShaders()
 		D3D11_INPUT_ELEMENT_DESC layout[] = { {"SV_Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}, };
 		UINT numElements = ARRAYSIZE(layout);
 
-		status = _d3dDevice->CreateInputLayout(layout, numElements, g_VertexShaderHyperHDR, sizeof(g_VertexShaderHyperHDR), &_d3dVertexLayout);
+		status = _d3dDevice->CreateInputLayout(layout, numElements, g_VertexShaderAmbilightAPP, sizeof(g_VertexShaderAmbilightAPP), &_d3dVertexLayout);
 		if (CHECK(status))
 			_d3dContext->IASetInputLayout(_d3dVertexLayout);
 		else

@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -44,14 +44,14 @@ EffectDefinition Animation4Music_QuatroWhite::getDefinition()
 }
 
 void Animation4Music_QuatroWhite::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 	SetSleepTime(15);
 }
 
-bool Animation4Music_QuatroWhite::Play(AmbilightImage& painter)
+bool Animation4Music_QuatroWhite::Play(QPainter* painter)
 {
 	return false;
 }
@@ -86,10 +86,10 @@ bool Animation4Music_QuatroWhite::getImage(Image<ColorRgb>& newImage)
 		{
 			int width = newImage.width() * 0.04;
 
-			ColorRgb selected(255, 255, 255);
+			QColor selected(255, 255, 255);
 
-			newImage.gradientVBox(0, h1, width, h2, selected.Red(), selected.Green(), selected.Blue());
-			newImage.gradientVBox(newImage.width() - 1 - width, h1, newImage.width() - 1, h2, selected.Red(), selected.Green(), selected.Blue());
+			newImage.gradientVBox(0, h1, width, h2, selected.red(), selected.green(), selected.blue());
+			newImage.gradientVBox(newImage.width() - 1 - width, h1, newImage.width() - 1, h2, selected.red(), selected.green(), selected.blue());
 		}
 	}
 	{
@@ -102,10 +102,10 @@ bool Animation4Music_QuatroWhite::getImage(Image<ColorRgb>& newImage)
 		{
 			int height = newImage.height() * 0.067;
 
-			ColorRgb selected(255, 255, 255);
+			QColor selected(255, 255, 255);
 
-			newImage.gradientHBox(w1, 0, w2, height, selected.Red(), selected.Green(), selected.Blue());
-			newImage.gradientHBox(w1, newImage.height() - 1 - height, w2, newImage.height() - 1, selected.Red(), selected.Green(), selected.Blue());
+			newImage.gradientHBox(w1, 0, w2, height, selected.red(), selected.green(), selected.blue());
+			newImage.gradientHBox(w1, newImage.height() - 1 - height, w2, newImage.height() - 1, selected.red(), selected.green(), selected.blue());
 		}
 	}
 

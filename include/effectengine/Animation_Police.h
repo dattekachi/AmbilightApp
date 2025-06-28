@@ -9,10 +9,10 @@ public:
 	Animation_Police(QString name);
 
 	void Init(
-		AmbilightImage& hyperImage,
-		int hyperLatchTime) override;
+		QImage& ambilightImage,
+		int ambilightLatchTime) override;
 
-	bool Play(AmbilightImage& painter) override;
+	bool Play(QPainter* painter) override;
 	bool hasLedData(QVector<ColorRgb>& buffer) override;
 
 protected:

@@ -19,18 +19,18 @@ public:
 	Animation_Swirl(QString name);
 
 	void Init(
-		AmbilightImage& hyperImage,
-		int hyperLatchTime) override;
+		QImage& ambilightImage,
+		int ambilightLatchTime) override;
 
-	bool Play(AmbilightImage& painter) override;
+	bool Play(QPainter* painter) override;
 
 private:
 
-	Point2d getPoint(const AmbilightImage& hyperImage, bool random, double x, double y);
-	int   getSTime(int hyperLatchTime, int _rt, double steps);
+	Point2d getPoint(const QImage& ambilightImage, bool random, double x, double y);
+	int   getSTime(int ambilightLatchTime, int _rt, double steps);
 
 	void  buildGradient(QList<Animation_Swirl::SwirlGradient>& ba, bool withAlpha, QList<Animation_Swirl::SwirlColor> cc, bool closeCircle);
-	bool  imageConicalGradient(AmbilightImage& painter, int centerX, int centerY, int angle, const QList<Animation_Swirl::SwirlGradient>& bytearray, bool reset);
+	bool  imageConicalGradient(QPainter* painter, int centerX, int centerY, int angle, const QList<Animation_Swirl::SwirlGradient>& bytearray);
 
 	Point2d pointS1;
 	Point2d pointS2;

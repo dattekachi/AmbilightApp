@@ -2,9 +2,9 @@
 *
 *  MIT License
 *
-*  Copyright (c) 2020-2024 awawa-dev
+*  Copyright (c) 2020-2023 awawa-dev
 *
-*  Project homesite: https://ambilightled.com
+*  Project homesite: http://ambilightled.com
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
@@ -72,8 +72,8 @@ void Animation_Fade::SetPoint(Point3d point) {
 	(uint8_t)(std::min(std::max(int(std::round(colorStart.i + color_step.i*step)),0), int((colorStart.i < colorEnd.i) ? colorEnd.i : colorStart.i)))
 
 void Animation_Fade::Init(
-	AmbilightImage& hyperImage,
-	int hyperLatchTime
+	QImage& ambilightImage,
+	int ambilightLatchTime
 )
 {
 	fadeInTime /= 1000.0;
@@ -82,7 +82,7 @@ void Animation_Fade::Init(
 	colorStartTime /= 1000.0;
 	colorEndTime /= 1000.0;
 
-	minStepTime = float(hyperLatchTime) / 1000.0;
+	minStepTime = float(ambilightLatchTime) / 1000.0;
 	if (minStepTime < 0.012)
 		minStepTime = 0.012;
 
@@ -141,7 +141,7 @@ void Animation_Fade::Init(
 	repeatCounter = 1;
 }
 
-bool Animation_Fade::Play(AmbilightImage& painter)
+bool Animation_Fade::Play(QPainter* painter)
 {
 	return true;
 }

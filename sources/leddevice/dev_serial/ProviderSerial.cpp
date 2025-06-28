@@ -13,6 +13,9 @@
 #include <QEventLoop>
 #include <QThread>
 #include <QSerialPort>
+#include <QSettings>
+#include <QMutex>
+#include <QMutexLocker>
 
 #include <utils/InternalClock.h>
 #include <utils/GlobalSignals.h>
@@ -25,16 +28,40 @@ constexpr std::chrono::milliseconds OPEN_TIMEOUT{ 5000 };		// device open timeou
 const int MAX_WRITE_TIMEOUTS = 5;	// Maximum number of allowed timeouts
 const int NUM_POWEROFF_WRITE_BLACK = 3;	// Number of write "BLACK" during powering off
 
+QMap<QString, QString> ProviderSerial::s_lastSuccessPorts;
+QMutex ProviderSerial::s_portAccessMutex;
+QSettings ProviderSerial::s_settings("HKEY_CURRENT_USER\\Software\\AmbilightApp", QSettings::NativeFormat);
+
 ProviderSerial::ProviderSerial(const QJsonObject& deviceConfig)
 	: LedDevice(deviceConfig)
 	, _serialPort(nullptr)
 	, _baudRate_Hz(1000000)
 	, _isAutoDeviceName(false)
-	, _delayAfterConnect_ms(0)
+	, _delayAfterConnect_ms(1000)
 	, _frameDropCounter(0)
-	, _espHandshake(true)
+	, _espHandshake(false)
 	, _forceSerialDetection(false)
+	, _ledType("screen")
 {
+	// Đọc thông tin cổng đã lưu khi khởi tạo instance đầu tiên
+	static bool isFirstInstance = true;
+	if (isFirstInstance)
+	{
+		QMutexLocker locker(&s_portAccessMutex);
+		s_settings.beginGroup("Instances");
+		QStringList instances = s_settings.childGroups();
+		for (const QString& instance : instances)
+		{
+			s_settings.beginGroup(instance);
+			if (s_settings.contains("Port"))
+			{
+				s_lastSuccessPorts[instance] = s_settings.value("Port").toString();
+			}
+			s_settings.endGroup();
+		}
+		s_settings.endGroup();
+		isFirstInstance = false;
+	}
 }
 
 bool ProviderSerial::init(const QJsonObject& deviceConfig)
@@ -58,11 +85,14 @@ bool ProviderSerial::init(const QJsonObject& deviceConfig)
 			_deviceName = _deviceName.mid(5);
 
 		_isAutoDeviceName = _deviceName.toLower() == "auto";
-		_baudRate_Hz = deviceConfig["rate"].toInt();
-		_delayAfterConnect_ms = deviceConfig["delayAfterConnect"].toInt(0);
-		_espHandshake = deviceConfig["espHandshake"].toBool(true);
-		_maxRetry = _devConfig["maxRetry"].toInt(60);
+		_baudRate_Hz = deviceConfig["rate"].toInt(1000000);
+		_delayAfterConnect_ms = deviceConfig["delayAfterConnect"].toInt(1000);
+		_espHandshake = deviceConfig["espHandshake"].toBool(false);
+		_maxRetry = _devConfig["maxRetry"].toInt(10);
 		_forceSerialDetection = deviceConfig["forceSerialDetection"].toBool(false);
+		_ledType = deviceConfig["ledType"].toString("screen");
+
+		_instanceKey = QString("Instance_%1").arg(this->getInstanceIndex());
 
 		Debug(_log, "Device name   : %s", QSTRING_CSTR(_deviceName));
 		Debug(_log, "Auto selection: %d", _isAutoDeviceName);
@@ -147,17 +177,17 @@ int ProviderSerial::close()
 		}
 
 
-		if (_espHandshake)
-		{
-			QTimer::singleShot(200, this, [this]() { if (_serialPort->isOpen()) EspTools::goingSleep(_serialPort); });
-			EspTools::goingSleep(_serialPort);
+		// if (_espHandshake)
+		// {
+		QTimer::singleShot(200, this, [this]() { if (_serialPort->isOpen()) EspTools::goingSleep(_serialPort); });
+		EspTools::goingSleep(_serialPort);
 
-			for (int i = 0; i < 6 && _serialPort->isOpen(); i++)
-			{
-				if (_serialPort->waitForReadyRead(100) && waitForExitStats())
-					break;
-			}
+		for (int i = 0; i < 6 && _serialPort->isOpen(); i++)
+		{
+			if (_serialPort->waitForReadyRead(100) && waitForExitStats())
+				break;
 		}
+		// }
 
 		_serialPort->close();
 
@@ -180,7 +210,7 @@ bool ProviderSerial::powerOff()
 
 bool ProviderSerial::tryOpen(int delayAfterConnect_ms)
 {
-	if (_deviceName.isEmpty() || _serialPort->portName().isEmpty() || (_isAutoDeviceName && _espHandshake))
+	if (_deviceName.isEmpty() || _serialPort->portName().isEmpty() || _isAutoDeviceName)
 	{
 		if (!_serialPort->isOpen())
 		{
@@ -227,11 +257,30 @@ bool ProviderSerial::tryOpen(int delayAfterConnect_ms)
 				return false;
 			}
 
+			disconnect(_serialPort, &QSerialPort::readyRead, nullptr, nullptr);
+
 			if (_espHandshake)
 			{
-				disconnect(_serialPort, &QSerialPort::readyRead, nullptr, nullptr);
-
 				EspTools::initializeEsp(_serialPort, serialPortInfo, _log, _forceSerialDetection);
+			}
+
+			// Lưu cổng kết nối thành công vào Registry nếu khác với cổng đã lưu
+			QString savedPort = s_lastSuccessPorts.value(_instanceKey);
+			if (savedPort != _deviceName)
+			{
+				s_lastSuccessPorts[_instanceKey] = _deviceName;
+				QMutexLocker locker(&s_portAccessMutex);
+				s_settings.beginGroup("Instances");
+				s_settings.beginGroup(_instanceKey);
+				s_settings.setValue("Port", _deviceName);
+				s_settings.endGroup();
+				s_settings.endGroup();
+				s_settings.sync();
+				Info(_log, "Saved new successful port connection: %s for instance %s", 
+					QSTRING_CSTR(_deviceName), QSTRING_CSTR(_instanceKey));
+				
+				// Phát signal khi cổng thay đổi thông qua GlobalSignals
+				emit GlobalSignals::getInstance()->SignalPortChanged(_instanceKey, _deviceName);
 			}
 		}
 		else
@@ -244,7 +293,6 @@ bool ProviderSerial::tryOpen(int delayAfterConnect_ms)
 
 	if (delayAfterConnect_ms > 0)
 	{
-
 		Debug(_log, "delayAfterConnect for %d ms - start", delayAfterConnect_ms);
 
 		// Wait delayAfterConnect_ms before allowing write
@@ -324,41 +372,198 @@ int ProviderSerial::writeBytes(const qint64 size, const uint8_t* data)
 }
 
 QString ProviderSerial::discoverFirst()
-{
-	for (int round = 0; round < 4; round++)
-		for (auto const& port : QSerialPortInfo::availablePorts())
+{   
+    // Thử kết nối với cổng đã biết trước
+    if (s_lastSuccessPorts.contains(_instanceKey))
+    {
+        QString lastPort = s_lastSuccessPorts[_instanceKey];
+        for (const auto& port : QSerialPortInfo::availablePorts())
+        {
+            if (port.portName() == lastPort)
+            {
+                quint16 vendor = port.vendorIdentifier();
+                quint16 prodId = port.productIdentifier();
+                bool isCH340 = (vendor == 0x1a86 && prodId == 0x7523);
+                
+                if (isCH340)
+                {
+                    Info(_log, "Trying last successful port: %s", QSTRING_CSTR(lastPort));
+                    if (isAmbilightDevice(lastPort))
+                    {
+                        Info(_log, "Reconnected to last port: %s", QSTRING_CSTR(lastPort));
+                        return lastPort;
+                    }
+                    // Xóa port không còn phù hợp
+                    s_lastSuccessPorts.remove(_instanceKey);
+                    QMutexLocker locker(&s_portAccessMutex);
+                    s_settings.beginGroup("Instances");
+                    s_settings.beginGroup(_instanceKey);
+                    s_settings.remove("Port");
+                    s_settings.endGroup();
+                    s_settings.endGroup();
+                    s_settings.sync();
+                    break;
+                }
+            }
+        }
+    }
+    
+    // Tìm cổng mới nếu không có cổng đã biết
+    static int nextPortIndex = 0;
+    QList<QSerialPortInfo> ch340Ports;
+    
+    for (const auto& port : QSerialPortInfo::availablePorts())
+    {
+        if (!port.isNull())
+        {
+            quint16 vendor = port.vendorIdentifier();
+            quint16 prodId = port.productIdentifier();
+            bool isCH340 = (vendor == 0x1a86 && prodId == 0x7523) || (vendor == 0x403 && prodId == 0x6001);
+            
+            if (isCH340 && !port.systemLocation().startsWith("/dev/tty."))
+            {
+                ch340Ports.append(port);
+            }
+        }
+    }
+    
+    if (ch340Ports.isEmpty())
+    {
+        Debug(_log, "No devices found");
+        nextPortIndex = 0;
+        return "";
+    }
+
+    int startIndex = nextPortIndex++ % ch340Ports.size();
+	static int fallbackPortIndex = 0;
+    if (!_espHandshake)
+	{
+		for (int i = 0; i < ch340Ports.size(); i++)
 		{
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-			if (!port.isNull() && !port.isBusy())
-#else
-			if (!port.isNull())
-#endif
+			int currentIndex = (startIndex + i) % ch340Ports.size();
+			const auto& port = ch340Ports[currentIndex];
+			
+			QString infoMessage = QString("%1 (%2 => %3)")
+				.arg(port.description())
+				.arg(port.systemLocation())
+				.arg(port.portName());
+
+			if (isAmbilightDevice(port.portName())) return port.portName();
+		}
+	}
+	else
+	{
+		if (!ch340Ports.isEmpty())
+		{        
+			int currentIndex = fallbackPortIndex % ch340Ports.size();
+			const auto& port = ch340Ports[currentIndex];
+			
+			// Nếu KHÔNG phản hồi thì mới tiếp tục với cổng này
+			if (!hasSerialResponse(port.portName()))
+			{   
+				// Chuẩn bị index cho lần gọi tiếp theo
+				fallbackPortIndex = (currentIndex + 1) % ch340Ports.size();
+				return port.portName();
+			}
+			
+			// Thử cổng tiếp theo nếu cổng hiện tại có phản hồi
+			fallbackPortIndex = (currentIndex + 1) % ch340Ports.size();
+		}
+	}
+    
+    return "";
+}
+
+bool ProviderSerial::isAmbilightDevice(const QString& portName)
+{
+	QMutexLocker locker(&s_portAccessMutex);
+
+	QSerialPort testPort;
+	testPort.setPortName(portName);
+
+	QString searchType = _ledType;
+    if (_ledType == "dualscreen")
+        searchType = "screen";
+	
+	Debug(_log, "Checking port: %s for LED type: %s", QSTRING_CSTR(portName), QSTRING_CSTR(searchType));
+	
+	if (testPort.open(QIODevice::ReadWrite))
+	{
+		testPort.setBaudRate(_baudRate_Hz);
+		testPort.clear();
+		testPort.write("T");
+		testPort.flush();
+		
+		auto start = InternalClock::now();
+		while (InternalClock::now() - start < 1000)
+		{
+			testPort.waitForReadyRead(100);
+			if (testPort.bytesAvailable() > 0)
 			{
-				QString infoMessage = QString("%1 (%2 => %3)").arg(port.description()).arg(port.systemLocation()).arg(port.portName());
-				quint16 vendor = port.vendorIdentifier();
-				quint16 prodId = port.productIdentifier();
-				bool knownESPA = ((vendor == 0x303a) && (prodId == 0x80c2)) ||
-								 ((vendor == 0x2e8a) && (prodId == 0xa));
-				bool knownESPB = (vendor == 0x303a) ||
-								 ((vendor == 0x10c4) && (prodId == 0xea60)) ||
-								 ((vendor == 0x1A86) && (prodId == 0x7523 || prodId == 0x55d4));
-				if (round == 3 ||
-					(_espHandshake && round == 0 && knownESPA) ||
-					(_espHandshake && round == 1 && knownESPB) ||
-					(!_espHandshake && round == 2 &&
-						port.description().contains("Bluetooth", Qt::CaseInsensitive) == false &&
-						port.systemLocation().contains("ttyAMA0", Qt::CaseInsensitive) == false))
+				auto incoming = testPort.readAll();
+				for (int i = 0; i < incoming.length(); i++)
+					if (!(incoming[i] == '\n' ||
+						(incoming[i] >= ' ' && incoming[i] <= 'Z') ||
+						(incoming[i] >= 'a' && incoming[i] <= 'z')))
+					{
+						incoming.replace(incoming[i], '*');
+					}
+				
+				QString result = QString(incoming).remove('*').replace('\n', ' ').trimmed();
+				
+				if (result.contains(searchType, Qt::CaseInsensitive))
 				{
-					Info(_log, "Serial port auto-discovery. Found serial port device: %s", QSTRING_CSTR(infoMessage));
-					return port.portName();
-				}
-				else
-				{
-					Warning(_log, "Serial port auto-discovery. Skipping this device for now: %s, VID: 0x%x, PID: 0x%x", QSTRING_CSTR(infoMessage), vendor, prodId);
+					Debug(_log, "Found matching LED device (%s) on port: %s", QSTRING_CSTR(searchType), QSTRING_CSTR(portName));
+					testPort.close();
+					return true;
 				}
 			}
 		}
-	return "";
+
+		Debug(_log, "No matching LED device (%s) found on port: %s", QSTRING_CSTR(searchType), QSTRING_CSTR(portName));
+		testPort.close();
+		return false;
+	}
+	
+	Debug(_log, "Failed to open port: %s", QSTRING_CSTR(testPort.errorString()));
+	return false;
+}
+
+bool ProviderSerial::hasSerialResponse(const QString& portName)
+{
+    QMutexLocker locker(&s_portAccessMutex);
+
+    QSerialPort testPort;
+    testPort.setPortName(portName);
+    
+    Debug(_log, "Checking port response: %s", QSTRING_CSTR(portName));
+    
+    if (testPort.open(QIODevice::ReadWrite))
+    {
+        testPort.setBaudRate(_baudRate_Hz);
+        
+        testPort.write("T");
+        testPort.flush();
+        
+        auto start = InternalClock::now();
+        while (InternalClock::now() - start < 1000)
+        {
+            testPort.waitForReadyRead(100);
+            if (testPort.bytesAvailable() > 0)
+            {
+                Debug(_log, "Got response from port: %s", QSTRING_CSTR(portName));
+                testPort.close();
+                return true;
+            }
+        }
+
+        Debug(_log, "No response from port: %s", QSTRING_CSTR(portName));
+        testPort.close();
+        return false;
+    }
+    
+    Debug(_log, "Failed to open port: %s", QSTRING_CSTR(testPort.errorString()));
+    return false;
 }
 
 QJsonObject ProviderSerial::discover(const QJsonObject& /*params*/)
@@ -372,14 +577,24 @@ QJsonObject ProviderSerial::discover(const QJsonObject& /*params*/)
 
 	for (const QSerialPortInfo& info : QSerialPortInfo::availablePorts())
 	{
-		deviceList.push_back(QJsonObject{
-			{ "value", info.portName() },
-			{ "name", QString("%2 (%1)").arg(info.systemLocation()).arg(info.description()) }
-		});
-
-#ifdef ENABLE_BONJOUR
 		quint16 vendor = info.vendorIdentifier();
 		quint16 prodId = info.productIdentifier();
+		
+		// Lọc chỉ hiển thị CH340 và FTDI
+		bool isCH340 = (vendor == 0x1a86 && prodId == 0x7523);
+		bool isFTDI = (vendor == 0x403 && prodId == 0x6001);
+		
+		if ((isCH340 || isFTDI) && !info.systemLocation().startsWith("/dev/tty."))
+		{
+			deviceList.push_back(QJsonObject{
+				{ "value", info.portName() },
+				{ "name", QString("%1 (%2)").arg(info.portName()).arg(info.description()) }
+			});
+		}
+
+#ifdef ENABLE_BONJOUR
+		// quint16 vendor = info.vendorIdentifier();
+		// quint16 prodId = info.productIdentifier();
 		DiscoveryRecord newRecord;
 
 		if ((vendor == 0x303a) && (prodId == 0x80c2))
@@ -390,9 +605,7 @@ QJsonObject ProviderSerial::discover(const QJsonObject& /*params*/)
 		{
 			newRecord.type = DiscoveryRecord::Service::Pico;
 		}
-		else if ((vendor == 0x303a) ||
-			((vendor == 0x10c4) && (prodId == 0xea60)) ||
-			((vendor == 0x1A86) && (prodId == 0x7523 || prodId == 0x55d4)))
+		else if ((isCH340 || isFTDI) && !info.systemLocation().startsWith("/dev/tty."))
 		{
 			newRecord.type = DiscoveryRecord::Service::ESP;
 		}

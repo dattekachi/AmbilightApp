@@ -29,7 +29,7 @@ public:
 private:
 	QTcpSocket*	_socket;
 	Logger*		_log;
-	AmbilightAPI*	_hmbilightAPI;
+	AmbilightAPI*	_ambilightAPI;
 
 	void getWsFrameHeader(WebSocketHeader* header);
 	void sendClose(int status, QString reason = "");

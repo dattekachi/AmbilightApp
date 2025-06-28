@@ -5,43 +5,28 @@ $(document).ready(function()
 	var importedConf;
 	var confName;
 	var conf_editor = null;
-	var conf_editor_logs = null;
-
-	$('#conf_cont_logs').append(createOptPanel('<svg data-src="svg/logs_panel.svg" width="18" height="18" fill="currentColor" class="svg4ambilightapp"></svg>', $.i18n("edt_conf_log_heading_title"), 'logs_editor_container', 'btn_submit_logs'));
-	$('#conf_cont_logs').append(createHelpTable(window.schema.logger.properties, $.i18n("edt_conf_log_heading_title")));
-	$("#conf_cont_logs").children().first().removeClass();
-	$("#conf_cont_logs").children().first().addClass("editor_column");
-
-	conf_editor_logs = createJsonEditor('logs_editor_container', {
-		logger : window.schema.logger
-	}, true, true);
-
-	conf_editor_logs.on('change',function() {
-		conf_editor_logs.validate().length ? $('#btn_submit_logs').attr('disabled', true) : $('#btn_submit_logs').attr('disabled', false);
-	});
-
-	$('#btn_submit_logs').off().on('click',function() {
-		requestWriteConfig(conf_editor_logs.getValue());
-	});
-
 	
-	$('#conf_cont').append(createOptPanel('<svg data-src="svg/general_settings.svg" fill="currentColor" class="svg4ambilightapp"></svg>', $.i18n("edt_conf_gen_heading_title"), 'editor_container', 'btn_submit'));
-	$('#conf_cont').append(createHelpTable(window.schema.general.properties, $.i18n("edt_conf_gen_heading_title")));
-	
-
 	conf_editor = createJsonEditor('editor_container',
 	{
-		general: window.schema.general
+		general: window.schema.general,
 	}, true, true);
 
 	conf_editor.on('change', function()
 	{
-		conf_editor.validate().length ? $('#btn_submit').attr('disabled', true) : $('#btn_submit').attr('disabled', false);
+		conf_editor.validate().length || window.readOnlyMode ? $('#btn_submit').attr('disabled', true) : $('#btn_submit').attr('disabled', false);
 	});
 
 	$('#btn_submit').off().on('click', function()
 	{
 		requestWriteConfig(conf_editor.getValue());
+	});
+
+	$("#editor_container [data-schemapath^='root.general']").each(function() {
+		const path = $(this).attr('data-schemapath');
+		if (path.includes('disableOnLocked') ||
+			path.includes('disableLedsStartup')) {
+			$(this).hide();
+		}
 	});
 
 	// Instance handling
@@ -50,8 +35,8 @@ $(document).ready(function()
 
 		conf_editor.on('change', function()
 		{
-			$('#btn_submit').attr('disabled', false);
-			$('#btn_submit').attr('disabled', false);
+			window.readOnlyMode ? $('#btn_cl_save').attr('disabled', true) : $('#btn_submit').attr('disabled', false);
+			window.readOnlyMode ? $('#btn_ma_save').attr('disabled', true) : $('#btn_submit').attr('disabled', false);
 		});
 
 		var inst = e.currentTarget.id.split("_")[1];
@@ -118,9 +103,9 @@ $(document).ready(function()
 			$('#inst_' + inst[key].instance).off().on('click', handleInstanceStartStop);
 			$('#instdel_' + inst[key].instance).off().on('click', handleInstanceDelete);
 
-			$('#btn_submit').attr('disabled', false);
-			$('#btn_submit').attr('disabled', false);
-			$('#btn_submit').attr('disabled', false);
+			window.readOnlyMode ? $('#instren_' + inst[key].instance).attr('disabled', true) : $('#btn_submit').attr('disabled', false);
+			window.readOnlyMode ? $('#inst_' + inst[key].instance).attr('disabled', true) : $('#btn_submit').attr('disabled', false);
+			window.readOnlyMode ? $('#instdel_' + inst[key].instance).attr('disabled', true) : $('#btn_submit').attr('disabled', false);
 		}
 	}
 	
@@ -128,7 +113,7 @@ $(document).ready(function()
 
 	$('#inst_name').off().on('input', function(e)
 	{
-		(e.currentTarget.value.length >= 5) ? $('#btn_create_inst').attr('disabled', false) : $('#btn_create_inst').attr('disabled', true);
+		(e.currentTarget.value.length >= 5) && !window.readOnlyMode ? $('#btn_create_inst').attr('disabled', false) : $('#btn_create_inst').attr('disabled', true);
 		if (5 - e.currentTarget.value.length >= 1 && 5 - e.currentTarget.value.length <= 4)
 			$('#inst_chars_needed').html(5 - e.currentTarget.value.length + " " + $.i18n('general_chars_needed'))
 		else
@@ -150,7 +135,7 @@ $(document).ready(function()
 	//import
 	function dis_imp_btn(state)
 	{
-		(e.currentTarget.value.length >= 5) ? $('#btn_create_inst').attr('disabled', false) : $('#btn_create_inst').attr('disabled', true);
+		state || window.readOnlyMode ? $('#btn_import_conf').attr('disabled', true) : $('#btn_import_conf').attr('disabled', false);
 	}
 
 	function readFile(evt)
@@ -227,7 +212,7 @@ $(document).ready(function()
 			download(JSON.stringify(backup.info, null, "\t"), 'AmbilightApp-' + window.currentVersion + '-Backup-' + timestamp + '.json', "application/json");		
 	});
 
-	//create introduction
+	// create introduction
 	if (window.showOptHelp)
 	{
 		createHint("intro", $.i18n('conf_general_intro'), "editor_container");
