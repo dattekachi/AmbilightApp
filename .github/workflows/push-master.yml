@@ -85,15 +85,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: release-artifact-${{ matrix.JOB_RUNNER }}      
-            path: build/Ambilight*.dmg
+            path: build/Ambilight*.zip
 
       # Upload artifacts from commit
       - name: Upload artifacts from commit
         if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-            name: Apple_macOS_${{ matrix.NICE_NAME }}_DMG_installer
-            path: build/Ambilight*.dmg
+            name: Apple_macOS_${{ matrix.NICE_NAME }}_ZIP_package
+            path: build/Ambilight*.zip
 
 ######################
 ###### Windows #######

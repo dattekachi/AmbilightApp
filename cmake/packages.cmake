@@ -87,8 +87,6 @@ endif()
 
 if ( APPLE )
 	SET ( CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/osxbundle/LICENSE" )
-	SET ( CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/osxbundle/background.png" )
-	SET ( CPACK_DMG_DS_STORE_SETUP_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/osxbundle/autorun.scpt" )
 ELSE()
 	SET ( CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE" )
 ENDIF()
@@ -136,13 +134,9 @@ if(NOT DO_NOT_BUILD_ARCHIVES)
 	SET ( CPACK_RPM_COMPRESSION_TYPE "xz" )
 endif()
 
-# OSX dmg generator
+# OSX zip generator
 if ( APPLE )
-	SET ( CPACK_GENERATOR "DragNDrop")
-	SET ( CPACK_DMG_FORMAT "UDBZ" )
-	
-	unset(CPACK_PACKAGE_ICON)
-	set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/cmake/osxbundle/Ambilightapp.icns")
+	SET ( CPACK_GENERATOR "ZIP")
 	
 	set_target_properties(ambilightapp PROPERTIES
 	  MACOSX_BUNDLE TRUE
