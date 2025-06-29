@@ -22,6 +22,3 @@
 [submodule "external/sdbus-cpp"]
 	path = external/sdbus-cpp
 	url = https://github.com/Kistler-Group/sdbus-cpp
-[submodule "external/mbedtls"]
-	path = external/mbedtls
-	url = https://github.com/ARMmbed/mbedtls
