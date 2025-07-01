@@ -28,7 +28,7 @@ jobs:
             NICE_NAME: arm64_M1_M2
           - JOB_RUNNER: macos-13
             JOB_NAME: macOS 13 (x64)
-            QT_VERSION: 5
+            QT_VERSION: 6
             NICE_NAME: x64
     steps:
       # Checkout
@@ -138,93 +138,11 @@ jobs:
         run: |
           ./.ci/ci_build.sh
 
-      # Upload artifacts (only on tagged commit)
+      # Upload artifacts
       - name: Upload artifacts
-        # if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
         if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: Windows_Artifact_x64
           path: build/Ambilight*.zip
           
-      # Upload artifacts from commit
-      # - name: Upload artifacts from commit
-      #   if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: Windows_x64_setup
-      #     path: build/Ambilight*.exe
-
-################################
-####### CodeQL support #########
-################################
-
-  # analyze:
-  #   name: Analyze (CodeQL)
-  #   runs-on: ubuntu-latest
-  #   if: ( true )
-  #   permissions:
-  #     actions: read
-  #     contents: read
-  #     security-events: write
-
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       language: [ 'cpp', 'javascript' ]
-
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-  #       with:
-  #         submodules: true
-
-  #     - name: Run composite CodeQL job for '${{matrix.language}}' language
-  #       uses: ./.github/actions/codeql
-  #       with:
-  #         language: ${{matrix.language}}
-
-################################
-###### Publish Releases ########
-################################
-
-  # publish:
-  #   name: Publish Releases
-  #   if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
-  #   needs: [windows, macOS]
-  #   runs-on: ubuntu-22.04
-  #   permissions:
-  #     contents: write
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-
-  #     # generate environment variables
-  #     - name: Generate environment variables from version and tag
-  #       run: |
-  #         echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
-  #         echo "VERSION=$(tr -d '\n' < version)" >> $GITHUB_ENV
-  #         echo "preRelease=false" >> $GITHUB_ENV
-
-  #     # If version contains alpha or beta, mark draft release as pre-release
-  #     - name: Mark release as pre-release
-  #       if: contains(env.VERSION, 'alpha') || contains(env.VERSION, 'beta')
-  #       run: echo "preRelease=true" >> $GITHUB_ENV
-
-  #     # Download artifacts from previous build process
-  #     - name: Download artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         path: artifacts
-  #         pattern: release-artifact-*
-  #         merge-multiple: true          
-
-  #     # create draft release and upload artifacts
-  #     - name: Create draft release
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         name: AmbilightApp ${{ env.VERSION }}
-  #         tag_name: ${{ env.TAG }}
-  #         files: "artifacts/**"
-  #         draft: true
-  #         prerelease: ${{ env.preRelease }}

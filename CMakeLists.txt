@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.5.0)
+if (WIN32)
+	cmake_minimum_required(VERSION 3.24.0)
+else()
+	cmake_minimum_required(VERSION 3.16.0)
+endif()
 
 message( STATUS "CMake Version: ${CMAKE_VERSION}" )
 
@@ -22,7 +26,6 @@ SET ( DEFAULT_PROTOBUF                    ON  )
 SET ( DEFAULT_BOBLIGHT                    OFF )
 SET ( DEFAULT_WS281XPWM                   OFF )
 SET ( DEFAULT_USE_SYSTEM_FLATBUFFERS_LIBS OFF )
-SET ( DEFAULT_USE_SYSTEM_MBEDTLS_LIBS     OFF )
 SET ( DEFAULT_USE_SYSTEM_MQTT_LIBS        OFF )
 SET ( DEFAULT_MF                          OFF )
 SET ( DEFAULT_DX                          OFF )
@@ -275,6 +278,12 @@ if (DEFAULT_PIPEWIRE OR ENABLE_PIPEWIRE)
 	endif()
 endif()
 
+# Find OpenSSL
+find_package(OpenSSL)
+if (NOT OPENSSL_FOUND)
+	message( WARNING "OpenSSL could not be found. HyperHDR HTTPS instance and Philips Hue support will be disabled." )
+endif()
+
 # CEC library
 find_library (CEC_SUPPORT p8-platform NAMES libp8-platform.so.2 libp8-platform p8-platform )
 if(NOT CEC_SUPPORT AND DEFAULT_CEC)
@@ -421,9 +430,6 @@ colorMe("USE_SYSTEM_MQTT_LIBS = " ${USE_SYSTEM_MQTT_LIBS})
 option(USE_SYSTEM_FLATBUFFERS_LIBS "Use system flatbuffers libs" ${DEFAULT_USE_SYSTEM_FLATBUFFERS_LIBS})
 colorMe("USE_SYSTEM_FLATBUFFERS_LIBS = " ${USE_SYSTEM_FLATBUFFERS_LIBS})
 
-option(USE_SYSTEM_MBEDTLS_LIBS "Use system mbedtls libs" ${DEFAULT_USE_SYSTEM_MBEDTLS_LIBS})
-colorMe("USE_SYSTEM_MBEDTLS_LIBS = " ${USE_SYSTEM_MBEDTLS_LIBS})
-
 if(UNIX AND NOT APPLE)
 	option(USE_STANDARD_INSTALLER_NAME "Use the standardized Linux installer name" OFF)
 	colorMe("USE_STANDARD_INSTALLER_NAME = " ${USE_STANDARD_INSTALLER_NAME})
@@ -485,7 +491,7 @@ else()
 	include(CheckCXXCompilerFlag)
     CHECK_CXX_COMPILER_FLAG("/std:c++20" COMPILER_SUPPORTS_CXX20)
     if (COMPILER_SUPPORTS_CXX20)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
+		set(CMAKE_CXX_STANDARD 20)
 		message(STATUS "Enabling MSVC support for c++20")
     endif()
 endif()
@@ -611,7 +617,22 @@ if (USE_STATIC_QT_PLUGINS)
 			message("Using static QT plugin: " ${file})
 			set(STATIC_QT_PLUGINS_LIBS ${STATIC_QT_PLUGINS_LIBS} ${file})
 		endif()
-	endforeach()	
+	endforeach()
+	if (TARGET Qt${Qt_VERSION}::qmake)
+        get_target_property(QT_QMAKE_EXECUTABLE Qt${Qt_VERSION}::qmake IMPORTED_LOCATION)
+        execute_process(
+            COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_PLUGINS
+            OUTPUT_VARIABLE QT_PLUGINS_DIR
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        file(GLOB opensslPlugins "${QT_PLUGINS_DIR}/tls/*openssl*")
+        foreach(file ${opensslPlugins})
+            if (NOT IS_SYMLINK ${file})
+                message("Using static QT plugin: " ${file})
+                set(STATIC_QT_PLUGINS_LIBS ${STATIC_QT_PLUGINS_LIBS} ${file})
+            endif()
+        endforeach()	
+    endif()
 endif()
 
 # Add the source/lib directories
@@ -636,8 +657,8 @@ add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_D
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/packages.cmake)
 
 # external targets
-if (WIN32 AND TARGET apidoc AND TARGET flatbuffers AND TARGET flatc AND TARGET mbedcrypto AND TARGET qmqtt AND TARGET liblzma)
-	set_target_properties(qmqtt apidoc flatbuffers flatc lib mbedcrypto mbedtls mbedx509 resources uninstall liblzma PROPERTIES FOLDER ExternalLibsTargets)	
+if (WIN32 AND TARGET apidoc AND TARGET flatbuffers AND TARGET flatc AND TARGET qmqtt AND TARGET liblzma)
+	set_target_properties(qmqtt apidoc flatbuffers flatc lib resources uninstall liblzma PROPERTIES FOLDER ExternalLibsTargets)	
 else()
 	set_target_properties(resources uninstall PROPERTIES FOLDER ExternalLibsTargets)
 endif()
