@@ -135,7 +135,7 @@ endif ()
 
 
 if(APPLE)
-	install ( TARGETS ambilightapp DESTINATION "share/.." COMPONENT "AmbilightAPP" )
+	install ( TARGETS ambilightapp DESTINATION "share/.." COMPONENT "AmbilightAPP" )	
 elseif(NOT WIN32)
 	install ( TARGETS ambilightapp DESTINATION "share/ambilightapp/bin" COMPONENT "AmbilightAPP" )
 	install ( DIRECTORY ${CMAKE_SOURCE_DIR}/cmake/debian/service DESTINATION "share/ambilightapp/" COMPONENT "AmbilightAPP" )

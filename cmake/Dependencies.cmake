@@ -34,136 +34,132 @@ macro(DeployApple TARGET)
 		install(CODE "set(SCOPE_Qt_VERSION ${Qt_VERSION})"               COMPONENT "AmbilightAPP")
 		install(CODE "set(SCOPE_CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR})" COMPONENT "AmbilightAPP")
 		install(CODE [[
-			execute_process(
-				COMMAND brew --prefix openssl@3
-				RESULT_VARIABLE BREW_OPENSSL3
-				OUTPUT_VARIABLE BREW_OPENSSL3_PATH
-				OUTPUT_STRIP_TRAILING_WHITESPACE
-			)
-			if (BREW_OPENSSL3 EQUAL 0 AND EXISTS "${BREW_OPENSSL3_PATH}/lib")
-				set(BREW_OPENSSL3_LIB "${BREW_OPENSSL3_PATH}/lib")
-				message("Found OpenSSL@3 at ${BREW_OPENSSL3_LIB}")
-				file(GLOB filesSSL3 "${BREW_OPENSSL3_LIB}/*")
-				if (NOT (SCOPE_Qt_VERSION EQUAL 5))
-					list (APPEND filesSSL ${filesSSL3})
-				else()
-					message("Skipping OpenSSL@3 for Qt5")
+				execute_process(
+					COMMAND brew --prefix openssl@3
+					RESULT_VARIABLE BREW_OPENSSL3
+					OUTPUT_VARIABLE BREW_OPENSSL3_PATH
+					OUTPUT_STRIP_TRAILING_WHITESPACE
+				)
+				if (BREW_OPENSSL3 EQUAL 0 AND EXISTS "${BREW_OPENSSL3_PATH}/lib")
+					set(BREW_OPENSSL3_LIB "${BREW_OPENSSL3_PATH}/lib")
+					message("Found OpenSSL@3 at ${BREW_OPENSSL3_LIB}")
+					file(GLOB filesSSL3 "${BREW_OPENSSL3_LIB}/*")
+					if (NOT (SCOPE_Qt_VERSION EQUAL 5))
+						list (APPEND filesSSL ${filesSSL3})
+					else()
+						message("Skipping OpenSSL@3 for Qt5")
+					endif()
 				endif()
-			endif()
 
-			execute_process(
-				COMMAND brew --prefix openssl@1.1
-				RESULT_VARIABLE BREW_OPENSSL1
-				OUTPUT_VARIABLE BREW_OPENSSL1_PATH
-				OUTPUT_STRIP_TRAILING_WHITESPACE
-			)
-			if (BREW_OPENSSL1 EQUAL 0 AND EXISTS "${BREW_OPENSSL1_PATH}/lib")
-				set(BREW_OPENSSL1_LIB "${BREW_OPENSSL1_PATH}/lib")
-				message("Found OpenSSL@1.1 at ${BREW_OPENSSL1_LIB}")
-				file(GLOB filesSSL1 "${BREW_OPENSSL1_LIB}/*")
-				list (APPEND filesSSL ${filesSSL1})
-			endif()
+				execute_process(
+					COMMAND brew --prefix openssl@1.1
+					RESULT_VARIABLE BREW_OPENSSL1
+					OUTPUT_VARIABLE BREW_OPENSSL1_PATH
+					OUTPUT_STRIP_TRAILING_WHITESPACE
+				)
+				if (BREW_OPENSSL1 EQUAL 0 AND EXISTS "${BREW_OPENSSL1_PATH}/lib")
+					set(BREW_OPENSSL1_LIB "${BREW_OPENSSL1_PATH}/lib")
+					message("Found OpenSSL@1.1 at ${BREW_OPENSSL1_LIB}")
+					file(GLOB filesSSL1 "${BREW_OPENSSL1_LIB}/*")
+					list (APPEND filesSSL ${filesSSL1})
+				endif()
 
-			#OpenSSL
-			if(filesSSL)
-				list( REMOVE_DUPLICATES filesSSL)
-				foreach(openssl_lib ${filesSSL})
-					string(FIND ${openssl_lib} "dylib" _indexSSL)
-					if (${_indexSSL} GREATER -1)
+				#OpenSSL
+				if(filesSSL)
+					list( REMOVE_DUPLICATES filesSSL)
+					foreach(openssl_lib ${filesSSL})
+						string(FIND ${openssl_lib} "dylib" _indexSSL)
+						if (${_indexSSL} GREATER -1)
+							file(INSTALL
+								DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/Frameworks"
+								TYPE SHARED_LIBRARY
+								FILES "${openssl_lib}"
+							)
+						else()
+							file(INSTALL
+								DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
+								TYPE SHARED_LIBRARY
+								FILES "${openssl_lib}"
+							)
+						endif()
+					endforeach()
+				else()
+					message( WARNING "OpenSSL NOT found (https instance will not work)")
+				endif()
+				
+				file(GET_RUNTIME_DEPENDENCIES
+					EXECUTABLES ${MY_DEPENDENCY_PATHS}
+					RESOLVED_DEPENDENCIES_VAR _r_deps
+					UNRESOLVED_DEPENDENCIES_VAR _u_deps
+				)
+				  
+				foreach(_file ${_r_deps})										
+					string(FIND ${_file} "dylib" _index)
+					if (${_index} GREATER -1)
 						file(INSTALL
 							DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/Frameworks"
 							TYPE SHARED_LIBRARY
-							FILES "${openssl_lib}"
+							FILES "${_file}"
 						)
 					else()
 						file(INSTALL
 							DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
 							TYPE SHARED_LIBRARY
-							FILES "${openssl_lib}"
+							FILES "${_file}"
 						)
 					endif()
 				endforeach()
-			else()
-				message( WARNING "OpenSSL NOT found (https instance will not work)")
-			endif()
-			
-			file(GET_RUNTIME_DEPENDENCIES
-				EXECUTABLES ${MY_DEPENDENCY_PATHS}
-				RESOLVED_DEPENDENCIES_VAR _r_deps
-				UNRESOLVED_DEPENDENCIES_VAR _u_deps
-			)
 				
-			foreach(_file ${_r_deps})										
-				string(FIND ${_file} "dylib" _index)
-				if (${_index} GREATER -1)
-					file(INSTALL
-						DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/Frameworks"
-						TYPE SHARED_LIBRARY
-						FILES "${_file}"
-					)
-				else()
+				if (NOT Qt5Core_FOUND AND EXISTS "/usr/local/lib/libbrotlicommon.1.dylib")
 					file(INSTALL
 						DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
 						TYPE SHARED_LIBRARY
-						FILES "${_file}"
-					)
+						FOLLOW_SYMLINK_CHAIN
+						FILES "/usr/local/lib/libbrotlicommon.1.dylib")
+				endif()
+
+				if (EXISTS "/usr/local/lib/libsharpyuv.0.dylib")
+					file(INSTALL
+						DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
+						TYPE SHARED_LIBRARY
+						FOLLOW_SYMLINK_CHAIN
+						FILES "/usr/local/lib/libsharpyuv.0.dylib")
+				endif()					
+				  
+				list(LENGTH _u_deps _u_length)
+				if("${_u_length}" GREATER 0)
+					message(WARNING "Unresolved dependencies detected!")
+				endif()
+				  
+				foreach(PLUGIN "platforms" "sqldrivers" "imageformats")
+				if(EXISTS ${MYQT_PLUGINS_DIR}/${PLUGIN})
+					file(GLOB files "${MYQT_PLUGINS_DIR}/${PLUGIN}/*")
+					foreach(file ${files})							
+							file(GET_RUNTIME_DEPENDENCIES
+							EXECUTABLES ${file}
+							RESOLVED_DEPENDENCIES_VAR PLUGINS
+							UNRESOLVED_DEPENDENCIES_VAR _u_deps				
+							)
+
+						foreach(DEPENDENCY ${PLUGINS})
+								file(INSTALL
+									DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
+									TYPE SHARED_LIBRARY
+									FILES ${DEPENDENCY}
+								)									
+						endforeach()
+							
+						get_filename_component(singleQtLib ${file} NAME)
+						list(APPEND MYQT_PLUGINS "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/plugins/${PLUGIN}/${singleQtLib}")
+						file(INSTALL
+							DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/plugins/${PLUGIN}"
+							TYPE SHARED_LIBRARY
+							FILES ${file}
+						)
+							
+					endforeach()
 				endif()
 			endforeach()
-			
-			if (NOT Qt5Core_FOUND AND EXISTS "/usr/local/lib/libbrotlicommon.1.dylib")
-				file(INSTALL
-					DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
-					TYPE SHARED_LIBRARY
-					FOLLOW_SYMLINK_CHAIN
-					FILES "/usr/local/lib/libbrotlicommon.1.dylib")
-			endif()
-
-			if (EXISTS "/usr/local/lib/libsharpyuv.0.dylib")
-				file(INSTALL
-					DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
-					TYPE SHARED_LIBRARY
-					FOLLOW_SYMLINK_CHAIN
-					FILES "/usr/local/lib/libsharpyuv.0.dylib")
-			endif()					
-				
-			list(LENGTH _u_deps _u_length)
-			if("${_u_length}" GREATER 0)
-				message(WARNING "Unresolved dependencies detected!")
-			endif()
-				
-			foreach(PLUGIN "platforms" "sqldrivers" "imageformats" "tls")
-                if(EXISTS ${MYQT_PLUGINS_DIR}/${PLUGIN})
-                    if(${PLUGIN} STREQUAL "tls")
-                        file(GLOB files "${MYQT_PLUGINS_DIR}/${PLUGIN}/*openssl*")
-                    else()
-                        file(GLOB files "${MYQT_PLUGINS_DIR}/${PLUGIN}/*")
-                    endif()
-                    foreach(file ${files})							
-                            file(GET_RUNTIME_DEPENDENCIES
-                            EXECUTABLES ${file}
-                            RESOLVED_DEPENDENCIES_VAR PLUGINS
-                            UNRESOLVED_DEPENDENCIES_VAR _u_deps				
-                            )
-
-                        foreach(DEPENDENCY ${PLUGINS})
-                                file(INSTALL
-                                    DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib"
-                                    TYPE SHARED_LIBRARY
-                                    FILES ${DEPENDENCY}
-                                )									
-                        endforeach()
-                            
-                        get_filename_component(singleQtLib ${file} NAME)
-                        list(APPEND MYQT_PLUGINS "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/plugins/${PLUGIN}/${singleQtLib}")
-                        file(INSTALL
-                            DESTINATION "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/plugins/${PLUGIN}"
-                            TYPE SHARED_LIBRARY
-                            FILES ${file}
-                        )
-                            
-                    endforeach()
-                endif()
-            endforeach()
 			
 			include(BundleUtilities)							
 			fixup_bundle("${CMAKE_INSTALL_PREFIX}/ambilightapp.app" "${MYQT_PLUGINS}" "${CMAKE_INSTALL_PREFIX}/ambilightapp.app/Contents/lib")
@@ -467,54 +463,50 @@ macro(DeployUnix TARGET)
 		endif()
 
 		# Copy Qt plugins to 'share/ambilightapp/lib'
-        if(QT_PLUGINS_DIR)
-            foreach(PLUGIN "platforms" "sqldrivers" "imageformats" "tls")
-                if(EXISTS ${QT_PLUGINS_DIR}/${PLUGIN})
-                    if(${PLUGIN} STREQUAL "tls")
-                        file(GLOB files "${QT_PLUGINS_DIR}/${PLUGIN}/*openssl*")
-                    else()
-                        file(GLOB files "${QT_PLUGINS_DIR}/${PLUGIN}/*")
-                    endif()
-                    foreach(file ${files})
-                        if (NOT CMAKE_CROSSCOMPILING)
-                            get_prerequisites(${file} PLUGINS 0 1 "" "")
-                        endif()
+		if(QT_PLUGINS_DIR)
+			foreach(PLUGIN "platforms" "sqldrivers" "imageformats")
+				if(EXISTS ${QT_PLUGINS_DIR}/${PLUGIN})
+					file(GLOB files "${QT_PLUGINS_DIR}/${PLUGIN}/*")
+					foreach(file ${files})
+						if (NOT CMAKE_CROSSCOMPILING)
+							get_prerequisites(${file} PLUGINS 0 1 "" "")
+						endif()
 
-                        foreach(DEPENDENCY ${PLUGINS})
-                            get_filename_component(resolved ${DEPENDENCY} NAME_WE)
-                            
-                            foreach(myitem ${SYSTEM_LIBS_SKIP})
-                                    #message(STATUS "Checking ${myitem}")
-                                    string(FIND ${myitem} ${resolved} _index)
-                                    if (${_index} GREATER -1)
-                                        #message(STATUS "${myitem} = ${resolved}")									
-                                        break()									
-                                    endif()
-                            endforeach()
-                                
-                            if (${_index} GREATER -1)
-                                #message(STATUS "QT skipped: ${resolved}")
-                                continue() # Skip system libraries
-                            else()						
-                                #message(STATUS "QT included: ${resolved}")
-                                gp_resolve_item("${file}" "${DEPENDENCY}" "" "" resolved_file)
-                                get_filename_component(resolved_file ${resolved_file} ABSOLUTE)
-                                gp_append_unique(PREREQUISITE_LIBS ${resolved_file})
-                                get_filename_component(file_canonical ${resolved_file} REALPATH)
-                                gp_append_unique(PREREQUISITE_LIBS ${file_canonical})
-                                #message(STATUS "QT added: ${resolved_file}")
-                            endif()
-                        endforeach()
+						foreach(DEPENDENCY ${PLUGINS})
+							get_filename_component(resolved ${DEPENDENCY} NAME_WE)
+							
+							foreach(myitem ${SYSTEM_LIBS_SKIP})
+									#message(STATUS "Checking ${myitem}")
+									string(FIND ${myitem} ${resolved} _index)
+									if (${_index} GREATER -1)
+										#message(STATUS "${myitem} = ${resolved}")									
+										break()									
+									endif()
+							endforeach()
+								
+							if (${_index} GREATER -1)
+								#message(STATUS "QT skipped: ${resolved}")
+								continue() # Skip system libraries
+							else()						
+								#message(STATUS "QT included: ${resolved}")
+								gp_resolve_item("${file}" "${DEPENDENCY}" "" "" resolved_file)
+								get_filename_component(resolved_file ${resolved_file} ABSOLUTE)
+								gp_append_unique(PREREQUISITE_LIBS ${resolved_file})
+								get_filename_component(file_canonical ${resolved_file} REALPATH)
+								gp_append_unique(PREREQUISITE_LIBS ${file_canonical})
+								#message(STATUS "QT added: ${resolved_file}")
+							endif()
+						endforeach()
 
-                        install(
-                            FILES ${file}
-                            DESTINATION "share/ambilightapp/lib/${PLUGIN}"
-                            COMPONENT "AmbilightAPP"
-                        )
-                    endforeach()
-                endif()
-            endforeach()
-        endif(QT_PLUGINS_DIR)
+						install(
+							FILES ${file}
+							DESTINATION "share/ambilightapp/lib/${PLUGIN}"
+							COMPONENT "AmbilightAPP"
+						)
+					endforeach()
+				endif()
+			endforeach()
+		endif(QT_PLUGINS_DIR)
 
 		# Create a qt.conf file in 'share/ambilightapp/bin' to override hard-coded search paths in Qt plugins
 		file(WRITE "${CMAKE_BINARY_DIR}/qt.conf" "[Paths]\nPlugins=../lib/\n")
@@ -681,25 +673,21 @@ macro(DeployWindows TARGET)
 			COMPONENT "AmbilightAPP"
 		)
 
-		INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION bin COMPONENT "AmbilightAPP")
-		
-		install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION bin COMPONENT "AmbilightAPP")
-		install(FILES "${PROJECT_SOURCE_DIR}/3RD_PARTY_LICENSES" DESTINATION bin COMPONENT "AmbilightAPP")
 
 		find_package(OpenSSL QUIET)
-
+		
 		find_file(OPENSSL_SSL
-			NAMES libssl-3-x64.dll libssl-1_1-x64.dll libssl-1_1.dll libssl ssleay32.dll ssl.dll
+			NAMES libssl-1_1-x64.dll libssl-1_1.dll libssl ssleay32.dll ssl.dll
 			PATHS "C:/Program Files/OpenSSL" "C:/Program Files/OpenSSL-Win64" ${_OPENSSL_ROOT_PATHS}
 			PATH_SUFFIXES bin
 		)
 
 		find_file(OPENSSL_CRYPTO
-			NAMES libcrypto-3-x64.dll libcrypto-1_1-x64.dll libcrypto-1_1.dll libcrypto libeay32.dll crypto.dll
+			NAMES libcrypto-1_1-x64.dll libcrypto-1_1.dll libcrypto libeay32.dll crypto.dll
 			PATHS "C:/Program Files/OpenSSL" "C:/Program Files/OpenSSL-Win64" ${_OPENSSL_ROOT_PATHS}
 			PATH_SUFFIXES bin
 		)
-
+		
 		if(OPENSSL_SSL AND OPENSSL_CRYPTO)
 			message( STATUS "OpenSSL found: ${OPENSSL_SSL} ${OPENSSL_CRYPTO}")
 			install(
@@ -708,8 +696,13 @@ macro(DeployWindows TARGET)
 				COMPONENT "AmbilightAPP"
 			)
 		else()
-			message( WARNING "OpenSSL NOT found. AmbilightAPP's https instance and Philips Hue devices will not work.")
+			message( WARNING "OpenSSL NOT found (AmbilightAPP's https instance will not work)")
 		endif()
+
+		INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION bin COMPONENT "AmbilightAPP")
+		
+		install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION bin COMPONENT "AmbilightAPP")
+		install(FILES "${PROJECT_SOURCE_DIR}/3RD_PARTY_LICENSES" DESTINATION bin COMPONENT "AmbilightAPP")
 
 	else()
 		# Run CMake after target was built

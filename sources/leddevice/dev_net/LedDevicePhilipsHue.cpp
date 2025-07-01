@@ -1,4 +1,4 @@
-#include <QSslConfiguration>
+// Local-Ambilight App includes
 #include "LedDevicePhilipsHue.h"
 #include <utils/QStringUtils.h>
 #include <AmbilightappConfig.h>
@@ -406,10 +406,10 @@ bool LedDevicePhilipsHueBridge::checkApiError(const QJsonDocument& response, boo
 	return apiError;
 }
 
-std::list<QString> LedDevicePhilipsHueBridge::getCiphersuites()
+const int* LedDevicePhilipsHueBridge::getCiphersuites() const
 {
-	std::list<QString> ret { "PSK-AES128-GCM-SHA256" };
-	return ret;
+	static const int SSL_CIPHERSUITES[2] = { get_MBEDTLS_TLS_PSK_WITH_AES_128_GCM_SHA256(), 0 };
+	return SSL_CIPHERSUITES;
 }
 
 void LedDevicePhilipsHueBridge::log(const char* msg, const char* type, ...) const
