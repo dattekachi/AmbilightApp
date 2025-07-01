@@ -54,15 +54,6 @@ jobs:
             key: macOS-ccache-${{ matrix.NICE_NAME }}-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
             restore-keys: macOS-ccache-${{ matrix.NICE_NAME }}
 
-      # Cleanup Qt6 for macOS 13 to ensure Qt5 is used
-      - name: Cleanup Qt6 for macOS 13
-        if: ( matrix.QT_VERSION == 5 )
-        shell: bash
-        run: |
-            brew uninstall --ignore-dependencies qt@6 qt6 || true
-            brew unlink qt@6 || true
-            brew link --force qt@5 || true
-
       # Install deps
       - name: Install deps
         shell: bash
@@ -94,15 +85,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: release-artifact-${{ matrix.JOB_RUNNER }}      
-            path: build/Ambilight*.dmg
+            path: build/Ambilight*.zip
 
       # Upload artifacts from commit
       - name: Upload artifacts from commit
         if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-            name: Apple_macOS_${{ matrix.NICE_NAME }}_DMG_installer
-            path: build/Ambilight*.dmg
+            name: Apple_macOS_${{ matrix.NICE_NAME }}_ZIP_package
+            path: build/Ambilight*.zip
 
 ######################
 ###### Windows #######
@@ -147,93 +138,11 @@ jobs:
         run: |
           ./.ci/ci_build.sh
 
-      # Upload artifacts (only on tagged commit)
+      # Upload artifacts
       - name: Upload artifacts
-        # if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
         if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: Windows_Artifact_x64
           path: build/Ambilight*.zip
           
-      # Upload artifacts from commit
-      # - name: Upload artifacts from commit
-      #   if: (startsWith(github.event.ref, 'refs/tags') != true) && github.event_name != 'pull_request'
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: Windows_x64_setup
-      #     path: build/Ambilight*.exe
-
-################################
-####### CodeQL support #########
-################################
-
-  # analyze:
-  #   name: Analyze (CodeQL)
-  #   runs-on: ubuntu-latest
-  #   if: ( true )
-  #   permissions:
-  #     actions: read
-  #     contents: read
-  #     security-events: write
-
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       language: [ 'cpp', 'javascript' ]
-
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-  #       with:
-  #         submodules: true
-
-  #     - name: Run composite CodeQL job for '${{matrix.language}}' language
-  #       uses: ./.github/actions/codeql
-  #       with:
-  #         language: ${{matrix.language}}
-
-################################
-###### Publish Releases ########
-################################
-
-  # publish:
-  #   name: Publish Releases
-  #   if: startsWith(github.event.ref, 'refs/tags') && github.event_name != 'pull_request'
-  #   needs: [windows, macOS]
-  #   runs-on: ubuntu-22.04
-  #   permissions:
-  #     contents: write
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-
-  #     # generate environment variables
-  #     - name: Generate environment variables from version and tag
-  #       run: |
-  #         echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
-  #         echo "VERSION=$(tr -d '\n' < version)" >> $GITHUB_ENV
-  #         echo "preRelease=false" >> $GITHUB_ENV
-
-  #     # If version contains alpha or beta, mark draft release as pre-release
-  #     - name: Mark release as pre-release
-  #       if: contains(env.VERSION, 'alpha') || contains(env.VERSION, 'beta')
-  #       run: echo "preRelease=true" >> $GITHUB_ENV
-
-  #     # Download artifacts from previous build process
-  #     - name: Download artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         path: artifacts
-  #         pattern: release-artifact-*
-  #         merge-multiple: true          
-
-  #     # create draft release and upload artifacts
-  #     - name: Create draft release
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         name: AmbilightApp ${{ env.VERSION }}
-  #         tag_name: ${{ env.TAG }}
-  #         files: "artifacts/**"
-  #         draft: true
-  #         prerelease: ${{ env.preRelease }}
